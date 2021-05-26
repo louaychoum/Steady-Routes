@@ -26,10 +26,13 @@ import 'package:steadyroutes/services/web_auth_service.dart';
 
 void main() {
   Logger.root.level = Level.ALL; // defaults to Level.INFO
-  Logger.root.onRecord.listen((record) {
-    print(
-        '[${record.level.name}]: ${record.loggerName} --- ${record.time} --- ${record.message}');
-  }, onError: (e) => print(e);
+  Logger.root.onRecord.listen(
+    (record) {
+      print(
+          '[${record.level.name}]: ${record.loggerName} --- ${record.time} --- ${record.message}');
+    },
+    onError: (e) => print(e),
+  );
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
