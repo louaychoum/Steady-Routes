@@ -1,0 +1,19 @@
+{
+  "login": {
+      "request" : {
+        "header":{},
+        "body" : {
+          "username" : "abd",
+          "password": "test1234",
+          "access": "admin"
+        }
+      },
+      "response" : {
+          "body" : {
+              "authToken" : "1233lkjsdlfkjdlskfmdslfjkpoewripworip[qoirpqworipewoirpweokrpweoirwpeirklcxmfldkjop",
+              "role":"admin"
+            }
+        }
+  }
+    
+  }

@@ -1,0 +1,20 @@
+{
+"getDrivers": {
+  "in" : {
+  "header" : {
+    "authToken" : "1233lkjsdlfkjdlskfmdslfjkpoewripworip[qoirpqworipewoirpweokrpweoirwpeirklcxmfldkjop"
+  }
+  },
+  "out" : {
+  "body" : {
+    "drivers" : [
+      { "id" : 1, "name" : "Abd", "username": "abd", "plateNumber": "AA11B", "drivingLicense": 1133445, "drivingLicenseExDate": "23/12/2021", "company": "Comapany1", "passportNumber": "BBVV1177Y", "passportExDate": "14/07/2024", "visaNumber": 4444333322221111, "visaExDate": "12/2022"},
+      { "id" : 2, "name" : "Louay", "username": "louay", "plateNumber": "CC44N", "drivingLicense": 1122445, "drivingLicenseExDate": "22/12/2021", "company": "Comapany2", "passportNumber": "CCAV1177Y", "passportExDate": "18/07/2024", "visaNumber": 4001590000000001, "visaExDate": "08/2025"},
+      { "id" : 3, "name" : "Wissam", "username": "samer", "plateNumber": "HH66U", "drivingLicense": 7722445, "drivingLicenseExDate": "21/12/2021", "company": "Comapany3", "passportNumber": "AAVV1177Y", "passportExDate": "25/07/2024", "visaNumber": 4199350000000002, "visaExDate": "02/2030"},
+      { "id" : 4, "name" : "Wissam", "username": "samer", "plateNumber": "HH66U", "drivingLicense": 7722445, "drivingLicenseExDate": "21/12/2021", "company": "Comapany3", "passportNumber": "AAVV1177Y", "passportExDate": "25/07/2024", "visaNumber": 4199350000000002, "visaExDate": "02/2030"}
+    ]
+  }
+  }
+}
+  
+}

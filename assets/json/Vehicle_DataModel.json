@@ -1,0 +1,19 @@
+{
+"getVehicles": {
+  "in" : {
+  "header" : {
+    "authToken" : "1233lkjsdlfkjdlskfmdslfjkpoewripworip[qoirpqworipewoirpweokrpweoirwpeirklcxmfldkjop"
+  }
+  },
+  "out" : {
+  "body" : {
+    "vehicles" : [
+      { "id" : 1, "name" : "Tesla", "plateNumber": "AA11B", "registrationExDate": "14/07/2024", "rtaNumber": 8009090, "rtaExDate": "23/12/2021"},
+      { "id" : 2, "name" : "BMW", "plateNumber": "AX01B", "registrationExDate": "20/11/2034", "rtaNumber": 8009123, "rtaExDate": "21/12/2021"},
+      { "id" : 3, "name" : "Toyota", "plateNumber": "HG44K", "registrationExDate": "29/04/2029", "rtaNumber": 8009333, "rtaExDate": "09/09/2029"}
+    ]
+  }
+  }
+}
+  
+}
