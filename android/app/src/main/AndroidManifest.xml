@@ -6,7 +6,7 @@
         </intent>
     </queries>
        <application
-       android:requestLegacyExternalStorage="true"
+       android:usesCleartextTraffic="true"        android:requestLegacyExternalStorage="true"
         android:label="steadyroutes"
         android:icon="@mipmap/ic_launcher">
         <activity

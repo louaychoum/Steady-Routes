@@ -53,6 +53,7 @@ class _LoginState extends State<Login> {
 
   Future<void> validateAndSubmit({bool autoLogin}) async {
     if (!validateAndSave()) {
+      // showInSnackBar('Please fix the errors in red before submitting.');
       return;
     }
     final AuthService auth = Provider.of<AuthService>(context, listen: false);
@@ -61,7 +62,10 @@ class _LoginState extends State<Login> {
       _isLoading = true;
     });
     if (!await auth.signIn(
-        username: _username, password: _password, autoLogin: autoLogin)) {
+      username: _username,
+      password: _password,
+      autoLogin: autoLogin,
+    )) {
       setState(() {
         _isLoading = false;
         _errorMessage = 'Invalid email or password.';

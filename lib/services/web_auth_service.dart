@@ -1,14 +1,16 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:http/http.dart' as http;
 
 import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/models/user.dart';
-import 'package:steadyroutes/screens/root.dart';
+import 'package:steadyroutes/root.dart';
 import 'package:steadyroutes/services/auth_service.dart';
 import 'package:steadyroutes/services/navigator_sevice.dart';
 
@@ -16,6 +18,7 @@ class WebAuthService with ChangeNotifier implements AuthService {
   static final _log = Logger('WebAuthService');
   static final WebAuthService _instance = WebAuthService._internal();
   static const userPrefKey = "USER_PREF_KEY";
+  final Uri _baseUrl = Uri.parse("http://10.0.2.2:9001/");
   User _user;
   AuthStatus _status;
 
@@ -29,46 +32,60 @@ class WebAuthService with ChangeNotifier implements AuthService {
     // setStatus(AuthStatus.adminLoggedIn);
     _status = AuthStatus.notDetermined;
     // check storage and try to login
-    SharedPreferences.getInstance().then((pref) {
-      final String userPref = pref.getString(userPrefKey);
-      if (userPref != null) {
-        _user = User.fromJson(json.decode(userPref) as Map<String, dynamic>);
-        if (_user.access == 'admin') {
-          setStatus(AuthStatus.adminLoggedIn);
-        } else {
-          setStatus(AuthStatus.driverLoggedIn);
+    getUserInPref().whenComplete(
+      () {
+        if (_user != null) {
+          if (_user.access == 'admin') {
+            setStatus(AuthStatus.adminLoggedIn);
+          } else {
+            setStatus(AuthStatus.driverLoggedIn);
+          }
         }
-      } else {
-        setStatus(AuthStatus.notLoggedIn);
-      }
-    });
+      },
+    );
   }
 
   void setStatus(AuthStatus status) {
-    _log.info('SetStatus Called');
+    _log.info(
+        'SetStatus Called, new staus is ${status.toString().split('.').last}');
     _status = status;
     notifyListeners();
   }
 
   @override
-  Future<bool> signIn(
-      {String username, String password, bool autoLogin}) async {
+  Future<bool> signIn({
+    String username,
+    String password,
+    bool autoLogin,
+  }) async {
     _log.info('Sign In Called');
     try {
-      final url = '${apiBase}login.json';
-      final response = await rootBundle.loadString(url);
-      // var response = await http
-      //     .post(url,
-      //         headers: {"Content-Type": "application/json"},
-      //         body: json.encode({'email': email, 'password': password}))
-      //     .timeout(const Duration(seconds: 10));
+      // final url = '${apiBase}login.json';
+      // final response = await rootBundle.loadString(url);
+      final uri = Uri.parse('${_baseUrl}user/login');
+      final request = await http
+          .post(
+            uri,
+            headers: {"Content-Type": "application/json"},
+            body: json.encode(
+              {
+                'username': username,
+                'password': password,
+              },
+            ),
+          )
+          .timeout(const Duration(seconds: 10));
+      // print(json.decode(request.body)["userId"] );
 
-      // if (response.statusCode != 200) {
-      //   return false;
-      // }
-      _user = User.fromJson(
-          json.decode(response)['login']['in']['body'] as Map<String, dynamic>);
+      if (request.statusCode != 200) {
+        return false;
+      }
+      //  final resuri =Uri.parse('json.decode(request.body)["userId"]'),
+      final id = json.decode(request.body)["userId"];
+      final response = await http.get(Uri.parse('${_baseUrl}user/$id'));
+      _user = User.fromJson(json.decode(response.body) as Map<String, dynamic>);
       if (autoLogin) {
+        _log.info('Auto Login is true');
         saveUserInPref();
       }
       if (_user.access == 'admin') {
@@ -77,16 +94,75 @@ class WebAuthService with ChangeNotifier implements AuthService {
         setStatus(AuthStatus.driverLoggedIn);
       }
       return true;
+    } on TimeoutException catch (error) {
+      _log.warning(error);
+      return false;
+    } on SocketException catch (error) {
+      _log.warning(error);
+      return false;
     } catch (error) {
-      debugPrint(error.toString());
+      _log.warning(error);
       return false;
     }
-    // on TimeoutException catch (_) {
-    //   return false;
-    // } on SocketException catch (_) {
-    //   return false;
-    // }
   }
+
+  // Future authenticateUser(String username, String password) async {
+  //   // final ApiResponse _apiResponse = ApiResponse();
+  //   try {
+  //     final response =
+  //         await http.post(Uri.parse('$_baseUrl user/login'), body: {
+  //       'username': username,
+  //       'password': password,
+  //     });
+
+  //     switch (response.statusCode) {
+  //       case 200:
+  //         _apiResponse.Data =
+  //             User.fromJson(json.decode(response.body) as Map<String, dynamic>);
+  //         break;
+  //       case 401:
+  //         _apiResponse.ApiError = ApiError.fromJson(
+  //             json.decode(response.body) as Map<String, dynamic>);
+  //         break;
+  //       default:
+  //         _apiResponse.ApiError = ApiError.fromJson(
+  //             json.decode(response.body) as Map<String, dynamic>);
+  //         break;
+  //     }
+  //   } on SocketException {
+  //     _apiResponse.ApiError = ApiError(error: "Server error. Please retry");
+  //   }
+  //   return _apiResponse;
+  // }
+
+  // Future getUserDetails(String userId) async {
+  //   // final ApiResponse _apiResponse = ApiResponse();
+  //   try {
+  //     final response = await http.get(
+  //       Uri.parse('$_baseUrl user/$userId'),
+  //     );
+
+  //     switch (response.statusCode) {
+  //       case 200:
+  //         _apiResponse.Data =
+  //             User.fromJson(json.decode(response.body) as Map<String, dynamic>);
+  //         break;
+  //       case 401:
+  //         print((_apiResponse.ApiError as ApiError).error);
+  //         _apiResponse.ApiError = ApiError.fromJson(
+  //             json.decode(response.body) as Map<String, dynamic>);
+  //         break;
+  //       default:
+  //         print((_apiResponse.ApiError as ApiError).error);
+  //         _apiResponse.ApiError = ApiError.fromJson(
+  //             json.decode(response.body) as Map<String, dynamic>);
+  //         break;
+  //     }
+  //   } on SocketException {
+  //     _apiResponse.ApiError = ApiError(error: "Server error. Please retry");
+  //   }
+  //   return _apiResponse;
+  // }
 
   // Future<bool> processApiError(dynamic response) async {
   //   if (response.statusCode < 400 || response.statusCode > 499) {
@@ -141,9 +217,26 @@ class WebAuthService with ChangeNotifier implements AuthService {
   }
 
   void saveUserInPref() {
+    _log.info('saving to prefs');
     SharedPreferences.getInstance().then((pref) {
       pref.setString(userPrefKey, json.encode(_user));
     });
+  }
+
+  Future<void> getUserInPref() async {
+    _log.info("Getting user's prefrences");
+    final pref = await SharedPreferences.getInstance();
+    final userPref = pref.getString(userPrefKey);
+    if (userPref != null) {
+      _user = User.fromJson(json.decode(userPref) as Map<String, dynamic>);
+      await signIn(
+        username: _user.username,
+        password: _user.password,
+        autoLogin: true,
+      );
+    } else {
+      setStatus(AuthStatus.notLoggedIn);
+    }
   }
 
   @override

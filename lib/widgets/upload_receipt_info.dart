@@ -129,11 +129,11 @@ class UploadedReceiptInfo extends StatelessWidget {
                                 ),
                               );
 
-                              final String jwt = Provider.of<AuthService>(
-                                      context,
-                                      listen: false)
-                                  .user
-                                  .jwt;
+                              // final String jwt = Provider.of<AuthService>(
+                              //         context,
+                              //         listen: false)
+                              //     .user.token
+                              //     ;
                               final SteadyApiService api =
                                   Provider.of<SteadyApiService>(context,
                                       listen: false);

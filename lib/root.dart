@@ -6,6 +6,8 @@ import 'package:steadyroutes/screens/auth_screen.dart';
 import 'package:steadyroutes/screens/driverDashBoardScreen/driver_dashboard_screen.dart';
 import 'package:steadyroutes/services/auth_service.dart';
 
+import 'screens/driverDashBoardScreen/driver_dashboard_screen.dart';
+
 class Root extends StatefulWidget {
   static const routeName = '/';
   const Root();
@@ -32,13 +34,13 @@ class _RootState extends State<Root> {
           return buildWaitingScreen();
           break;
         case AuthStatus.notLoggedIn:
-          return AdminDashboard();
+          return AuthScreen();
           break;
         case AuthStatus.adminLoggedIn:
           return AdminDashboard(); //!
           break;
         case AuthStatus.driverLoggedIn:
-          return AdminDashboard();
+          return DriverDashboardScreen();
           break;
         default:
           return buildWaitingScreen();

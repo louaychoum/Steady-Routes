@@ -18,12 +18,13 @@ import 'package:steadyroutes/screens/driverDashBoardScreen/check_in_screen.dart'
 import 'package:steadyroutes/screens/driverDashBoardScreen/check_out_screen.dart';
 import 'package:steadyroutes/screens/driverDashBoardScreen/driver_dashboard_screen.dart';
 import 'package:steadyroutes/screens/driverDashBoardScreen/upload_receipt_screen.dart';
-import 'package:steadyroutes/screens/root.dart';
+import 'package:steadyroutes/root.dart';
 import 'package:steadyroutes/services/auth_service.dart';
 import 'package:steadyroutes/services/navigator_sevice.dart';
 import 'package:steadyroutes/services/steady_api_service.dart';
 import 'package:steadyroutes/services/web_auth_service.dart';
 
+//!android:usesCleartextTraffic="true"  Remove in android manifest
 void main() {
   Logger.root.level = Level.ALL; // defaults to Level.INFO
   Logger.root.onRecord.listen(

@@ -4,26 +4,36 @@ enum Access {
 }
 
 class User {
-  String username;
-  String password;
-  String access;
-  String jwt;
+  final String userId;
+  final String username;
+  final String password;
+  final String access;
 
-  User();
+  const User({
+    this.userId,
+    this.username,
+    this.password,
+    this.access,
+  });
 // User.fromJson(Map<String, String> json)
-  User.fromJson(Map<String, dynamic> json)
-      : username = json['username'].toString() ?? "",
-        password = json['password'].toString() ?? "",
-        jwt = json['jwt'].toString() ?? "",
-        access = json['access'].toString() ?? "";
+  factory User.fromJson(Map<String, dynamic> json) {
+    if (json == null) return null;
+
+    return User(
+      userId: json['userId'].toString() ?? '',
+      username: json['username'].toString() ?? '',
+      password: json['password'].toString() ?? '',
+      access: json['access'].toString() ?? '',
+    );
+  }
+
   // Access.values.firstWhere(
   //     (s) => s.toString() == 'Access.${json['access']}',
   //     orElse: () => null);
-
   Map<String, dynamic> toJson() => {
         'username': username,
         'password': password,
-        'jwt': jwt,
         'access': access,
+        'userId': userId,
       };
 }

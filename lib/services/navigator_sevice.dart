@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:steadyroutes/screens/root.dart';
+import 'package:steadyroutes/root.dart';
 
 mixin NavigationService {
   static final GlobalKey<NavigatorState> navigatorKey =
