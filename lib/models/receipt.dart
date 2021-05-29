@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/foundation.dart';
 
 enum Status {
@@ -7,17 +8,17 @@ enum Status {
 }
 
 class Receipt with ChangeNotifier {
-  final int /*!*/ id;
-  final String /*!*/ date;
-  final String /*!*/ url;
-  final double /*!*/ cashAmount;
-  Status status;
+  final int id;
+  final String date;
+  final String url;
+  final double cashAmount;
+  Status? status;
 
   Receipt({
-    @required this.id,
-    @required this.date,
-    @required this.url,
-    @required this.cashAmount,
+    required this.id,
+    required this.date,
+    required this.url,
+    required this.cashAmount,
     this.status = Status.pending,
   });
 
@@ -26,9 +27,8 @@ class Receipt with ChangeNotifier {
         date = json['date'].toString(),
         url = json['url'].toString(),
         cashAmount = double.parse(json['cashAmount'].toString()),
-        status = Status.values.firstWhere(
-            (s) => s.toString() == 'Status.${json['status']}',
-            orElse: () => null);
+        status = Status.values.firstWhereOrNull(
+            (s) => s.toString() == 'Status.${json['status']}');
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
@@ -41,11 +41,11 @@ class Receipt with ChangeNotifier {
   }
 
   Receipt copyWith({
-    int id,
-    String date,
-    String url,
-    double cashAmount,
-    Status status,
+    int? id,
+    String? date,
+    String? url,
+    double? cashAmount,
+    Status? status,
   }) {
     return Receipt(
       id: id ?? this.id,

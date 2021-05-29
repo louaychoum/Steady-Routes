@@ -16,13 +16,13 @@ class ReceiptListView extends StatefulWidget {
 
 class _ReceiptListViewState extends State<ReceiptListView> {
   final _refreshKey = GlobalKey<RefreshIndicatorState>();
-  String jwt;
+  late String jwt;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => _refreshKey.currentState.show());
+    WidgetsBinding.instance!
+        .addPostFrameCallback((_) => _refreshKey.currentState!.show());
   }
 
   // var _isInit = true;

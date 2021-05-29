@@ -12,9 +12,8 @@ class CheckOutForm extends StatefulWidget {
 }
 
 class _CheckOutFormState extends State<CheckOutForm> {
-  DateTime now;
-  String selectedValue;
-  String error;
+  late DateTime now;
+  late String selectedValue;
   final _controller = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
@@ -71,7 +70,7 @@ class _CheckOutFormState extends State<CheckOutForm> {
             ),
             MallDropdown(
               (newVal) {
-                selectedValue = newVal;
+                selectedValue = newVal!;
               },
             ),
             const Spacer(),
@@ -95,7 +94,7 @@ class _CheckOutFormState extends State<CheckOutForm> {
             ElevatedButton(
               onPressed: () async {
                 if (_formKey.currentState != null) {
-                  if (_formKey.currentState.validate()) {
+                  if (_formKey.currentState!.validate()) {
                     now = DateTime.now();
                     final String convertedDateTime =
                         "${now.year.toString()}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString()}-${now.minute.toString()}";

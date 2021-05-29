@@ -5,7 +5,7 @@ import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/models/receipt.dart';
 
 class ReceiptCashAmount extends StatefulWidget {
-  final Receipt _receipt;
+  final Receipt? _receipt;
   const ReceiptCashAmount(this._receipt);
   @override
   _ReceiptCashAmountState createState() => _ReceiptCashAmountState();
@@ -14,12 +14,12 @@ class ReceiptCashAmount extends StatefulWidget {
 class _ReceiptCashAmountState extends State<ReceiptCashAmount> {
   final _controller = TextEditingController();
   var _isInit = true;
-  int receiptId;
+  late int receiptId;
 
   var _editedReceipts = Receipt(
-    cashAmount: null,
+    cashAmount: 0,
     date: '',
-    id: null,
+    id: 0,
     status: null,
     url: '',
   );
@@ -36,17 +36,16 @@ class _ReceiptCashAmountState extends State<ReceiptCashAmount> {
   void didChangeDependencies() {
     if (_isInit) {
       widget._receipt != null
-          ? receiptId = widget._receipt.id
-          : receiptId = null;
-      if (receiptId != null) {
-        _editedReceipts = widget._receipt;
+          ? receiptId = widget._receipt!.id
+          : receiptId = 0;
+      if (receiptId != 0) {
+        _editedReceipts = widget._receipt!;
         // _initValues = {
         //   'date': _editedReceipts.date,
         //   'id': _editedReceipts.id.toString(),
         //   'status': _editedReceipts.status.toString(),
         //   'url': _editedReceipts.url,
         // };
-        print(_editedReceipts.cashAmount);
         _controller.text = _editedReceipts.cashAmount.toStringAsFixed(2);
       }
     }

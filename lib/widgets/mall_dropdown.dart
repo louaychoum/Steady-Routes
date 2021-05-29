@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:steadyroutes/helpers/constants.dart';
 
 class MallDropdown extends StatelessWidget {
-  final ValueChanged<String> onChange;
+  final ValueChanged<String?> onChange;
 
   const MallDropdown(this.onChange);
   @override

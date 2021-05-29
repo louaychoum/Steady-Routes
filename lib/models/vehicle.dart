@@ -1,20 +1,20 @@
 import 'package:flutter/foundation.dart';
 
 class Vehicle {
-  final int /*!*/ id;
-  final String /*!*/ name;
-  final String /*!*/ plateNumber;
-  final String /*!*/ registrationExDate;
-  final int /*!*/ rtaNumber;
-  final String /*!*/ rtaExDate;
+  final int id;
+  final String name;
+  final String plateNumber;
+  final String registrationExDate;
+  final int rtaNumber;
+  final String rtaExDate;
 
   Vehicle({
-    @required this.id,
-    @required this.name,
-    @required this.plateNumber,
-    @required this.registrationExDate,
-    @required this.rtaNumber,
-    @required this.rtaExDate,
+    required this.id,
+    required this.name,
+    required this.plateNumber,
+    required this.registrationExDate,
+    required this.rtaNumber,
+    required this.rtaExDate,
   });
 
   Vehicle.fromJson(dynamic json)
@@ -37,12 +37,12 @@ class Vehicle {
   }
 
   Vehicle copyWith({
-    int id,
-    String name,
-    String plateNumber,
-    String registrationExDate,
-    int rtaNumber,
-    String rtaExDate,
+    int? id,
+    String? name,
+    String? plateNumber,
+    String? registrationExDate,
+    int? rtaNumber,
+    String? rtaExDate,
   }) {
     return Vehicle(
       id: id ?? this.id,

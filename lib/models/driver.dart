@@ -1,30 +1,30 @@
 import 'package:flutter/foundation.dart';
 
 class Driver {
-  final int /*!*/ id;
-  final String /*!*/ name;
-  final String /*!*/ username;
-  final String /*!*/ plateNumber;
-  final int /*!*/ drivingLicense;
-  final String /*!*/ drivingLicenseExDate; //*may require change
-  final String /*!*/ company;
-  final String /*!*/ passportNumber;
-  final String /*!*/ passportExDate; //*may require change
-  final int /*!*/ visaNumber; //*may require change
-  final String /*!*/ visaExDate; //*may require change
+  final int id;
+  final String name;
+  final String username;
+  final String plateNumber;
+  final int drivingLicense;
+  final String drivingLicenseExDate; //*may require change
+  final String company;
+  final String passportNumber;
+  final String passportExDate; //*may require change
+  final int visaNumber; //*may require change
+  final String visaExDate; //*may require change
 
   Driver({
-    @required this.id,
-    @required this.name,
-    @required this.username,
-    @required this.plateNumber,
-    @required this.drivingLicense,
-    @required this.drivingLicenseExDate,
-    @required this.company,
-    @required this.passportNumber,
-    @required this.passportExDate,
-    @required this.visaNumber,
-    @required this.visaExDate,
+    required this.id,
+    required this.name,
+    required this.username,
+    required this.plateNumber,
+    required this.drivingLicense,
+    required this.drivingLicenseExDate,
+    required this.company,
+    required this.passportNumber,
+    required this.passportExDate,
+    required this.visaNumber,
+    required this.visaExDate,
   });
 // Driver.fromJson(Map<String, dynamic> json)
   Driver.fromJson(dynamic json)
@@ -57,17 +57,17 @@ class Driver {
   }
 
   Driver copyWith({
-    int id,
-    String name,
-    String username,
-    String plateNumber,
-    int drivingLicense,
-    String drivingLicenseExDate, //*may require change
-    String company,
-    String passportNumber,
-    String passportExDate, //*may require change
-    int visaNumber, //*may require change
-    String visaExDate, //*may require change
+    int? id,
+    String? name,
+    String? username,
+    String? plateNumber,
+    int? drivingLicense,
+    String? drivingLicenseExDate, //*may require change
+    String? company,
+    String? passportNumber,
+    String? passportExDate, //*may require change
+    int? visaNumber, //*may require change
+    String? visaExDate, //*may require change
   }) {
     return Driver(
       id: id ?? this.id,

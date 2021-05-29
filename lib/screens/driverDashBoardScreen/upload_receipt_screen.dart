@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import 'package:steadyroutes/widgets/upload_image.dart';
 import 'package:steadyroutes/widgets/upload_receipt_info.dart';
@@ -14,14 +13,8 @@ class UploadReceiptScreen extends StatefulWidget {
 }
 
 class _UploadReceiptScreenState extends State<UploadReceiptScreen> {
-  File _images;
+  File? _images;
   final _controller = TextEditingController();
-// (
-//     rightSymbol: ' AED',
-//     decimalSeparator: '.',
-//     thousandSeparator: ',',
-//   );
-  
 
   @override
   void dispose() {
@@ -55,7 +48,7 @@ class _UploadReceiptScreenState extends State<UploadReceiptScreen> {
                               'assets/images/receipt-placeholder.png',
                             )
                           : Image.file(
-                              _images,
+                              _images!,
                             ),
                     ),
                   ),
@@ -98,7 +91,7 @@ class _UploadReceiptScreenState extends State<UploadReceiptScreen> {
           Flexible(
             flex: 2,
             child: UploadedReceiptInfo(
-              images: _images,
+              images: _images!,
               controller: _controller,
             ),
             // UploadReceiptInfo(formKey: _formKey, images: _images),

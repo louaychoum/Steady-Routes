@@ -12,12 +12,13 @@ import 'package:steadyroutes/services/navigator_sevice.dart';
 import 'package:steadyroutes/services/steady_api_service.dart';
 
 class UploadedReceiptInfo extends StatelessWidget {
-  UploadedReceiptInfo(
-      {@required File images, @required TextEditingController controller})
-      : _images = images,
+  UploadedReceiptInfo({
+    required File images,
+    required TextEditingController controller,
+  })  : _images = images,
         _controller = controller;
 
-  final File _images;
+  final File? _images;
   final TextEditingController _controller;
 
   final _formKey = GlobalKey<FormState>();
@@ -32,11 +33,11 @@ class UploadedReceiptInfo extends StatelessWidget {
     );
     final splitted = filePath.substring(0, lastIndex);
     final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
-    final result = await FlutterImageCompress.compressAndGetFile(
+    final result = await (FlutterImageCompress.compressAndGetFile(
       file.absolute.path,
       outPath,
       quality: kCompressedImageQuality, //ca
-    );
+    ) as Future<File>);
     debugPrint((file.lengthSync() / 1024).toString());
     debugPrint((result.lengthSync() / 1024).toString());
     return result;
@@ -44,7 +45,7 @@ class UploadedReceiptInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    File compressedImage;
+    late File compressedImage;
     return Consumer<SteadyApiService>(
       builder: (context, api, child) {
         api.vehiclesService.fetchVehicles('');
@@ -115,48 +116,47 @@ class UploadedReceiptInfo extends StatelessWidget {
                         // Validate returns true if the form is valid, or false otherwise.
                         // if (_formKey.currentState!.validate()) {
                         if (_formKey.currentState != null) {
-                          if (_formKey.currentState.validate()) {
+                          if (_formKey.currentState!.validate()) {
                             debugPrint(_images.toString());
                             compressedImage = await compressFile(
-                              _images,
+                              _images!,
                             );
-                            if (compressedImage != null) {
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                backgroundColor: kDefaultScaffoldColor,
+                                behavior: SnackBarBehavior.floating,
+                                content: Text('Uploading receipt...'),
+                              ),
+                            );
+
+                            // final String jwt = Provider.of<AuthService>(
+                            //         context,
+                            //         listen: false)
+                            //     .user.token
+                            //     ;
+                            final SteadyApiService api =
+                                Provider.of<SteadyApiService>(context,
+                                    listen: false);
+                            final bool uploadRes = await Future.delayed(
+                              const Duration(
+                                seconds: 3,
+                              ),
+                            ).then(
+                              (value) => true,
+                            );
+                            // await api.receiptsService
+                            //     .upload('jwt', File(compressedImage.path));
+
+                            if (uploadRes) {
+                              NavigationService.popUntilRoot();
+                            } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  backgroundColor: kDefaultScaffoldColor,
-                                  behavior: SnackBarBehavior.floating,
-                                  content: Text('Uploading receipt...'),
+                                  backgroundColor: kErrorScaffoldColor,
+                                  content: Text('Upload failed.'),
                                 ),
                               );
-
-                              // final String jwt = Provider.of<AuthService>(
-                              //         context,
-                              //         listen: false)
-                              //     .user.token
-                              //     ;
-                              final SteadyApiService api =
-                                  Provider.of<SteadyApiService>(context,
-                                      listen: false);
-                              final bool uploadRes = await Future.delayed(
-                                const Duration(
-                                  seconds: 3,
-                                ),
-                              ).then(
-                                (value) => true,
-                              );
-                              // await api.receiptsService
-                              //     .upload('jwt', File(compressedImage.path));
-
-                              if (uploadRes) {
-                                NavigationService.popUntilRoot();
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    backgroundColor: kErrorScaffoldColor,
-                                    content: Text('Upload failed.'),
-                                  ),
-                                );
-                              }
                             }
 
                             //                 If the form is valid, display a snackbar. In the real world,
@@ -173,10 +173,8 @@ class UploadedReceiptInfo extends StatelessWidget {
                       },
                       child: const Text('Upload'),
                     ),
-                  Container(
-                    child: compressedImage == null
-                        ? null
-                        : Image.file(compressedImage),
+                  SizedBox(
+                    child: Image.file(compressedImage),
                   ),
                 ],
               ),

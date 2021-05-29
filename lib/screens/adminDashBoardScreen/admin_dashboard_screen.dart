@@ -10,7 +10,7 @@ import 'package:steadyroutes/widgets/dashboard_button.dart';
 
 class AdminDashboard extends StatelessWidget {
   static const routeName = '/admin';
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
