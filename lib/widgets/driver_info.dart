@@ -23,24 +23,24 @@ class _DriverInfoState extends State<DriverInfo> {
   DateTime selectedDate = DateTime.now();
 
   Driver _editedDriver = Driver(
-    id: null,
+    id: 0,
     name: '',
     company: '',
-    drivingLicense: null,
+    drivingLicense: 0,
     drivingLicenseExDate: '',
     passportExDate: '',
-    passportNumber: null,
+    passportNumber: '',
     plateNumber: '',
     username: '',
     visaExDate: '',
-    visaNumber: null,
+    visaNumber: 0,
   );
 
   Future<void> _selectDate(
     BuildContext context,
     TextEditingController controller,
   ) async {
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: selectedDate,
         firstDate: DateTime(2015, 8),
@@ -140,7 +140,7 @@ class _DriverInfoState extends State<DriverInfo> {
               keyboardType: TextInputType.number,
               onSaved: (newValue) {
                 _editedDriver = _editedDriver.copyWith(
-                  drivingLicense: int.tryParse(newValue),
+                  drivingLicense: int.tryParse(newValue!),
                 );
               },
               textInputAction: TextInputAction.next,
@@ -278,7 +278,7 @@ class _DriverInfoState extends State<DriverInfo> {
               keyboardType: TextInputType.number,
               onSaved: (newValue) {
                 _editedDriver = _editedDriver.copyWith(
-                  visaNumber: int.tryParse(newValue),
+                  visaNumber: int.tryParse(newValue!),
                 );
               },
               textInputAction: TextInputAction.next,
@@ -339,11 +339,11 @@ class _DriverInfoState extends State<DriverInfo> {
                 // if (_formKey.currentState!.validate()) {
                 //
                 if (_formKey.currentState != null) {
-                  final isValid = _formKey.currentState.validate();
+                  final isValid = _formKey.currentState!.validate();
                   if (!isValid) {
                     return;
                   }
-                  _formKey.currentState.save();
+                  _formKey.currentState!.save();
                   //
                   // setState(() {
                   //   _isLoading = true;

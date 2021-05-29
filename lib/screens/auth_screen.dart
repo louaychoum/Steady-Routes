@@ -6,9 +6,10 @@ import 'package:steadyroutes/services/auth_service.dart';
 
 class AuthScreen extends StatelessWidget {
   static const routeName = '/auth';
-
+  static late final dynamic args;
   @override
   Widget build(BuildContext context) {
+    args = ModalRoute.of(context)!.settings.arguments ?? '';
     // final deviceSize = MediaQuery.of(context).size;
 // final transformConfig = Matrix4.rotationZ(-8 * pi / 180);
 // transformConfig.translate(-10.0);
@@ -28,12 +29,12 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
 
-  String _username;
-  String _password;
-  String _errorMessage;
+  late String _username;
+  late String _password;
+  late String _errorMessage;
 
-  bool _isLoading;
-  var _autoLogin = true;
+  late bool _isLoading;
+  bool _autoLogin = true;
 
   @override
   void initState() {
@@ -43,7 +44,7 @@ class _LoginState extends State<Login> {
   }
 
   bool validateAndSave() {
-    final form = _formKey.currentState;
+    final form = _formKey.currentState!;
     if (form.validate()) {
       form.save();
       return true;
@@ -51,26 +52,34 @@ class _LoginState extends State<Login> {
     return false;
   }
 
-  Future<void> validateAndSubmit({bool autoLogin}) async {
+  Future<void> validateAndSubmit({required bool autoLogin}) async {
     if (!validateAndSave()) {
       // showInSnackBar('Please fix the errors in red before submitting.');
       return;
     }
     final AuthService auth = Provider.of<AuthService>(context, listen: false);
     setState(() {
-      _errorMessage = "";
+      _errorMessage = '';
       _isLoading = true;
     });
-    if (!await auth.signIn(
-      username: _username,
-      password: _password,
-      autoLogin: autoLogin,
-    )) {
-      setState(() {
-        _isLoading = false;
-        _errorMessage = 'Invalid email or password.';
-        _formKey.currentState.reset();
-      });
+    try {
+      if (!await auth.signIn(
+        username: _username,
+        password: _password,
+        autoLogin: autoLogin,
+      )) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = 'Invalid email or password.';
+          _formKey.currentState!.reset();
+        });
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          error.toString(),
+        ),
+      ));
     }
     setState(() {
       _isLoading = false;
@@ -264,23 +273,19 @@ class _LoginState extends State<Login> {
   }
 
   Widget showErrorMessage() {
-    if (_errorMessage.isNotEmpty && _errorMessage != null) {
+    if (_errorMessage.isNotEmpty) {
       return Padding(
         padding: const EdgeInsets.only(top: 8.0),
         child: Center(
           child: Text(
             _errorMessage,
             style: const TextStyle(
-              // fontSize: 13.0,
               color: Colors.red,
-              // height: 1.0,
-              // fontWeight: FontWeight.w300
             ),
           ),
         ),
       );
     }
-
     return Container();
   }
 
@@ -288,12 +293,12 @@ class _LoginState extends State<Login> {
     return TextFormField(
       decoration: kTextFieldDecoration,
       validator: (value) {
-        if (value.isEmpty) {
+        if (value!.isEmpty) {
           return "Username can't be empty!";
         }
         return null;
       },
-      onSaved: (value) => _username = value.trim(),
+      onSaved: (value) => _username = value!.trim(),
       // _authData['username'] = value;
     );
   }
@@ -304,7 +309,7 @@ class _LoginState extends State<Login> {
           labelText: 'Password', hintText: 'Enter your password'),
       obscureText: true,
       validator: (value) {
-        if (value.isEmpty) {
+        if (value!.isEmpty) {
           return "Password can't be empty!";
         }
         // !if (value.length < 8) {
@@ -312,7 +317,7 @@ class _LoginState extends State<Login> {
         // }
         return null;
       },
-      onSaved: (value) => _password = value.trim(),
+      onSaved: (value) => _password = value!.trim(),
       //   _authData['password'] = value;
       // },
     );
@@ -325,7 +330,7 @@ class _LoginState extends State<Login> {
       value: _autoLogin,
       onChanged: (value) {
         setState(() {
-          _autoLogin = value;
+          _autoLogin = value!;
         });
       },
     );
@@ -335,7 +340,9 @@ class _LoginState extends State<Login> {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: ElevatedButton(
-        onPressed: () => validateAndSubmit(autoLogin: _autoLogin),
+        onPressed: () => validateAndSubmit(
+          autoLogin: _autoLogin,
+        ),
         child: const Text(
           'Login',
           // style: TextStyle(fontSize: 20.0, color: Colors.white),

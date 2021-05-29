@@ -18,11 +18,11 @@ class ReceiptReviewArguments {
 
 class ReceiptReview extends StatelessWidget {
   static const routeName = '/receipt-review';
-  static ReceiptReviewArguments args;
+  static late ReceiptReviewArguments args;
 
   @override
   Widget build(BuildContext context) {
-    args = ModalRoute.of(context).settings.arguments as ReceiptReviewArguments;
+    args = ModalRoute.of(context)!.settings.arguments as ReceiptReviewArguments;
     // final receiptId = ModalRoute.of(context).settings.arguments as int;
     // final loadedReceipt = Provider.of<Receipts>(
     //   context,

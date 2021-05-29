@@ -11,13 +11,13 @@ class VehiclesListView extends StatefulWidget {
 
 class _VehiclesListViewState extends State<VehiclesListView> {
   final _refreshKey = GlobalKey<RefreshIndicatorState>();
-  String jwt;
+  late String jwt;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => _refreshKey.currentState.show());
+    WidgetsBinding.instance!
+        .addPostFrameCallback((_) => _refreshKey.currentState!.show());
   }
   // var _isInit = true;
   // var _isLoading = false;

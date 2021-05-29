@@ -14,8 +14,8 @@ class ReportInfo extends StatefulWidget {
 
 class _ReportInfoState extends State<ReportInfo> {
   final _formKey = GlobalKey<FormState>();
-  String selectedDriver;
-  String selectedVehicle;
+  late String selectedDriver;
+  late String selectedVehicle;
   // bool isDriver = false;
   bool isLoading = false;
   final TextEditingController _fromDateController = TextEditingController();
@@ -26,7 +26,7 @@ class _ReportInfoState extends State<ReportInfo> {
       "#": RegExp(r'[0-9]'),
     },
   );
-  DateTimeRange selectedRange;
+  DateTimeRange? selectedRange;
   DateTime selectedDate = DateTime.now();
 
   Future<void> _selectDate(
@@ -34,17 +34,17 @@ class _ReportInfoState extends State<ReportInfo> {
   ) async {
     // if (Platform.isAndroid) {
 
-    final DateTimeRange picked = await showDateRangePicker(
+    final DateTimeRange? picked = await showDateRangePicker(
       context: context,
       initialDateRange: selectedRange,
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
-      builder: (BuildContext context, Widget child) {
+      builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
             primaryColor: const Color(0xFFF44336),
           ),
-          child: child,
+          child: child!,
         );
       },
     );
@@ -243,7 +243,7 @@ class _ReportInfoState extends State<ReportInfo> {
                       // Validate returns true if the form is valid, or false otherwise.
                       // if (_formKey.currentState!.validate()) {
                       if (_formKey.currentState != null) {
-                        if (_formKey.currentState.validate()) {
+                        if (_formKey.currentState!.validate()) {
                           //!isdriver
                           // If the form is valid, display a snackbar. In the real world,
                           // you'd often call a server or save the information in a database.

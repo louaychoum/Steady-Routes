@@ -19,8 +19,8 @@ class WebAuthService with ChangeNotifier implements AuthService {
   static final WebAuthService _instance = WebAuthService._internal();
   static const userPrefKey = "USER_PREF_KEY";
   final Uri _baseUrl = Uri.parse("http://10.0.2.2:9001/");
-  User _user;
-  AuthStatus _status;
+  User? _user;
+  late AuthStatus _status;
 
   factory WebAuthService() {
     _log.info('Constructor Called');
@@ -32,13 +32,17 @@ class WebAuthService with ChangeNotifier implements AuthService {
     // setStatus(AuthStatus.adminLoggedIn);
     _status = AuthStatus.notDetermined;
     // check storage and try to login
-    getUserInPref().whenComplete(
-      () {
-        if (_user != null) {
-          if (_user.access == 'admin') {
-            setStatus(AuthStatus.adminLoggedIn);
-          } else {
-            setStatus(AuthStatus.driverLoggedIn);
+    getUserInPref().then(
+      (storedUser) {
+        if (storedUser != null) {
+          try {
+            signIn(
+              username: storedUser.username,
+              password: storedUser.password,
+              autoLogin: true,
+            ).then((value) => print('value $value'));
+          } catch (error) {
+            _log.warning("failed to get user's prefs");
           }
         }
       },
@@ -54,14 +58,17 @@ class WebAuthService with ChangeNotifier implements AuthService {
 
   @override
   Future<bool> signIn({
-    String username,
-    String password,
-    bool autoLogin,
+    required String username,
+    required String password,
+    required bool autoLogin,
   }) async {
     _log.info('Sign In Called');
     try {
       // final url = '${apiBase}login.json';
       // final response = await rootBundle.loadString(url);
+      print('username $username');
+      print('password $password');
+
       final uri = Uri.parse('${_baseUrl}user/login');
       final request = await http
           .post(
@@ -75,7 +82,7 @@ class WebAuthService with ChangeNotifier implements AuthService {
             ),
           )
           .timeout(const Duration(seconds: 10));
-      // print(json.decode(request.body)["userId"] );
+      print(request.statusCode);
 
       if (request.statusCode != 200) {
         return false;
@@ -88,7 +95,7 @@ class WebAuthService with ChangeNotifier implements AuthService {
         _log.info('Auto Login is true');
         saveUserInPref();
       }
-      if (_user.access == 'admin') {
+      if (_user!.access == 'admin') {
         setStatus(AuthStatus.adminLoggedIn);
       } else {
         setStatus(AuthStatus.driverLoggedIn);
@@ -96,10 +103,10 @@ class WebAuthService with ChangeNotifier implements AuthService {
       return true;
     } on TimeoutException catch (error) {
       _log.warning(error);
-      return false;
+      throw TimeoutException(error.toString());
     } on SocketException catch (error) {
       _log.warning(error);
-      return false;
+      throw SocketException(error.toString());
     } catch (error) {
       _log.warning(error);
       return false;
@@ -212,8 +219,9 @@ class WebAuthService with ChangeNotifier implements AuthService {
     });
     setStatus(AuthStatus.notLoggedIn);
 
-    NavigationService.navigatorKey.currentState
-        .popUntil(ModalRoute.withName(Root.routeName));
+    NavigationService.navigatorKey.currentState!.popUntil(
+      ModalRoute.withName(Root.routeName),
+    );
   }
 
   void saveUserInPref() {
@@ -223,17 +231,13 @@ class WebAuthService with ChangeNotifier implements AuthService {
     });
   }
 
-  Future<void> getUserInPref() async {
+  Future<User?> getUserInPref() async {
     _log.info("Getting user's prefrences");
     final pref = await SharedPreferences.getInstance();
     final userPref = pref.getString(userPrefKey);
     if (userPref != null) {
-      _user = User.fromJson(json.decode(userPref) as Map<String, dynamic>);
-      await signIn(
-        username: _user.username,
-        password: _user.password,
-        autoLogin: true,
-      );
+      return _user =
+          User.fromJson(json.decode(userPref) as Map<String, dynamic>);
     } else {
       setStatus(AuthStatus.notLoggedIn);
     }
@@ -243,5 +247,5 @@ class WebAuthService with ChangeNotifier implements AuthService {
   AuthStatus get status => _status;
 
   @override
-  User get user => _user;
+  User get user => _user!;
 }

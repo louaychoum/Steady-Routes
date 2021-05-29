@@ -12,13 +12,13 @@ class DriversListView extends StatefulWidget {
 
 class _DriversListViewState extends State<DriversListView> {
   final _refreshKey = GlobalKey<RefreshIndicatorState>();
-  String jwt;
+  late String jwt;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => _refreshKey.currentState.show());
+    WidgetsBinding.instance!
+        .addPostFrameCallback((_) => _refreshKey.currentState!.show());
   }
 
   // @override

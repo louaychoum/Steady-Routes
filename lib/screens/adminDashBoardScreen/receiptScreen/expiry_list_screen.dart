@@ -10,7 +10,8 @@ class ExpiryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final reportType = ModalRoute.of(context).settings.arguments as String;
+    final reportType =
+        ModalRoute.of(context)! .settings.arguments as String;
 
     return Scaffold(
       appBar: AppBar(),

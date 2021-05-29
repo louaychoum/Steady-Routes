@@ -10,8 +10,8 @@ class ExpiryInfo extends StatefulWidget {
 
 class _ExpiryInfoState extends State<ExpiryInfo> {
   final _formKey = GlobalKey<FormState>();
-  String _typeController;
-  int _monthController;
+  String? /*late*/ _typeController;
+  int? /*late*/ _monthController;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class _ExpiryInfoState extends State<ExpiryInfo> {
               icon: const Icon(
                 Icons.receipt_outlined,
               ),
-              validator: (value) {
+              validator: (dynamic value) {
                 if (value == null) {
                   return 'Please enter a valid Report Type';
                 }
@@ -43,7 +43,7 @@ class _ExpiryInfoState extends State<ExpiryInfo> {
                     ),
                   )
                   .toList(),
-              onChanged: (value) {
+              onChanged: (dynamic value) {
                 setState(() {
                   _typeController = value.toString();
                 });
@@ -58,7 +58,7 @@ class _ExpiryInfoState extends State<ExpiryInfo> {
               icon: const Icon(
                 Icons.calendar_today,
               ),
-              validator: (value) {
+              validator: (dynamic value) {
                 if (value == null) {
                   return 'Please enter number of months left till expiry';
                 }
@@ -75,9 +75,9 @@ class _ExpiryInfoState extends State<ExpiryInfo> {
                     ),
                   )
                   .toList(),
-              onChanged: (value) {
+              onChanged: (dynamic value) {
                 setState(() {
-                  _monthController = value as int;
+                  _monthController = value as int?;
                 });
               },
               decoration:
@@ -91,7 +91,7 @@ class _ExpiryInfoState extends State<ExpiryInfo> {
                 // Validate returns true if the form is valid, or false otherwise.
                 // if (_formKey.currentState!.validate()) {
                 if (_formKey.currentState != null) {
-                  if (_formKey.currentState.validate()) {
+                  if (_formKey.currentState!.validate()) {
                     // If the form is valid, display a snackbar. In the real world,
                     // you'd often call a server or save the information in a database.
                     /** 

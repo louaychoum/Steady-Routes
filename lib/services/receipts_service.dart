@@ -77,7 +77,7 @@ class ReceiptsService with ChangeNotifier {
 
   Future<bool> upload(String jwt, File img) async {
     try {
-      final List<String> mime = lookupMimeType(img.path).split('/');
+      final List<String> mime = lookupMimeType(img.path)!.split('/');
       final uri = Uri.parse('${apiBase}Receipt_DataModel.json/');
 
       final request = http.MultipartRequest('POST', uri)
@@ -92,7 +92,7 @@ class ReceiptsService with ChangeNotifier {
       print(response.statusCode);
       print(response.body);
 
-      final parsed = jsonDecode(response.body) as Map<String, dynamic>;
+      final parsed = jsonDecode(response.body) as Map<String, dynamic>?;
       if (response.statusCode != 200) {
         return false;
       }

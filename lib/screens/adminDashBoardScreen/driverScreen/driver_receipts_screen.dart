@@ -13,12 +13,11 @@ class DriverReceiptsArguments {
 
 class DriverReceiptsScreen extends StatelessWidget {
   static const routeName = '/driver-receipt';
-  static DriverReceiptsArguments args;
-
+  static late DriverReceiptsArguments? args;
   @override
   Widget build(BuildContext context) {
-    args = ModalRoute.of(context).settings.arguments as DriverReceiptsArguments;
-    final loadedDriver = args.driver;
+    args = ModalRoute.of(context)!.settings.arguments as DriverReceiptsArguments?;
+    final loadedDriver = args!.driver;
     // final driverId = ModalRoute.of(context).settings.arguments as int;
     // final loadedDriver = driversService.findById(args.driver);
     return Scaffold(

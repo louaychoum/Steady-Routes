@@ -14,8 +14,8 @@ class CheckInForm extends StatefulWidget {
 }
 
 class _CheckInFormState extends State<CheckInForm> {
-  DateTime now;
-  String selectedValue;
+  late DateTime now;
+  late String selectedValue;
   bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
 
@@ -62,7 +62,7 @@ class _CheckInFormState extends State<CheckInForm> {
           ),
           MallDropdown(
             (newVal) {
-              selectedValue = newVal;
+              selectedValue = newVal!;
             },
           ),
           const Spacer(),
@@ -72,7 +72,7 @@ class _CheckInFormState extends State<CheckInForm> {
             ElevatedButton(
               onPressed: () async {
                 if (_formKey.currentState != null) {
-                  if (_formKey.currentState.validate()) {
+                  if (_formKey.currentState!.validate()) {
                     setState(() {
                       isLoading = true;
                     });

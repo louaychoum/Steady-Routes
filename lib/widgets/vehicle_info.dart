@@ -6,26 +6,26 @@ import 'package:steadyroutes/models/vehicle.dart';
 
 class VehicleInfo extends StatefulWidget {
   const VehicleInfo({
-    Vehicle vehicle,
+    Vehicle? vehicle,
   }) : _vehicle = vehicle;
-  final Vehicle _vehicle;
+  final Vehicle? _vehicle;
   @override
   _VehicleInfoState createState() => _VehicleInfoState();
 }
 
 class _VehicleInfoState extends State<VehicleInfo> {
   final _formKey = GlobalKey<FormState>();
-  int vehicleId;
+  int? vehicleId;
 
   DateTime selectedDate = DateTime.now();
 
-  var _editedVehicles = Vehicle(
-    id: null,
+  Vehicle? _editedVehicles = Vehicle(
+    id: 0,
     name: '',
     plateNumber: '',
     registrationExDate: '',
     rtaExDate: '',
-    rtaNumber: null,
+    rtaNumber: 0,
   );
 
   var _initValues = {
@@ -53,19 +53,19 @@ class _VehicleInfoState extends State<VehicleInfo> {
   void didChangeDependencies() {
     if (_isInit) {
       widget._vehicle != null
-          ? vehicleId = widget._vehicle.id
+          ? vehicleId = widget._vehicle!.id
           : vehicleId = null;
       if (vehicleId != null) {
         _editedVehicles = widget._vehicle;
         _initValues = {
-          'name': _editedVehicles.name,
-          'plateNumber': _editedVehicles.plateNumber,
+          'name': _editedVehicles!.name,
+          'plateNumber': _editedVehicles!.plateNumber,
           'registrationExDate': '',
           'rtaExDate': '',
-          'rtaNumber': _editedVehicles.rtaNumber.toString(),
+          'rtaNumber': _editedVehicles!.rtaNumber.toString(),
         };
-        _regDateController.text = _editedVehicles.registrationExDate;
-        _rtaDateController.text = _editedVehicles.rtaExDate;
+        _regDateController.text = _editedVehicles!.registrationExDate;
+        _rtaDateController.text = _editedVehicles!.rtaExDate;
       }
     }
     _isInit = false;
@@ -73,9 +73,9 @@ class _VehicleInfoState extends State<VehicleInfo> {
   }
 
   Future<void> _saveForm() async {
-    final isValid = _formKey.currentState.validate();
+    final isValid = _formKey.currentState!.validate();
     if (!isValid) return;
-    _formKey.currentState.save();
+    _formKey.currentState!.save();
     setState(() {
       _isLoading = true;
     });
@@ -127,7 +127,7 @@ class _VehicleInfoState extends State<VehicleInfo> {
     BuildContext context,
     TextEditingController controller,
   ) async {
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: selectedDate,
         firstDate: DateTime(2015, 8),

@@ -9,7 +9,7 @@ class AddVehicle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loadedVehicles = ModalRoute.of(context).settings.arguments as Vehicle;
+    final loadedVehicles = ModalRoute.of(context)!.settings.arguments as Vehicle?;
     return Scaffold(
       appBar: AppBar(),
       body: Padding(

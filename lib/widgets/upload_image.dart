@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-Future<File> settingModalBottomSheet(BuildContext context) {
-  File imageFile;
+Future<File?> settingModalBottomSheet(BuildContext context) {
+  File? imageFile;
   return showModalBottomSheet<File>(
     context: context,
     builder: (BuildContext bc) {
@@ -36,7 +36,7 @@ Future<File> settingModalBottomSheet(BuildContext context) {
   );
 }
 
-Future<File> _onImageButtonPressed(
+Future<File?> _onImageButtonPressed(
     ImageSource source, BuildContext context) async {
   final ImagePicker _picker = ImagePicker();
   try {
