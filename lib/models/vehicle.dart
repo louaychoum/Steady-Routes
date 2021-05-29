@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
 
 class Vehicle {
-  final int id;
-  final String name;
-  final String plateNumber;
-  final String registrationExDate;
-  final int rtaNumber;
-  final String rtaExDate;
+  final int /*!*/ id;
+  final String /*!*/ name;
+  final String /*!*/ plateNumber;
+  final String /*!*/ registrationExDate;
+  final int /*!*/ rtaNumber;
+  final String /*!*/ rtaExDate;
 
   Vehicle({
     @required this.id,

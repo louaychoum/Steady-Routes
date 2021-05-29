@@ -4,10 +4,10 @@ enum Access {
 }
 
 class User {
-  final String userId;
-  final String username;
-  final String password;
-  final String access;
+  final String /*!*/ userId;
+  final String /*!*/ username;
+  final String /*!*/ password;
+  final String /*!*/ access;
 
   const User({
     this.userId,

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_masked_text/flutter_masked_text.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import 'package:steadyroutes/widgets/upload_image.dart';
 import 'package:steadyroutes/widgets/upload_receipt_info.dart';
@@ -15,11 +15,13 @@ class UploadReceiptScreen extends StatefulWidget {
 
 class _UploadReceiptScreenState extends State<UploadReceiptScreen> {
   File _images;
-  final _controller = MoneyMaskedTextController(
-    rightSymbol: ' AED',
-    decimalSeparator: '.',
-    thousandSeparator: ',',
-  );
+  final _controller = TextEditingController();
+// (
+//     rightSymbol: ' AED',
+//     decimalSeparator: '.',
+//     thousandSeparator: ',',
+//   );
+  
 
   @override
   void dispose() {

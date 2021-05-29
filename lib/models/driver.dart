@@ -1,17 +1,17 @@
 import 'package:flutter/foundation.dart';
 
 class Driver {
-  final int id;
-  final String name;
-  final String username;
-  final String plateNumber;
-  final int drivingLicense;
-  final String drivingLicenseExDate; //*may require change
-  final String company;
-  final String passportNumber;
-  final String passportExDate; //*may require change
-  final int visaNumber; //*may require change
-  final String visaExDate; //*may require change
+  final int /*!*/ id;
+  final String /*!*/ name;
+  final String /*!*/ username;
+  final String /*!*/ plateNumber;
+  final int /*!*/ drivingLicense;
+  final String /*!*/ drivingLicenseExDate; //*may require change
+  final String /*!*/ company;
+  final String /*!*/ passportNumber;
+  final String /*!*/ passportExDate; //*may require change
+  final int /*!*/ visaNumber; //*may require change
+  final String /*!*/ visaExDate; //*may require change
 
   Driver({
     @required this.id,

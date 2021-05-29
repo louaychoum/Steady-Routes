@@ -7,10 +7,10 @@ enum Status {
 }
 
 class Receipt with ChangeNotifier {
-  final int id;
-  final String date;
-  final String url;
-  final double cashAmount;
+  final int /*!*/ id;
+  final String /*!*/ date;
+  final String /*!*/ url;
+  final double /*!*/ cashAmount;
   Status status;
 
   Receipt({

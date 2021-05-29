@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_masked_text/flutter_masked_text.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/models/vehicle.dart';
@@ -40,12 +40,13 @@ class _VehicleInfoState extends State<VehicleInfo> {
 
   var _isLoading = false;
 
-  final _regDateController = MaskedTextController(
-    mask: '00/00/0000',
-  );
-
-  final _rtaDateController = MaskedTextController(
-    mask: '00/00/0000',
+  final _regDateController = TextEditingController();
+  final _rtaDateController = TextEditingController();
+  final maskFormatter = MaskTextInputFormatter(
+    mask: '##/##/####',
+    filter: {
+      "#": RegExp(r'[0-9]'),
+    },
   );
 
   @override
@@ -124,7 +125,7 @@ class _VehicleInfoState extends State<VehicleInfo> {
 
   Future<void> _selectDate(
     BuildContext context,
-    MaskedTextController controller,
+    TextEditingController controller,
   ) async {
     final DateTime picked = await showDatePicker(
         context: context,
@@ -138,6 +139,7 @@ class _VehicleInfoState extends State<VehicleInfo> {
           final String startDateSlug =
               "${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year.toString()}";
           controller.text = startDateSlug;
+          selectedDate = DateTime.now();
         },
       );
     }
@@ -200,6 +202,7 @@ class _VehicleInfoState extends State<VehicleInfo> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                   child: TextFormField(
+                    inputFormatters: [maskFormatter],
                     keyboardType: TextInputType.datetime,
                     controller: _regDateController,
                     decoration: kTextFieldDecoration.copyWith(
@@ -218,7 +221,10 @@ class _VehicleInfoState extends State<VehicleInfo> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'Please enter a date';
+                      }
+                      if (value.length != 10) {
+                        return 'Make sure the date format is correct';
                       }
                       return null;
                     },
@@ -246,6 +252,7 @@ class _VehicleInfoState extends State<VehicleInfo> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                   child: TextFormField(
+                    inputFormatters: [maskFormatter],
                     keyboardType: TextInputType.datetime,
                     controller: _rtaDateController,
                     decoration: kTextFieldDecoration.copyWith(
@@ -265,7 +272,10 @@ class _VehicleInfoState extends State<VehicleInfo> {
                     // The validator receives the text that the user has entered.
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'Please enter a date';
+                      }
+                      if (value.length != 10) {
+                        return 'Make sure the date format is correct';
                       }
                       return null;
                     },

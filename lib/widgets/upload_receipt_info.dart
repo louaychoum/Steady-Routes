@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:provider/provider.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
@@ -13,12 +13,12 @@ import 'package:steadyroutes/services/steady_api_service.dart';
 
 class UploadedReceiptInfo extends StatelessWidget {
   UploadedReceiptInfo(
-      {@required File images, @required MoneyMaskedTextController controller})
+      {@required File images, @required TextEditingController controller})
       : _images = images,
         _controller = controller;
 
   final File _images;
-  final MoneyMaskedTextController _controller;
+  final TextEditingController _controller;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -92,13 +92,13 @@ class UploadedReceiptInfo extends StatelessWidget {
                     keyboardType: TextInputType.number,
                     controller: _controller,
                     decoration: kTextFieldDecoration.copyWith(
+                      prefixText: 'AED ',
                       labelText: 'Amount',
                       hintText: '',
                     ),
                     // The validator receives the text that the user has entered.
                     validator: (value) {
-                      if (value.substring(0, value.length - 3).trim() ==
-                          '0.00') {
+                      if (value == null) {
                         return 'Please enter a valid cash amount';
                       }
                       return null;

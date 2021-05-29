@@ -1,6 +1,7 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/screens/adminDashBoardScreen/receiptScreen/report_list_screen.dart';
@@ -19,6 +20,12 @@ class _ReportInfoState extends State<ReportInfo> {
   bool isLoading = false;
   final TextEditingController _fromDateController = TextEditingController();
   final TextEditingController _toDateController = TextEditingController();
+  final maskFormatter = MaskTextInputFormatter(
+    mask: '##/##/####',
+    filter: {
+      "#": RegExp(r'[0-9]'),
+    },
+  );
   DateTimeRange selectedRange;
   DateTime selectedDate = DateTime.now();
 
@@ -160,6 +167,7 @@ class _ReportInfoState extends State<ReportInfo> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
                   child: TextFormField(
+                    inputFormatters: [maskFormatter],
                     controller: _fromDateController,
                     keyboardType: TextInputType.datetime,
                     decoration: kTextFieldDecoration.copyWith(
@@ -191,6 +199,7 @@ class _ReportInfoState extends State<ReportInfo> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
                   child: TextFormField(
+                    inputFormatters: [maskFormatter],
                     keyboardType: TextInputType.datetime,
                     controller: _toDateController,
                     decoration: kTextFieldDecoration.copyWith(

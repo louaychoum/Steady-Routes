@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_masked_text/flutter_masked_text.dart';
+import 'package:flutter/services.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/models/driver.dart';
@@ -12,15 +13,12 @@ class DriverInfo extends StatefulWidget {
 class _DriverInfoState extends State<DriverInfo> {
   final _formKey = GlobalKey<FormState>();
 
-  final _licenseDateController = MaskedTextController(
-    mask: '00/00/0000',
-  );
-  final _passportDateController = MaskedTextController(
-    mask: '00/00/0000',
-  );
-  final _visaDateController = MaskedTextController(
-    mask: '00/00/0000',
-  );
+  final _licenseDateController = TextEditingController();
+  final _passportDateController = TextEditingController();
+  final _visaDateController = TextEditingController();
+
+  final maskFormatter = MaskTextInputFormatter(
+      mask: '##/##/####', filter: {"#": RegExp(r'[0-9]')});
 
   DateTime selectedDate = DateTime.now();
 
@@ -40,7 +38,7 @@ class _DriverInfoState extends State<DriverInfo> {
 
   Future<void> _selectDate(
     BuildContext context,
-    MaskedTextController controller,
+    TextEditingController controller,
   ) async {
     final DateTime picked = await showDatePicker(
         context: context,
@@ -54,6 +52,7 @@ class _DriverInfoState extends State<DriverInfo> {
           final String startDateSlug =
               "${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year.toString()}";
           controller.text = startDateSlug;
+          selectedDate = DateTime.now();
         },
       );
     }
@@ -138,9 +137,10 @@ class _DriverInfoState extends State<DriverInfo> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
             child: TextFormField(
+              keyboardType: TextInputType.number,
               onSaved: (newValue) {
                 _editedDriver = _editedDriver.copyWith(
-                  drivingLicense: int.parse(newValue),
+                  drivingLicense: int.tryParse(newValue),
                 );
               },
               textInputAction: TextInputAction.next,
@@ -164,6 +164,7 @@ class _DriverInfoState extends State<DriverInfo> {
                 _editedDriver =
                     _editedDriver.copyWith(drivingLicenseExDate: newValue);
               },
+              inputFormatters: [maskFormatter],
               textInputAction: TextInputAction.next,
               controller: _licenseDateController,
               keyboardType: TextInputType.datetime,
@@ -184,7 +185,10 @@ class _DriverInfoState extends State<DriverInfo> {
               // The validator receives the text that the user has entered.
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter some text';
+                  return 'Please enter a date';
+                }
+                if (value.length != 10) {
+                  return 'Make sure the date format is correct';
                 }
                 return null;
               },
@@ -238,6 +242,7 @@ class _DriverInfoState extends State<DriverInfo> {
                 _editedDriver =
                     _editedDriver.copyWith(passportExDate: newValue);
               },
+              inputFormatters: [maskFormatter],
               textInputAction: TextInputAction.next,
               keyboardType: TextInputType.datetime,
               controller: _passportDateController,
@@ -258,7 +263,10 @@ class _DriverInfoState extends State<DriverInfo> {
               // The validator receives the text that the user has entered.
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter some text';
+                  return 'Please enter a date';
+                }
+                if (value.length != 10) {
+                  return 'Make sure the date format is correct';
                 }
                 return null;
               },
@@ -267,9 +275,10 @@ class _DriverInfoState extends State<DriverInfo> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
             child: TextFormField(
+              keyboardType: TextInputType.number,
               onSaved: (newValue) {
                 _editedDriver = _editedDriver.copyWith(
-                  visaNumber: int.parse(newValue),
+                  visaNumber: int.tryParse(newValue),
                 );
               },
               textInputAction: TextInputAction.next,
@@ -292,6 +301,7 @@ class _DriverInfoState extends State<DriverInfo> {
               onSaved: (newValue) {
                 _editedDriver = _editedDriver.copyWith(visaExDate: newValue);
               },
+              inputFormatters: [maskFormatter],
               textInputAction: TextInputAction.done,
               keyboardType: TextInputType.datetime,
               controller: _visaDateController,
@@ -312,7 +322,10 @@ class _DriverInfoState extends State<DriverInfo> {
               // The validator receives the text that the user has entered.
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter some text';
+                  return 'Please enter a date';
+                }
+                if (value.length != 10) {
+                  return 'Make sure the date format is correct';
                 }
                 return null;
               },

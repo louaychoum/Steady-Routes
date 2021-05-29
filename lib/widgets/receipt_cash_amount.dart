@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_masked_text/flutter_masked_text.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/models/receipt.dart';
@@ -12,11 +12,7 @@ class ReceiptCashAmount extends StatefulWidget {
 }
 
 class _ReceiptCashAmountState extends State<ReceiptCashAmount> {
-  final _controller = MoneyMaskedTextController(
-    rightSymbol: ' AED',
-    decimalSeparator: '.',
-    thousandSeparator: ',',
-  );
+  final _controller = TextEditingController();
   var _isInit = true;
   int receiptId;
 
@@ -70,12 +66,13 @@ class _ReceiptCashAmountState extends State<ReceiptCashAmount> {
       keyboardType: TextInputType.number,
       controller: _controller,
       decoration: kTextFieldDecoration.copyWith(
+        prefixText: 'AED ',
         labelText: 'Amount',
         hintText: '',
       ),
       // The validator receives the text that the user has entered.
       validator: (value) {
-        if (value.substring(0, value.length - 3).trim() == '0.00') {
+        if (value == null || int.tryParse(value) == 0) {
           return 'Please enter a valid cash amount';
         }
         return null;
