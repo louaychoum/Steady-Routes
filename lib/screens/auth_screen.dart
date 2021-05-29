@@ -6,10 +6,9 @@ import 'package:steadyroutes/services/auth_service.dart';
 
 class AuthScreen extends StatelessWidget {
   static const routeName = '/auth';
-  static late final dynamic args;
+
   @override
   Widget build(BuildContext context) {
-    args = ModalRoute.of(context)!.settings.arguments ?? '';
     // final deviceSize = MediaQuery.of(context).size;
 // final transformConfig = Matrix4.rotationZ(-8 * pi / 180);
 // transformConfig.translate(-10.0);

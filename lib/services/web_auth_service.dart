@@ -40,7 +40,12 @@ class WebAuthService with ChangeNotifier implements AuthService {
               username: storedUser.username,
               password: storedUser.password,
               autoLogin: true,
-            ).then((value) => print('value $value'));
+            ).then((value) {
+              if (!value) {
+                _log.warning("failed to sign in");
+                signOut();
+              }
+            });
           } catch (error) {
             _log.warning("failed to get user's prefs");
           }
