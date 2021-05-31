@@ -15,9 +15,9 @@ class DriversService with ChangeNotifier {
   static final _log = Logger('Drivers Service');
   List<Driver> _drivers = [];
   List<Driver> get drivers => [..._drivers];
-  Driver findById(int id) {
-    return _drivers.firstWhere((driver) => driver.id == id);
-  }
+  // Driver findById(int id) {
+  //   return _drivers.firstWhere((driver) => driver.id == id);
+  // }
 
   Future<bool> fetchDrivers(String jwt) async {
     try {

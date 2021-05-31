@@ -14,7 +14,6 @@ class AdminDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(Provider.of<AuthService>(context, listen: false).user.token);
     return Scaffold(
       appBar: AppBar(
         title: Text(

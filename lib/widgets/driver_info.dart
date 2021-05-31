@@ -36,7 +36,7 @@ class _DriverInfoState extends State<DriverInfo> {
     visaExDate: '',
     visaNumber: 0,
     phone: 0,
-    user: '' as User,
+    user: null,
   );
 
   Future<void> _selectDate(
