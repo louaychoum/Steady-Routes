@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:provider/provider.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/models/driver.dart';
 import 'package:steadyroutes/models/user.dart';
+import 'package:steadyroutes/services/auth_service.dart';
+import 'package:steadyroutes/services/steady_api_service.dart';
+import 'package:steadyroutes/services/web_auth_service.dart';
 
 class DriverInfo extends StatefulWidget {
   @override
@@ -22,6 +26,7 @@ class _DriverInfoState extends State<DriverInfo> {
       mask: '##/##/####', filter: {"#": RegExp(r'[0-9]')});
 
   DateTime selectedDate = DateTime.now();
+  bool _isLoading = false;
 
   Driver _editedDriver = Driver(
     id: '',
@@ -336,59 +341,70 @@ class _DriverInfoState extends State<DriverInfo> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-            child: ElevatedButton(
-              onPressed: () {
-                // Validate returns true if the form is valid, or false otherwise.
-                // if (_formKey.currentState!.validate()) {
-                //
-                if (_formKey.currentState != null) {
-                  final isValid = _formKey.currentState!.validate();
-                  if (!isValid) {
-                    return;
-                  }
-                  _formKey.currentState!.save();
-                  //
-                  // setState(() {
-                  //   _isLoading = true;
-                  // });
-                  //
-                  // try {
-                  //   await Provider.of<Drivers>(context, listen: false)
-                  //       .addProduct(_editedProduct);
-                  // } catch (error) {
-                  //   await showDialog<Null>(
-                  //     context: context,
-                  //     builder: (ctx) => AlertDialog(
-                  //       title: Text('An error has occured!'),
-                  //       content: Text('Something went wrong.'),
-                  //       actions: [
-                  //         TextButton(
-                  //           onPressed: () {
-                  //             Navigator.of(ctx).pop();
-                  //           },
-                  //           child: Text('Ok'),
-                  //         )
-                  //       ],
-                  //     ),
-                  //   );
-                  // }
-                  //              setState(() {
-                  //   _isLoading = false;
-                  // });
-                  Navigator.of(context).pop();
-                  //
-                  //
-                  //
-                  //*if(editedpr.id != null)
-                  // Provider.of<Products>(ctx, llisten: false).updateProduct(editedpr);
-                  //* else
-                  // Provider.of<Products>(ctx, llisten: false).aaProduct(editedpr);
-                  // If the form is valid, display a snackbar. In the real world,
-                  // you'd often call a server or save the information in a database.
-                }
-              },
-              child: const Text('Submit'),
-            ),
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : ElevatedButton(
+                    onPressed: () async {
+                      // Validate returns true if the form is valid, or false otherwise.
+                      // if (_formKey.currentState!.validate()) {
+                      //
+                      if (_formKey.currentState != null) {
+                        final isValid = _formKey.currentState!.validate();
+                        if (!isValid) {
+                          return;
+                        }
+                        _formKey.currentState!.save();
+
+                        setState(() {
+                          _isLoading = true;
+                        });
+
+                        try {
+                          final String jwt =
+                              Provider.of<AuthService>(context, listen: false)
+                                  .user
+                                  .token;
+                          await SteadyApiService()
+                              .driversService
+                              .addDriver(jwt, _editedDriver);
+                        } catch (error) {
+                          await showDialog<void>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: const Text('An error has occured!'),
+                              content: Text(
+                                error.toString(),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(ctx).pop();
+                                  },
+                                  child: const Text('Ok'),
+                                )
+                              ],
+                            ),
+                          );
+                        }
+                        setState(() {
+                          _isLoading = false;
+                        });
+                        Navigator.of(context).pop();
+                        //
+                        //
+                        //
+                        //*if(editedpr.id != null)
+                        // Provider.of<Products>(ctx, llisten: false).updateProduct(editedpr);
+                        //* else
+                        // Provider.of<Products>(ctx, llisten: false).aaProduct(editedpr);
+                        // If the form is valid, display a snackbar. In the real world,
+                        // you'd often call a server or save the information in a database.
+                      }
+                    },
+                    child: const Text('Submit'),
+                  ),
           ),
         ],
       ),
