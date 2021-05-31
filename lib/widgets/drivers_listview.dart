@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:steadyroutes/models/driver.dart';
 
 import 'package:steadyroutes/screens/adminDashBoardScreen/driverScreen/driver_receipts_screen.dart';
 import 'package:steadyroutes/services/auth_service.dart';
@@ -57,6 +58,8 @@ class _DriversListViewState extends State<DriversListView> {
         //     :
         Consumer<SteadyApiService>(
       builder: (context, api, child) {
+        print('build');
+        final driversList = api.driversService.drivers;
         return RefreshIndicator(
           key: _refreshKey,
           onRefresh: () {
@@ -64,19 +67,67 @@ class _DriversListViewState extends State<DriversListView> {
             return api.driversService.fetchDrivers(jwt);
           },
           child: ListView.builder(
-              itemCount: api.driversService.drivers.length,
+              itemCount: driversList.length,
               itemBuilder: (context, index) {
-                final driver = api.driversService.drivers[index];
-                return ListTile(
-                  title: Text(driver.name),
-                  trailing: Text(
-                    driver.user?.email ?? '',
-                    overflow: TextOverflow.ellipsis,
+                final driver = driversList[index];
+                return Dismissible(
+                  key: ValueKey<int>(index),
+                  background: Container(
+                    color: Colors.red,
+                    child: const Icon(Icons.delete),
                   ),
-                  onTap: () => Navigator.of(context).pushNamed(
-                    DriverReceiptsScreen.routeName,
-                    arguments: DriverReceiptsArguments(
-                      driver,
+                  direction: DismissDirection.endToStart,
+                  onDismissed: (direction) {
+                    setState(() {
+                      final deletedDriver = driversList.removeAt(index);
+                      // final deletedDriver = driver;
+                      // api.driversService.deleteDriver(jwt, driver.id);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("${driver.name} was deleted"),
+                          action: SnackBarAction(
+                            label: 'Undo',
+                            onPressed: () => setState(
+                              () => driversList.insert(index, deletedDriver),
+                            ),
+                          ),
+                        ),
+                      );
+                    });
+                  },
+                  confirmDismiss: (direction) {
+                    return showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Confirm"),
+                          content: const Text(
+                              "Are you sure you wish to delete this driver?"),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: const Text("DELETE"),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: const Text("CANCEL"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: ListTile(
+                    title: Text(driver.name),
+                    trailing: Text(
+                      driver.user?.email ?? '',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    onTap: () => Navigator.of(context).pushNamed(
+                      DriverReceiptsScreen.routeName,
+                      arguments: DriverReceiptsArguments(
+                        driver,
+                      ),
                     ),
                   ),
                 );

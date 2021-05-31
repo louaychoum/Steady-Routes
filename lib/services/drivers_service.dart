@@ -129,6 +129,30 @@ class DriversService with ChangeNotifier {
       rethrow;
     }
   }
+
+  Future<void> deleteDriver(
+    String jwt,
+    String id,
+  ) async {
+    // final response = await _dio.delete(
+    //   '/drivers/$id',
+    //   options: Options(
+    //     headers: {'Authorization': ' x $jwt'},
+    //   ),
+    // );
+    final existingDriverIndex = _drivers.indexWhere(
+      (driver) => driver.id == id,
+    );
+    Driver? existingDrivers = _drivers[existingDriverIndex];
+    _drivers.removeAt(existingDriverIndex);
+    notifyListeners();
+    // if (response.statusCode! >= 400) {
+    //   _drivers.insert(existingDriverIndex, existingDrivers);
+    //   notifyListeners();
+    //   throw 'Could not delete product.';
+    // }
+    existingDrivers = null;
+  }
   // Future<bool> assignReceiptToTransaction(
   //     String jwt, int receiptId, int transactionId) async {
   //   try {
