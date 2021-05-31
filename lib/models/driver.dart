@@ -1,9 +1,11 @@
-import 'package:flutter/foundation.dart';
+import 'package:steadyroutes/models/user.dart';
 
 class Driver {
-  final int id;
+  final String id;
   final String name;
-  final String username;
+  // final String email;
+  final User? user;
+  final int phone;
   final String plateNumber;
   final int drivingLicense;
   final String drivingLicenseExDate; //*may require change
@@ -16,7 +18,9 @@ class Driver {
   Driver({
     required this.id,
     required this.name,
-    required this.username,
+    // required this.email,
+    required this.user,
+    required this.phone,
     required this.plateNumber,
     required this.drivingLicense,
     required this.drivingLicenseExDate,
@@ -27,26 +31,31 @@ class Driver {
     required this.visaExDate,
   });
 // Driver.fromJson(Map<String, dynamic> json)
-  Driver.fromJson(dynamic json)
-      : id = int.parse(json['id'].toString()),
+  Driver.fromJson(Map<String, dynamic> json)
+      : id = json['_id'].toString(),
         name = json['name'].toString(),
-        username = json['username'].toString(),
+        user = json['user'] == null
+            ? null
+            : User.fromJson(json['user'] as Map<String, dynamic>),
+        // email = json['user']['email'].toString(),
+        phone = int.tryParse(json['phone'].toString()) ?? 0,
+        drivingLicense = int.tryParse(json['licenseNo'].toString()) ?? 0,
         plateNumber = json['plateNumber'].toString(),
-        drivingLicense = int.parse(json['drivingLicense'].toString()),
         drivingLicenseExDate = json['drivingLicenseExDate'].toString(),
         company = json['company'].toString(),
         passportNumber = json['passportNumber'].toString(),
         passportExDate = json['passportExDate'].toString(),
-        visaNumber = int.parse(json['visaNumber'].toString()),
+        visaNumber = int.tryParse(json['visaNumber'].toString()) ?? 0,
         visaExDate = json['visaExDate'].toString();
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
+    final data = <String, dynamic>{};
+    data['_id'] = id;
     data['name'] = name;
-    data['username'] = username;
+    // data['email'] = email;
+    data['phone'] = phone;
     data['plateNumber'] = plateNumber;
-    data['drivingLicense'] = drivingLicense;
+    data['licenseNo'] = drivingLicense;
     data['drivingLicenseExDate'] = drivingLicenseExDate;
     data['company'] = company;
     data['passportNumber'] = passportNumber;
@@ -57,9 +66,11 @@ class Driver {
   }
 
   Driver copyWith({
-    int? id,
+    String? id,
     String? name,
-    String? username,
+    String? email,
+    int? phone,
+    User? user,
     String? plateNumber,
     int? drivingLicense,
     String? drivingLicenseExDate, //*may require change
@@ -72,7 +83,9 @@ class Driver {
     return Driver(
       id: id ?? this.id,
       name: name ?? this.name,
-      username: username ?? this.username,
+      // email: email ?? this.email,
+      phone: phone ?? this.phone,
+      user: user ?? this.user,
       plateNumber: plateNumber ?? this.plateNumber,
       drivingLicense: drivingLicense ?? this.drivingLicense,
       drivingLicenseExDate: drivingLicenseExDate ?? this.drivingLicenseExDate,

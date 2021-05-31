@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 //* Could be config file
@@ -31,6 +32,12 @@ const kTextTitleStyle = TextStyle(
   color: Colors.black,
   fontWeight: FontWeight.bold,
   fontSize: 28,
+);
+
+final BaseOptions options = BaseOptions(
+  baseUrl: 'https://dropshoptest.herokuapp.com',
+  connectTimeout: 10000,
+  receiveTimeout: 10000,
 );
 
 const kErrorScaffoldColor = Color(0xFFB71C1C);

@@ -5,27 +5,29 @@ enum Access {
 
 class User {
   final String userId;
-  final String username;
+  final String email;
   final String password;
-  final String access;
+  final String role;
+  String token;
 
-  const User({
-    required this.userId,
-    required this.username,
-    required this.password,
-    required this.access,
-  });
+  User(
+      {required this.userId,
+      required this.email,
+      required this.password,
+      required this.role,
+      required this.token});
 // User.fromJson(Map<String, String> json)
   factory User.fromJson(Map<String, dynamic>? json) {
     if (json == null) {
-      return const User(userId: '', username: '', password: '', access: '');
+      return User(userId: '', email: '', password: '', role: '', token: '');
     }
 
     return User(
-      userId: json['userId'].toString(),
-      username: json['username'].toString(),
+      userId: json['_id'].toString(),
+      email: json['email'].toString(),
       password: json['password'].toString(),
-      access: json['access'].toString(),
+      role: json['role'].toString(),
+      token: json['token'].toString(),
     );
   }
 
@@ -33,9 +35,10 @@ class User {
   //     (s) => s.toString() == 'Access.${json['access']}',
   //     orElse: () => null);
   Map<String, dynamic> toJson() => {
-        'username': username,
+        'email': email,
         'password': password,
-        'access': access,
-        'userId': userId,
+        'role': role,
+        '_id': userId,
+        'token': token,
       };
 }

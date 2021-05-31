@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:steadyroutes/helpers/constants.dart';
 
 import 'package:steadyroutes/screens/adminDashBoardScreen/driverScreen/driver_list_screen.dart';
 import 'package:steadyroutes/screens/adminDashBoardScreen/receiptScreen/expiry_report_screen.dart';
@@ -13,7 +14,14 @@ class AdminDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(Provider.of<AuthService>(context, listen: false).user.token);
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Hello ${Provider.of<AuthService>(context, listen: false).user.email}',
+          style: kTextTitleStyle,
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 8,
@@ -23,7 +31,7 @@ class AdminDashboard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Spacer(
-              flex: 3,
+              flex: 1, //3
             ),
             DashboardButton(
               'Drivers',

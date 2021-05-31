@@ -63,7 +63,7 @@ class _LoginState extends State<Login> {
     });
     try {
       if (!await auth.signIn(
-        username: _username,
+        email: _username,
         password: _password,
         autoLogin: autoLogin,
       )) {

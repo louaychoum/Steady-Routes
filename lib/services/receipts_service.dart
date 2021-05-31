@@ -15,7 +15,7 @@ class ReceiptsService with ChangeNotifier {
   List<Receipt> _receipt = [];
   List<Receipt> get receipts => [..._receipt];
 
-  Future<bool> fetchReceipts(String jwt, int driverId) async {
+  Future<bool> fetchReceipts(String jwt, String driverId) async {
     try {
       const url = '${apiBase}Receipt_DataModel.json';
       final response = await rootBundle.loadString(url);

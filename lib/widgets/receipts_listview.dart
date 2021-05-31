@@ -68,7 +68,7 @@ class _ReceiptListViewState extends State<ReceiptListView> {
             jwt = '';
             return api.receiptsService.fetchReceipts(
               jwt,
-              driver.id,
+              driver.id
             );
           },
           child: ListView.builder(

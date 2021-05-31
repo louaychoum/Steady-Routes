@@ -1,12 +1,18 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:logging/logging.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
+import 'package:steadyroutes/models/dio_exception.dart';
 import 'package:steadyroutes/models/driver.dart';
+import 'package:steadyroutes/services/web_auth_service.dart';
 
 class DriversService with ChangeNotifier {
+  static final _log = Logger('Drivers Service');
   List<Driver> _drivers = [];
   List<Driver> get drivers => [..._drivers];
   Driver findById(int id) {
@@ -15,47 +21,54 @@ class DriversService with ChangeNotifier {
 
   Future<bool> fetchDrivers(String jwt) async {
     try {
-      const url = '${apiBase}Drivers_DataModel.json';
-      final response = await rootBundle.loadString(url);
+      final Dio _dio = Dio(options);
+      // const url = '${apiBase}Drivers_DataModel.json';
+      // final response = await rootBundle.loadString(url);
+      final response = await _dio.get(
+        '/drivers',
+        options: Options(
+          headers: {'Authorization': ' x $jwt'},
+        ),
+      );
+      if (response.statusCode != 200) {
+        WebAuthService().processApiError(response);
+        return false;
+      }
 
-      // final response = await http.get(
-      //   url,
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     "api-token": jwt,
-      //   },
-      // ).timeout(
-      //   const Duration(seconds: 10),
-      // );
-      // print('Response body: ${response.body}');
-      // print('Response body: ${response.statusCode}');
-      // TODO: manage all error codes
-      // if (response.statusCode != 200) {
-      //   WebAuthService().processApiError(response);
-      //   return false;
-      // }
       _drivers.clear();
       final parsedResponse =
-          jsonDecode(response)['getDrivers']['out']['body']['drivers'] as List;
+          jsonDecode(response.toString()) as Map<String, dynamic>;
+      final driversCount = parsedResponse['count'] as int;
       final List<Driver> loadedDrivers = [];
-      for (int i = 0; i < parsedResponse.length; i++) {
-        final parsedResponseItem = parsedResponse[i];
+      for (int i = 0; i < driversCount; i++) {
+        final parsedDriverItem =
+            parsedResponse['Drivers'][i] as Map<String, dynamic>;
         loadedDrivers.add(
-          Driver.fromJson(parsedResponseItem),
+          Driver.fromJson(parsedDriverItem),
         );
       }
       _drivers = loadedDrivers;
       notifyListeners();
       return true;
+    } on TimeoutException catch (error) {
+      _log.warning('[Timeout] $error');
+      return false;
+      // throw TimeoutException(error.toString());
+    } on SocketException catch (error) {
+      _log.warning('[Socket] $error');
+      return false;
+      // throw SocketException(error.toString());
+    } on DioError catch (error) {
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      _log.warning('[Dio] $errorMessage');
+      return false;
+    } on Exception catch (error) {
+      _log.warning('[Exception] $error');
+      return false;
     } catch (error) {
-      debugPrint(error.toString());
+      _log.warning('[Other] $error');
       return false;
     }
-    // on TimeoutException catch (_) {
-    //   return false;
-    // } on SocketException catch (_) {
-    //   return false;
-    // }
   }
 
   // Future<bool> assignReceiptToTransaction(

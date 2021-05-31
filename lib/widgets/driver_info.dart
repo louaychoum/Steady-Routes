@@ -4,6 +4,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/models/driver.dart';
+import 'package:steadyroutes/models/user.dart';
 
 class DriverInfo extends StatefulWidget {
   @override
@@ -23,7 +24,7 @@ class _DriverInfoState extends State<DriverInfo> {
   DateTime selectedDate = DateTime.now();
 
   Driver _editedDriver = Driver(
-    id: 0,
+    id: '',
     name: '',
     company: '',
     drivingLicense: 0,
@@ -31,9 +32,11 @@ class _DriverInfoState extends State<DriverInfo> {
     passportExDate: '',
     passportNumber: '',
     plateNumber: '',
-    username: '',
+    // email: '',
     visaExDate: '',
     visaNumber: 0,
+    phone: 0,
+    user: '' as User,
   );
 
   Future<void> _selectDate(
@@ -98,7 +101,7 @@ class _DriverInfoState extends State<DriverInfo> {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
             child: TextFormField(
               onSaved: (newValue) {
-                _editedDriver = _editedDriver.copyWith(username: newValue);
+                _editedDriver = _editedDriver.copyWith(email: newValue);
               },
               textInputAction: TextInputAction.next,
               decoration: kTextFieldDecoration.copyWith(

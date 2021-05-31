@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:steadyroutes/screens/adminDashBoardScreen/driverScreen/driver_receipts_screen.dart';
+import 'package:steadyroutes/services/auth_service.dart';
 import 'package:steadyroutes/services/steady_api_service.dart';
 
 class DriversListView extends StatefulWidget {
@@ -59,18 +60,19 @@ class _DriversListViewState extends State<DriversListView> {
         return RefreshIndicator(
           key: _refreshKey,
           onRefresh: () {
-            // jwt = Provider.of<AuthService>(context, listen: false).user.jwt;
-            jwt = '';
+            jwt = Provider.of<AuthService>(context, listen: false).user.token;
             return api.driversService.fetchDrivers(jwt);
           },
           child: ListView.builder(
-              itemCount: api.driversService.drivers == null
-                  ? 0
-                  : api.driversService.drivers.length,
+              itemCount: api.driversService.drivers.length,
               itemBuilder: (context, index) {
                 final driver = api.driversService.drivers[index];
                 return ListTile(
                   title: Text(driver.name),
+                  trailing: Text(
+                    driver.user?.email ?? '',
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   onTap: () => Navigator.of(context).pushNamed(
                     DriverReceiptsScreen.routeName,
                     arguments: DriverReceiptsArguments(

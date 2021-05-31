@@ -16,10 +16,11 @@ abstract class AuthService extends ChangeNotifier {
   AuthStatus get status;
 
   Future<bool> signIn({
-    required String username,
+    required String email,
     required String password,
     required bool autoLogin,
   });
+  // Future<bool> refreshToken();
 
   void signOut();
 }

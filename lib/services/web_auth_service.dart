@@ -6,9 +6,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
+import 'package:steadyroutes/models/dio_exception.dart';
 import 'package:steadyroutes/models/user.dart';
 import 'package:steadyroutes/root.dart';
 import 'package:steadyroutes/services/auth_service.dart';
@@ -18,7 +19,8 @@ class WebAuthService with ChangeNotifier implements AuthService {
   static final _log = Logger('WebAuthService');
   static final WebAuthService _instance = WebAuthService._internal();
   static const userPrefKey = "USER_PREF_KEY";
-  final Uri _baseUrl = Uri.parse("http://10.0.2.2:9001/");
+  // final Uri _baseUrl = Uri.parse("https://dropshoptest.herokuapp.com/");
+  final Dio _dio = Dio(options);
   User? _user;
   late AuthStatus _status;
 
@@ -37,7 +39,7 @@ class WebAuthService with ChangeNotifier implements AuthService {
         if (storedUser != null) {
           try {
             signIn(
-              username: storedUser.username,
+              email: storedUser.email,
               password: storedUser.password,
               autoLogin: true,
             ).then((value) {
@@ -63,59 +65,83 @@ class WebAuthService with ChangeNotifier implements AuthService {
 
   @override
   Future<bool> signIn({
-    required String username,
+    required String email,
     required String password,
-    required bool autoLogin,
+    bool? autoLogin,
   }) async {
     _log.info('Sign In Called');
+    print('username $email');
+    print('password $password');
+    print(_user);
+    // final uri = Uri.parse('${_baseUrl}users/login');
     try {
-      // final url = '${apiBase}login.json';
-      // final response = await rootBundle.loadString(url);
-      print('username $username');
-      print('password $password');
-
-      final uri = Uri.parse('${_baseUrl}user/login');
-      final request = await http
-          .post(
-            uri,
-            headers: {"Content-Type": "application/json"},
-            body: json.encode(
-              {
-                'username': username,
-                'password': password,
-              },
-            ),
-          )
-          .timeout(const Duration(seconds: 10));
-      print(request.statusCode);
-
-      if (request.statusCode != 200) {
+      final response = await _dio.post(
+        '/users/login',
+        data: {
+          'email': email,
+          'password': password,
+        },
+      );
+      final append = json.decode(response.toString()) as Map<String, dynamic>;
+      append['email'] = email;
+      append['password'] = password;
+      _user = User.fromJson(append);
+      if (_user == null) {
         return false;
       }
-      //  final resuri =Uri.parse('json.decode(request.body)["userId"]'),
-      final id = json.decode(request.body)["userId"];
-      final response = await http.get(Uri.parse('${_baseUrl}user/$id'));
-      _user = User.fromJson(json.decode(response.body) as Map<String, dynamic>);
-      if (autoLogin) {
+      if (autoLogin == true) {
         _log.info('Auto Login is true');
         saveUserInPref();
       }
-      if (_user!.access == 'admin') {
+      if (_user!.role == 'supplier') {
         setStatus(AuthStatus.adminLoggedIn);
       } else {
         setStatus(AuthStatus.driverLoggedIn);
       }
+      // _user = User.fromJson({"email": email, "password": password});
       return true;
     } on TimeoutException catch (error) {
-      _log.warning(error);
-      throw TimeoutException(error.toString());
+      _log.warning('[Timeout] $error');
+      return false;
+      // throw TimeoutException(error.toString());
     } on SocketException catch (error) {
-      _log.warning(error);
-      throw SocketException(error.toString());
+      _log.warning('[Socket] $error');
+      return false;
+      // throw SocketException(error.toString());
+    } on DioError catch (error) {
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      _log.warning('[Dio] $errorMessage');
+      return false;
     } catch (error) {
-      _log.warning(error);
+      _log.warning('[Other] $error');
       return false;
     }
+    // try {
+    //  http
+    //     .post(
+    //       uri,
+    //       headers: {"Content-Type": "application/x-www-form-urlencoded"},
+    //       body: json.encode(
+    //         {
+    //           'email': username,
+    //           'password': password,
+    //         },
+    //       ),
+    //     )
+    //     .timeout(const Duration(seconds: 10));
+
+    // print(request.statusCode);
+    // if (request.statusCode != 200) {
+    //   print('status error');
+    //   throw HttpException(request.toString());
+    //   // return false;
+    // }
+    //  final resuri =Uri.parse('json.decode(request.body)["userId"]'),
+
+    // final id = json.decode(request.body)["userId"];
+    // final response = await http.get(Uri.parse('${_baseUrl}user/$id'));
+
+    // }
   }
 
   // Future authenticateUser(String username, String password) async {
@@ -188,28 +214,38 @@ class WebAuthService with ChangeNotifier implements AuthService {
   //   }
   //   return true;
   // }
+  Future<bool> processApiError(Response<dynamic> response) async {
+    if (response.statusCode! < 400 || response.statusCode! > 499) {
+      return false;
+    }
+    final bool didRefresh = await refreshToken();
+    if (!didRefresh) {
+      signOut();
+      return false;
+    }
+    return true;
+  }
 
-  //  Future<bool> refreshToken() async {
-  //   try {
-  //     var url = '${API_BASE}users/token/refresh';
-  //     var response = await http
-  //         .post(url,
-  //             headers: {"Content-Type": "application/json"},
-  //             body: json.encode({'refresh': _user.refresh}))
-  //         .timeout(const Duration(seconds: 10));
-  //     if (response.statusCode != 200) {
-  //       return false;
-  //     }
-  //     _user.jwt = json.decode(response.body)['jwt'];
-  //     saveUserInPref();
-  //     setStatus(AuthStatus.LOGGED_IN);
-  //     return true;
-  //   } on TimeoutException catch (_) {
-  //     return false;
-  //   } on SocketException catch (_) {
-  //     return false;
-  //   }
-  // }
+  Future<bool> refreshToken() async {
+    _log.info('refreshing Token');
+    try {
+      final response = await _dio.post(
+        '/users/login',
+        data: {
+          'email': _user!.email,
+          'password': _user!.password,
+        },
+      );
+      final user = json.decode(response.toString()) as Map<String, dynamic>;
+      _user!.token = user['token'].toString();
+      saveUserInPref();
+      return true;
+    } on TimeoutException catch (_) {
+      return false;
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
 
   @override
   void signOut() {
@@ -240,12 +276,11 @@ class WebAuthService with ChangeNotifier implements AuthService {
     _log.info("Getting user's prefrences");
     final pref = await SharedPreferences.getInstance();
     final userPref = pref.getString(userPrefKey);
-    if (userPref != null) {
-      return _user =
-          User.fromJson(json.decode(userPref) as Map<String, dynamic>);
-    } else {
+    if (userPref == '' || userPref == 'null' || userPref == null) {
       setStatus(AuthStatus.notLoggedIn);
+      return null;
     }
+    return _user = User.fromJson(json.decode(userPref) as Map<String, dynamic>);
   }
 
   @override
