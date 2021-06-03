@@ -145,7 +145,7 @@ class WebAuthService with ChangeNotifier implements AuthService {
       // throw SocketException(error.toString());
     } on DioError catch (error) {
       final errorMessage = DioExceptions.fromDioError(error).toString();
-      _log.warning('[Dio] $errorMessage');
+      _log.warning('(Dio) $errorMessage');
       return false;
     } catch (error) {
       _log.warning('[Other] $error');

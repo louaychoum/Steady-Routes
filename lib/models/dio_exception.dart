@@ -31,15 +31,16 @@ class DioExceptions implements Exception {
   late String message;
 
   String _handleError(int statusCode, dynamic error) {
-    switch (statusCode) {
-      case 400:
-        return 'Bad request';
-      case 404:
-        return error["message"].toString();
-      case 500:
-        return 'Internal server error';
-      default:
-        return 'Oops something went wrong';
+    if (statusCode == 400) {
+      return 'Bad request';
+    }
+    if (statusCode >= 401 && statusCode <= 499) {
+      return error["message"].toString();
+    }
+    if (statusCode == 500) {
+      return 'Internal server error';
+    } else {
+      return 'Oops something went wrong';
     }
   }
 
