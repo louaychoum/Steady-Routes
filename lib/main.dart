@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
@@ -30,9 +31,9 @@ void main() {
   Logger.root.onRecord.listen(
     (record) {
       print(
-          '[${record.level.name}]: ${record.loggerName} --- ${record.time} --- ${record.message}');
+          '[${record.level.name}]: ${record.error}... ${record.loggerName} --- ${record.time} --- ${record.message}');
     },
-    onError: (e) => print(e),
+    onError: (e) => print('error $e'),
   );
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -59,29 +60,34 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         // home: AuthScreen(),
         theme: ThemeData(
-          primaryColor: Colors.red,
-          accentColor: Colors.teal,
+          textTheme:
+              GoogleFonts.latoTextTheme(Theme.of(context).textTheme).copyWith(),
+          primaryColor: const Color(0xfff23340),
+          accentColor: const Color(0xff448F83),
           appBarTheme: const AppBarTheme(
             actionsIconTheme: IconThemeData(
-              color: Colors.red,
+              color: Color(0xfff23340),
             ),
             iconTheme: IconThemeData(
-              color: Colors.red,
+              color: Color(0xfff23340),
             ),
-            backgroundColor: Colors.white,
+            backgroundColor: Color(0xffffffff),
             elevation: 0,
           ),
 
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              textStyle: const TextStyle(fontSize: 18),
-              padding: const EdgeInsets.symmetric(vertical: 20),
+              textStyle: GoogleFonts.bungee(
+                fontSize: 24,
+                letterSpacing: 1.5,
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 15),
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
                   Radius.circular(10),
                 ),
               ),
-              primary: Colors.red,
+              primary: const Color(0xfff23340),
             ),
           ),
 

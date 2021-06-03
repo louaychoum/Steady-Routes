@@ -29,9 +29,10 @@ const kTextFieldDecoration = InputDecoration(
 );
 
 const kTextTitleStyle = TextStyle(
-  color: Colors.black,
+  color: Color(0xff000000),
   fontWeight: FontWeight.bold,
   fontSize: 28,
+  letterSpacing: 1,
 );
 
 final BaseOptions options = BaseOptions(

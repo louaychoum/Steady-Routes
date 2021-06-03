@@ -32,16 +32,16 @@ class _RootState extends State<Root> {
       switch (auth.status) {
         case AuthStatus.notDetermined:
           return buildWaitingScreen();
-          break;
+
         case AuthStatus.notLoggedIn:
           return AuthScreen();
-          break;
+
         case AuthStatus.adminLoggedIn:
           return AdminDashboard(); //!
-          break;
+
         case AuthStatus.driverLoggedIn:
           return DriverDashboardScreen();
-          break;
+
         default:
           return buildWaitingScreen();
       }

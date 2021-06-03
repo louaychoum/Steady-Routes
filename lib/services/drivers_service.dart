@@ -21,13 +21,13 @@ class DriversService with ChangeNotifier {
   //   return _drivers.firstWhere((driver) => driver.id == id);
   // }
 
-  Future<bool> fetchDrivers(String jwt) async {
+  Future<bool> fetchDrivers(String jwt, String courierId) async {
     _log.info('fetching drivers');
     try {
       // const url = '${apiBase}Drivers_DataModel.json';
       // final response = await rootBundle.loadString(url);
       final response = await _dio.get(
-        '/drivers',
+        courierId.isNotEmpty ? '/drivers/courier/$courierId' : '/drivers',
         options: Options(
           headers: {'Authorization': ' x $jwt'},
         ),

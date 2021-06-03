@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
+import 'package:steadyroutes/models/courier.dart';
 import 'package:steadyroutes/models/dio_exception.dart';
 import 'package:steadyroutes/models/user.dart';
 import 'package:steadyroutes/root.dart';
@@ -22,6 +23,7 @@ class WebAuthService with ChangeNotifier implements AuthService {
   // final Uri _baseUrl = Uri.parse("https://dropshoptest.herokuapp.com/");
   final Dio _dio = Dio(options);
   User? _user;
+  Courier? _courier;
   late AuthStatus _status;
 
   factory WebAuthService() {
@@ -63,6 +65,32 @@ class WebAuthService with ChangeNotifier implements AuthService {
     notifyListeners();
   }
 
+  Future<void> fillCourierInfo(
+    String id,
+    String jwt,
+  ) async {
+    try {
+      throw UnimplementedError('this error');
+      if (id.isNotEmpty) {
+        final request = await _dio.get(
+          '/couriers/user/$id',
+          options: Options(
+            headers: {'Authorization': ' x $jwt'},
+          ),
+        );
+        final response = json.decode(
+          request.toString(),
+        );
+        print(response['courier']);
+        _courier = Courier.fromJson(
+          response['courier'] as Map<String, dynamic>,
+        );
+      }
+    } catch (error) {
+      _log.warning('dd', error);
+    }
+  }
+
   @override
   Future<bool> signIn({
     required String email,
@@ -93,7 +121,14 @@ class WebAuthService with ChangeNotifier implements AuthService {
         _log.info('Auto Login is true');
         saveUserInPref();
       }
-      if (_user!.role == 'supplier') {
+      if (_user?.role == 'courier') {
+        await fillCourierInfo(
+          _user?.userId ?? '',
+          _user?.token ?? '',
+        );
+        setStatus(AuthStatus.adminLoggedIn);
+      }
+      if (_user?.role == 'supplier') {
         setStatus(AuthStatus.adminLoggedIn);
       } else {
         setStatus(AuthStatus.driverLoggedIn);
@@ -232,12 +267,12 @@ class WebAuthService with ChangeNotifier implements AuthService {
       final response = await _dio.post(
         '/users/login',
         data: {
-          'email': _user!.email,
-          'password': _user!.password,
+          'email': _user?.email,
+          'password': _user?.password,
         },
       );
       final user = json.decode(response.toString()) as Map<String, dynamic>;
-      _user!.token = user['token'].toString();
+      _user?.token = user['token'].toString();
       saveUserInPref();
       return true;
     } on TimeoutException catch (_) {
@@ -287,5 +322,24 @@ class WebAuthService with ChangeNotifier implements AuthService {
   AuthStatus get status => _status;
 
   @override
-  User get user => _user!;
+  User get user =>
+      _user ??
+      User(
+        userId: '',
+        email: '',
+        password: '',
+        role: '',
+        token: '',
+      );
+
+  @override
+  Courier get courier =>
+      _courier ??
+      Courier(
+        id: '',
+        name: '',
+        phone: null,
+        user: _user,
+        location: null,
+      );
 }

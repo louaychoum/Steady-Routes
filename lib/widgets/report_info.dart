@@ -20,6 +20,7 @@ class _ReportInfoState extends State<ReportInfo> {
   // bool isDriver = false;
   bool isLoading = false;
   late String jwt;
+  late String courierId;
   final TextEditingController _fromDateController = TextEditingController();
   final TextEditingController _toDateController = TextEditingController();
   final maskFormatter = MaskTextInputFormatter(
@@ -42,11 +43,13 @@ class _ReportInfoState extends State<ReportInfo> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
       builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            primaryColor: const Color(0xFFF44336),
+        return SingleChildScrollView(
+          child: Theme(
+            data: ThemeData.light().copyWith(
+              primaryColor: const Color(0xFFF44336),
+            ),
+            child: child ?? const SizedBox(),
           ),
-          child: child!,
         );
       },
     );
@@ -103,8 +106,14 @@ class _ReportInfoState extends State<ReportInfo> {
           )
         : Consumer<SteadyApiService>(
             builder: (context, api, child) {
-              jwt = Provider.of<AuthService>(context, listen: false).user.token;
+              final auth = Provider.of<AuthService>(context, listen: false);
+              jwt = auth.user.token;
+              courierId = auth.courier?.id ?? '';
               api.vehiclesService.fetchVehicles('');
+              api.driversService.fetchDrivers(
+                jwt,
+                courierId,
+              );
               final driverData = api.driversService.drivers;
               final vehicleData = api.vehiclesService.vehicles;
               return SingleChildScrollView(
@@ -147,7 +156,10 @@ class _ReportInfoState extends State<ReportInfo> {
                               TextButton(
                                 onPressed: () {
                                   api.driversService
-                                      .fetchDrivers(jwt)
+                                      .fetchDrivers(
+                                        jwt,
+                                        courierId,
+                                      )
                                       .whenComplete(
                                         () => setState(
                                           () {

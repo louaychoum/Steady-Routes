@@ -14,11 +14,14 @@ class AdminDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(Provider.of<AuthService>(context, listen: false).courier?.id);
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Hello ${Provider.of<AuthService>(context, listen: false).user.userId}',
-          style: kTextTitleStyle,
+        title: FittedBox(
+          child: Text(
+            'Hello ${Provider.of<AuthService>(context, listen: false).user.email}\t${Provider.of<AuthService>(context, listen: false).courier?.name}',
+            style: kTextTitleStyle,
+          ),
         ),
       ),
       body: Padding(

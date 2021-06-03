@@ -16,6 +16,7 @@ class DriversListView extends StatefulWidget {
 class _DriversListViewState extends State<DriversListView> {
   final _refreshKey = GlobalKey<RefreshIndicatorState>();
   late String jwt;
+  late String courierId;
   bool isLoading = false;
 
   @override
@@ -29,7 +30,12 @@ class _DriversListViewState extends State<DriversListView> {
     setState(() {
       isLoading = true;
     });
-    return api.driversService.fetchDrivers(jwt).then(
+    return api.driversService
+        .fetchDrivers(
+      jwt,
+      courierId,
+    )
+        .then(
       (value) {
         if (!value) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -41,13 +47,13 @@ class _DriversListViewState extends State<DriversListView> {
                   setState(() {
                     isLoading = true;
                   }),
-                  api.driversService.fetchDrivers(jwt).whenComplete(
-                        () => {
-                          setState(() {
-                            isLoading = false;
-                          }),
-                        },
-                      ),
+                  fetchDrivers(api).whenComplete(
+                    () => {
+                      setState(() {
+                        isLoading = false;
+                      }),
+                    },
+                  ),
                 },
               ),
             ),
@@ -92,15 +98,19 @@ class _DriversListViewState extends State<DriversListView> {
         //     :
         Consumer<SteadyApiService>(
       builder: (context, api, child) {
+        final auth = Provider.of<AuthService>(context, listen: false);
         final driversList = api.driversService.drivers;
         return RefreshIndicator(
           key: _refreshKey,
           onRefresh: () {
-            jwt = Provider.of<AuthService>(context, listen: false).user.token;
+            jwt = auth.user.token;
+            courierId = auth.courier?.id ?? '';
             return fetchDrivers(api).whenComplete(() {
-              setState(() {
-                isLoading = false;
-              });
+              if (mounted) {
+                setState(() {
+                  isLoading = false;
+                });
+              }
             });
           },
           child: driversList.isNotEmpty
