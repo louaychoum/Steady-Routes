@@ -17,7 +17,7 @@ class AdminDashboard extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Hello ${Provider.of<AuthService>(context, listen: false).user.email}',
+          'Hello ${Provider.of<AuthService>(context, listen: false).user.userId}',
           style: kTextTitleStyle,
         ),
       ),

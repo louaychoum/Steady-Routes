@@ -13,7 +13,7 @@ import 'package:steadyroutes/services/steady_api_service.dart';
 
 class UploadedReceiptInfo extends StatelessWidget {
   UploadedReceiptInfo({
-    required File images,
+    required File? images,
     required TextEditingController controller,
   })  : _images = images,
         _controller = controller;
@@ -45,7 +45,7 @@ class UploadedReceiptInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    late File compressedImage;
+    File? compressedImage;
     return Consumer<SteadyApiService>(
       builder: (context, api, child) {
         api.vehiclesService.fetchVehicles('');
@@ -99,6 +99,7 @@ class UploadedReceiptInfo extends StatelessWidget {
                     ),
                     // The validator receives the text that the user has entered.
                     validator: (value) {
+                      print('na $value');
                       if (value == null) {
                         return 'Please enter a valid cash amount';
                       }
@@ -173,9 +174,12 @@ class UploadedReceiptInfo extends StatelessWidget {
                       },
                       child: const Text('Upload'),
                     ),
-                  SizedBox(
-                    child: Image.file(compressedImage),
-                  ),
+                  if (compressedImage != null)
+                    SizedBox(
+                      child: Image.file(compressedImage!),
+                    )
+                  else
+                    const SizedBox(),
                 ],
               ),
             ),

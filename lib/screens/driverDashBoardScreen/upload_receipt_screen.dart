@@ -91,7 +91,7 @@ class _UploadReceiptScreenState extends State<UploadReceiptScreen> {
           Flexible(
             flex: 2,
             child: UploadedReceiptInfo(
-              images: _images!,
+              images: _images,
               controller: _controller,
             ),
             // UploadReceiptInfo(formKey: _formKey, images: _images),

@@ -22,6 +22,7 @@ class DriversService with ChangeNotifier {
   // }
 
   Future<bool> fetchDrivers(String jwt) async {
+    _log.info('fetching drivers');
     try {
       // const url = '${apiBase}Drivers_DataModel.json';
       // final response = await rootBundle.loadString(url);
@@ -31,11 +32,6 @@ class DriversService with ChangeNotifier {
           headers: {'Authorization': ' x $jwt'},
         ),
       );
-      if (response.statusCode != 200) {
-        WebAuthService().processApiError(response);
-        return false;
-      }
-
       _drivers.clear();
       final parsedResponse =
           jsonDecode(response.toString()) as Map<String, dynamic>;
@@ -60,6 +56,15 @@ class DriversService with ChangeNotifier {
       return false;
       // throw SocketException(error.toString());
     } on DioError catch (error) {
+      if (error.response == null) {
+        return false;
+      }
+      if (error.response?.statusCode != 200) {
+        final errorMessage = DioExceptions.fromDioError(error).toString();
+        _log.warning('[Dio] $errorMessage');
+        WebAuthService().processApiError(error.response!);
+        return false;
+      }
       final errorMessage = DioExceptions.fromDioError(error).toString();
       _log.warning('[Dio] $errorMessage');
       return false;
