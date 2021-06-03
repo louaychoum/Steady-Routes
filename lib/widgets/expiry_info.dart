@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/receiptScreen/expiry_list_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/expiry_list_screen.dart';
 
 class ExpiryInfo extends StatefulWidget {
   @override

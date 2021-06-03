@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
-import 'package:steadyroutes/screens/driverDashboardScreen/driver_dashboard_screen.dart';
+import 'package:steadyroutes/pages/driverDashboardScreen/driver_dashboard_screen.dart';
 import 'package:steadyroutes/services/navigator_sevice.dart';
 import 'package:steadyroutes/widgets/mall_dropdown.dart';
 

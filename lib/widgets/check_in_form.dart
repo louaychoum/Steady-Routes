@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 import 'package:steadyroutes/helpers/geolocator.dart';
-import 'package:steadyroutes/screens/driverDashBoardScreen/driver_dashboard_screen.dart';
+import 'package:steadyroutes/pages/driverDashBoardScreen/driver_dashboard_screen.dart';
 import 'package:steadyroutes/services/navigator_sevice.dart';
 import 'package:steadyroutes/widgets/mall_dropdown.dart';
 

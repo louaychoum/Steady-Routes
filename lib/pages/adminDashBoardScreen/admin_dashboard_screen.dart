@@ -1,21 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:steadyroutes/helpers/constants.dart';
 
-import 'package:steadyroutes/screens/driverDashboardScreen/check_in_screen.dart';
-import 'package:steadyroutes/screens/driverDashBoardScreen/check_out_screen.dart';
-import 'package:steadyroutes/screens/driverDashBoardScreen/upload_receipt_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/driverScreen/driver_list_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/expiry_report_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/receipt_report_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/vehicleScreen/vehicle_list_screen.dart';
 import 'package:steadyroutes/services/auth_service.dart';
 import 'package:steadyroutes/widgets/dashboard_button.dart';
 
-class DriverDashboardScreen extends StatelessWidget {
-  static const routeName = '/driver-dashboard';
+class AdminDashboard extends StatelessWidget {
+  static const routeName = '/admin';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Hello ${Provider.of<AuthService>(context, listen: false).user.userId}',
+          style: kTextTitleStyle,
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
-          vertical: 10,
           horizontal: 8,
         ),
         child: Column(
@@ -23,26 +30,33 @@ class DriverDashboardScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Spacer(
-              flex: 3,
+              flex: 1, //3
             ),
             DashboardButton(
-              'Upload Receipt',
+              'Drivers',
               () => Navigator.of(context).pushNamed(
-                UploadReceiptScreen.routeName,
+                DriverList.routeName,
               ),
             ),
             const Spacer(),
             DashboardButton(
-              'Check In',
+              'Vehicles',
               () => Navigator.of(context).pushNamed(
-                CheckInScreen.routeName,
+                VehicleList.routeName,
               ),
             ),
             const Spacer(),
             DashboardButton(
-              'Check Out',
+              'Receipts Report',
               () => Navigator.of(context).pushNamed(
-                CheckOutScreen.routeName,
+                ReceiptReport.routeName,
+              ),
+            ),
+            const Spacer(),
+            DashboardButton(
+              'Near Expiry Report',
+              () => Navigator.of(context).pushNamed(
+                ExpiryReport.routeName,
               ),
             ),
             const Spacer(),

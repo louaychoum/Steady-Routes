@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:steadyroutes/helpers/constants.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/receiptScreen/report_list_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/report_list_screen.dart';
 import 'package:steadyroutes/services/auth_service.dart';
 import 'package:steadyroutes/services/steady_api_service.dart';
 

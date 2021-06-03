@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/vehicleScreen/add_vehicle_screen.dart';
-import 'package:steadyroutes/widgets/vehicles_listview.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/driverScreen/add_driver_screen.dart';
+import 'package:steadyroutes/widgets/drivers_listview.dart';
 
-class VehicleList extends StatelessWidget {
-  static const routeName = '/vehicle-list';
+class DriverList extends StatelessWidget {
+  static const routeName = '/driver-list';
+
+  // final myProducts = List<String>.generate(20, (i) => 'Driver $i');
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +20,7 @@ class VehicleList extends StatelessWidget {
               Icons.add,
             ),
             onPressed: () =>
-                Navigator.of(context).pushNamed(AddVehicle.routeName),
+                Navigator.of(context).pushNamed(AddDriver.routeName),
           ),
         ],
       ),
@@ -28,14 +30,14 @@ class VehicleList extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Vehicles List',
+              'Drivers List',
               style: kTextTitleStyle,
             ),
             const Divider(
               color: Colors.red,
             ),
             Expanded(
-              child: VehiclesListView(),
+              child: DriversListView(),
             ),
           ],
         ),

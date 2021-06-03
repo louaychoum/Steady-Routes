@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:steadyroutes/screens/adminDashboardScreen/vehicleScreen/add_vehicle_screen.dart';
+import 'package:steadyroutes/pages/adminDashboardScreen/vehicleScreen/add_vehicle_screen.dart';
 import 'package:steadyroutes/services/steady_api_service.dart';
 
 class VehiclesListView extends StatefulWidget {
