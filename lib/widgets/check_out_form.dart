@@ -70,7 +70,7 @@ class _CheckOutFormState extends State<CheckOutForm> {
             ),
             MallDropdown(
               (newVal) {
-                selectedValue = newVal!;
+                selectedValue = newVal ?? '';
               },
             ),
             const Spacer(),

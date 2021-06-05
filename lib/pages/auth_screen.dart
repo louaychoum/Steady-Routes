@@ -1,8 +1,12 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/services/auth_service.dart';
+import 'package:steadyroutes/widgets/dashboard_button.dart';
+import 'package:steadyroutes/widgets/default_textfield.dart';
 
 class AuthScreen extends StatelessWidget {
   static const routeName = '/auth';
@@ -28,7 +32,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
 
-  late String _username;
+  late String _email;
   late String _password;
   late String _errorMessage;
 
@@ -63,7 +67,7 @@ class _LoginState extends State<Login> {
     });
     try {
       if (!await auth.signIn(
-        email: _username,
+        email: _email,
         password: _password,
         autoLogin: autoLogin,
       )) {
@@ -199,71 +203,82 @@ class _LoginState extends State<Login> {
 
   Widget _showForm() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Flexible(
-          fit: FlexFit.tight,
-          child: Image.asset('assets/images/logo.png'),
+        Expanded(
+          child: Image.asset(
+            'assets/images/logo.png',
+          ),
         ),
-        Flexible(
+        Expanded(
           child: Form(
             key: _formKey,
-            child: Padding(
+            child: ListView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: const EdgeInsets.all(8.0),
-              child: ListView(
-                children: [
-                  showUsernameInput(),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  showPasswordInput(),
-                  showAutoLoginCheck(),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  showErrorMessage(),
-                  showPrimaryButton(),
-                  // if (_isLoading)
-                  //   CircularProgressIndicator()
-                  // else
-                  // TextButton(
-                  //   onPressed: _submit,
-                  //   style: TextButton.styleFrom(
-                  //     shape: RoundedRectangleBorder(
-                  //       borderRadius: BorderRadius.circular(30),
-                  //     ),
-                  //     padding:
-                  //         EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0),
-                  //     primary: Theme.of(context).primaryColor,
-                  //   ),
-                  //   child: const Text(
-                  //     'Admin Login',
-                  //     style: TextStyle(
-                  //         // color: Theme.of(context).,
-                  //         ),
-                  //   ),
-                  // ),
-                  // SizedBox(
-                  //   height: 10,
-                  // ),
-                  // TextButton(
-                  //   child: Text(
-                  //     'Driver Login',
-                  //     style: TextStyle(
-                  //       color: Colors.red,
-                  //     ),
-                  //   ),
-                  //   onPressed: () => Navigator.of(context)
-                  //       .pushNamed(DriverDashboardScreen.routeName),
-                  //   style: TextButton.styleFrom(
-                  //     padding:
-                  //         EdgeInsets.symmetric(horizontal: 30.0, vertical: 4),
-                  //     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  //   ),
-                  // ),
-                ],
-              ),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: showUsernameInput(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: showPasswordInput(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: showAutoLoginCheck(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: showErrorMessage(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: showPrimaryButton(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: showSignUpButton(),
+                ),
+                // if (_isLoading)
+                //   CircularProgressIndicator()
+                // else
+                // TextButton(
+                //   onPressed: _submit,
+                //   style: TextButton.styleFrom(
+                //     shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(30),
+                //     ),
+                //     padding:
+                //         EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0),
+                //     primary: Theme.of(context).primaryColor,
+                //   ),
+                //   child: const Text(
+                //     'Admin Login',
+                //     style: TextStyle(
+                //         // color: Theme.of(context).,
+                //         ),
+                //   ),
+                // ),
+                // SizedBox(
+                //   height: 10,
+                // ),
+                // TextButton(
+                //   child: Text(
+                //     'Driver Login',
+                //     style: TextStyle(
+                //       color: Colors.red,
+                //     ),
+                //   ),
+                //   onPressed: () => Navigator.of(context)
+                //       .pushNamed(DriverDashboardScreen.routeName),
+                //   style: TextButton.styleFrom(
+                //     padding:
+                //         EdgeInsets.symmetric(horizontal: 30.0, vertical: 4),
+                //     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                //   ),
+                // ),
+              ],
             ),
           ),
         ),
@@ -273,59 +288,56 @@ class _LoginState extends State<Login> {
 
   Widget showErrorMessage() {
     if (_errorMessage.isNotEmpty) {
-      return Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: Center(
-          child: Text(
-            _errorMessage,
-            style: const TextStyle(
-              color: Colors.red,
-            ),
-          ),
+      return Text(
+        _errorMessage,
+        style: const TextStyle(
+          color: Colors.red,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1,
         ),
+        textAlign: TextAlign.center,
       );
     }
-    return Container();
+    return const SizedBox();
   }
 
   Widget showUsernameInput() {
-    return TextFormField(
-      decoration: kTextFieldDecoration,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return "Username can't be empty!";
-        }
-        return null;
-      },
-      onSaved: (value) => _username = value!.trim(),
-      // _authData['username'] = value;
+    return DefaultTextfield(
+      keyboard: TextInputType.emailAddress,
+      savedValue: (value) => _email = value ?? '',
+      decoration: kTextFieldDecoration.copyWith(
+        prefixIcon: Icon(
+          Icons.email,
+          color: Theme.of(context).accentColor,
+        ),
+        labelText: 'Email',
+        hintText: 'Enter your email',
+      ),
     );
   }
 
   Widget showPasswordInput() {
-    return TextFormField(
+    return DefaultTextfield(
       decoration: kTextFieldDecoration.copyWith(
-          labelText: 'Password', hintText: 'Enter your password'),
-      obscureText: true,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return "Password can't be empty!";
-        }
-        // !if (value.length < 8) {
-        //   return 'Password is too short!';
-        // }
-        return null;
-      },
-      onSaved: (value) => _password = value!.trim(),
-      //   _authData['password'] = value;
-      // },
+        labelText: 'Password',
+        hintText: 'Enter your password',
+        prefixIcon: Icon(
+          Icons.lock,
+          color: Theme.of(context).accentColor,
+        ),
+      ),
+      isPassword: true,
+      savedValue: (value) => _password = value ?? '',
     );
   }
 
   Widget showAutoLoginCheck() {
     return CheckboxListTile(
+      contentPadding: const EdgeInsets.only(left: 3),
       controlAffinity: ListTileControlAffinity.leading,
-      title: const Text('Auto Login'),
+      title: const Text(
+        'Auto Login',
+      ),
       value: _autoLogin,
       onChanged: (value) {
         setState(() {
@@ -336,17 +348,18 @@ class _LoginState extends State<Login> {
   }
 
   Widget showPrimaryButton() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16.0),
-      child: ElevatedButton(
-        onPressed: () => validateAndSubmit(
-          autoLogin: _autoLogin,
-        ),
-        child: const Text(
-          'Login',
-          // style: TextStyle(fontSize: 20.0, color: Colors.white),
-        ),
+    return DashboardButton(
+      'Login',
+      () => validateAndSubmit(
+        autoLogin: _autoLogin,
       ),
+    );
+  }
+
+  Widget showSignUpButton() {
+    return TextButton(
+      onPressed: () => null,
+      child: const Text('Create a new account'),
     );
   }
 }

@@ -1,31 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 //* Could be config file
 
 const String apiBase = 'assets/json/';
 
 const kTextFieldDecoration = InputDecoration(
-  labelText: 'Username',
-  hintText: 'Enter your username',
-  labelStyle: TextStyle(
-    color: Colors.black,
-  ),
-  hintStyle: TextStyle(color: Colors.blueGrey),
-  border: OutlineInputBorder(
-    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-  ),
-  enabledBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-  ),
-  focusedBorder: OutlineInputBorder(
-    borderSide: BorderSide(width: 2.0),
-    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-  ),
-  errorBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.red),
-    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-  ),
+  labelText: '',
+  hintText: '',
 );
 
 const kTextTitleStyle = TextStyle(

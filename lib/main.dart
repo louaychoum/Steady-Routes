@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
+import 'package:steadyroutes/helpers/constants.dart';
 
 import 'package:steadyroutes/pages/adminDashBoardScreen/admin_dashboard_screen.dart';
 import 'package:steadyroutes/pages/adminDashBoardScreen/driverScreen/add_driver_screen.dart';
@@ -47,6 +48,9 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    const primaryColor = Color(0xfff23340);
+    const accentColor = Color(0xff448F83);
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthService>(
@@ -61,16 +65,45 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         // home: AuthScreen(),
         theme: ThemeData(
+          fixTextFieldOutlineLabel: true,
+          inputDecorationTheme: const InputDecorationTheme(
+            alignLabelWithHint: true,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(width: 2.0),
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.red),
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            ),
+            hintStyle: TextStyle(
+              color: Color(0xFF607D8B),
+            ),
+            labelStyle: TextStyle(
+              color: Color(0xFF000000),
+            ),
+          ),
           textTheme:
               GoogleFonts.latoTextTheme(Theme.of(context).textTheme).copyWith(),
-          primaryColor: const Color(0xfff23340),
-          accentColor: const Color(0xff448F83),
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              primary: accentColor,
+            ),
+          ),
+          primaryColor: primaryColor,
+          accentColor: accentColor,
           appBarTheme: const AppBarTheme(
             actionsIconTheme: IconThemeData(
-              color: Color(0xfff23340),
+              color: primaryColor,
             ),
             iconTheme: IconThemeData(
-              color: Color(0xfff23340),
+              color: primaryColor,
             ),
             backgroundColor: Color(0xffffffff),
             elevation: 0,
@@ -88,7 +121,7 @@ class MyApp extends StatelessWidget {
                   Radius.circular(10),
                 ),
               ),
-              primary: const Color(0xfff23340),
+              primary: primaryColor,
             ),
           ),
 
