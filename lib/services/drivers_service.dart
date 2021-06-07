@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
+import 'package:steadyroutes/models/courier.dart';
 import 'package:steadyroutes/models/dio_exception.dart';
 import 'package:steadyroutes/models/driver.dart';
 import 'package:steadyroutes/models/user.dart';
@@ -24,14 +25,18 @@ class DriversService with ChangeNotifier {
   Future<bool> fetchDrivers(String jwt, String courierId) async {
     _log.info('fetching drivers');
     try {
-      // const url = '${apiBase}Drivers_DataModel.json';
-      // final response = await rootBundle.loadString(url);
       final response = await _dio.get(
-        courierId.isNotEmpty ? '/drivers/courier/$courierId' : '/drivers',
+        '/drivers',
         options: Options(
           headers: {'Authorization': ' x $jwt'},
         ),
       );
+      // final response = await _dio.get(
+      //   courierId.isNotEmpty ? '/drivers/courier/$courierId' : '/drivers',
+      //   options: Options(
+      //     headers: {'Authorization': ' x $jwt'},
+      //   ),
+      // );
       _drivers.clear();
       final parsedResponse =
           jsonDecode(response.toString()) as Map<String, dynamic>;
@@ -77,45 +82,13 @@ class DriversService with ChangeNotifier {
     }
   }
 
-  Future<void> addDriver(
+  Future<bool> addDriver(
     String jwt,
     Driver _editedDriver,
   ) async {
+    _log.info('adding driver');
     try {
-      // final response = await _dio.post(
-      //   '/drivers',
-      //   options: Options(
-      //     headers: {'Authorization': ' x $jwt'},
-      //   ),
-      //   data: {
-      //     'id': _editedDriver.id,
-      //     'name': _editedDriver.name,
-      //     'phone': _editedDriver.phone,
-      //     'drivingLicense': _editedDriver.drivingLicense,
-      //     'company': _editedDriver.company,
-      //     'drivingLicenseExDate': _editedDriver.drivingLicenseExDate,
-      //     'passportExDate': _editedDriver.passportExDate,
-      //     'passportNumber': _editedDriver.passportNumber,
-      //     'plateNumber': _editedDriver.plateNumber,
-      //     'visaExDate': _editedDriver.visaExDate,
-      //     'visaNumber': _editedDriver.visaNumber,
-      //   },
-      // );
-      // if (response.statusCode != 200) {
-      //   WebAuthService().processApiError(response);
-      // }
-
-      final newDriver = Driver(
-        user: User(
-          email: '',
-          password: '',
-          role: '',
-          token: '',
-          userId: '',
-        ),
-        id: 'a1',
-        // id: json.decode(response.toString())['Drivers']['_id'].toString(),
-        // user: json.decode(response.toString())['Drivers']['user'] as User,
+      final Driver newDriver = Driver(
         name: _editedDriver.name,
         phone: _editedDriver.phone,
         drivingLicense: _editedDriver.drivingLicense,
@@ -126,12 +99,54 @@ class DriversService with ChangeNotifier {
         plateNumber: _editedDriver.plateNumber,
         visaExDate: _editedDriver.visaExDate,
         visaNumber: _editedDriver.visaNumber,
+        user: User(
+          email: '${_editedDriver.name}@${_editedDriver.company}.com',
+          password: 'password',
+          role: 'driver',
+          token: jwt,
+          userId: '',
+        ),
+        courier: _editedDriver.courier,
       );
+
+      final response = await _dio.post(
+        '/drivers/',
+        options: Options(
+          headers: {'Authorization': ' x $jwt'},
+        ),
+        data: newDriver.toJson(),
+      );
+
       drivers.add(newDriver);
       notifyListeners();
+      return true;
+    } on TimeoutException catch (error) {
+      _log.warning('[Timeout] $error');
+      return false;
+      // throw TimeoutException(error.toString());
+    } on SocketException catch (error) {
+      _log.warning('[Socket] $error');
+      return false;
+      // throw SocketException(error.toString());
+    } on DioError catch (error) {
+      if (error.response == null) {
+        return false;
+      }
+      if (error.response?.statusCode != 200) {
+        final errorMessage = DioExceptions.fromDioError(error).toString();
+        _log.warning('[Dio] $errorMessage');
+        WebAuthService().processApiError(error.response!);
+        return false;
+      }
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      _log.warning('[Dio] $errorMessage');
+      return false;
+    } on Exception catch (error) {
+      _log.warning('[Exception] $error');
+      return false;
     } catch (error) {
-      _log.warning(error);
-      rethrow;
+      _log.warning('[Other] $error');
+      return false;
     }
   }
 

@@ -32,7 +32,8 @@ void main() {
   Logger.root.onRecord.listen(
     (record) {
       print(
-        '${record.sequenceNumber}-[${record.level.name}]: ${record.time.toLocal()}, ${record.loggerName}, ${record.message}, Error: ${record.error ?? ''}, StackTrace: ${record.stackTrace ?? ''}',
+        '${record.sequenceNumber}-[${record.level.name}]: ${record.time.toLocal()}, ${record.loggerName}, ${record.message}',
+        //  Error: ${record.error ?? ''}, StackTrace: ${record.stackTrace ?? ''}',
       );
     },
     onError: (e) => print('error $e'),

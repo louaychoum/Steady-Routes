@@ -128,8 +128,12 @@ class _DriversListViewState extends State<DriversListView> {
                       onDismissed: (direction) {
                         setState(() {
                           // final deletedDriver = driversList.removeAt(index);
+
                           final deletedDriver = driver;
-                          api.driversService.deleteDriver(jwt, driver.id);
+                          api.driversService.deleteDriver(
+                            jwt,
+                            driver.id ?? '',
+                          );
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text("${driver.name} was deleted"),

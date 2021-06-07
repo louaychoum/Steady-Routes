@@ -69,8 +69,8 @@ class WebAuthService with ChangeNotifier implements AuthService {
     String id,
     String jwt,
   ) async {
+    _log.info('fillCourierInfo');
     try {
-      throw UnimplementedError('this error');
       if (id.isNotEmpty) {
         final request = await _dio.get(
           '/couriers/user/$id',
@@ -81,13 +81,12 @@ class WebAuthService with ChangeNotifier implements AuthService {
         final response = json.decode(
           request.toString(),
         );
-        print(response['courier']);
         _courier = Courier.fromJson(
           response['courier'] as Map<String, dynamic>,
         );
       }
     } catch (error) {
-      _log.warning('dd', error);
+      _log.warning('fillCourierInfo', error);
     }
   }
 
@@ -100,7 +99,7 @@ class WebAuthService with ChangeNotifier implements AuthService {
     _log.info('Sign In Called');
     print('username $email');
     print('password $password');
-    print(_user);
+    print(_user?.role);
     // final uri = Uri.parse('${_baseUrl}users/login');
     try {
       final response = await _dio.post(
@@ -127,14 +126,16 @@ class WebAuthService with ChangeNotifier implements AuthService {
           _user?.token ?? '',
         );
         setStatus(AuthStatus.adminLoggedIn);
+        return true;
       }
       if (_user?.role == 'supplier') {
         setStatus(AuthStatus.adminLoggedIn);
+        return true;
       } else {
         setStatus(AuthStatus.driverLoggedIn);
+        return true;
       }
       // _user = User.fromJson({"email": email, "password": password});
-      return true;
     } on TimeoutException catch (error) {
       _log.warning('[Timeout] $error');
       return false;

@@ -100,205 +100,182 @@ class _ReportInfoState extends State<ReportInfo> {
 
   @override
   Widget build(BuildContext context) {
-    return isLoading
-        ? const Center(
-            child: CircularProgressIndicator(),
-          )
-        : Consumer<SteadyApiService>(
-            builder: (context, api, child) {
-              final auth = Provider.of<AuthService>(context, listen: false);
-              jwt = auth.user.token;
-              courierId = auth.courier?.id ?? '';
-              api.vehiclesService.fetchVehicles('');
-              api.driversService.fetchDrivers(
-                jwt,
-                courierId,
-              );
-              final driverData = api.driversService.drivers;
-              final vehicleData = api.vehiclesService.vehicles;
-              return SingleChildScrollView(
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 20),
-                        child: DropdownSearch<String>(
-                          showAsSuffixIcons: true,
-                          searchBoxDecoration: kTextFieldDecoration.copyWith(
-                            labelText: 'Driver Name',
-                            hintText: 'Search drivers',
-                          ),
-                          dropdownSearchDecoration:
-                              kTextFieldDecoration.copyWith(
-                            labelText: 'Driver Name',
-                            hintText: 'Choose a driver',
-                          ),
-                          showClearButton: true,
-                          validator: (value) {
-                            if (value == null) {
-                              return 'Please select a driver';
-                            }
-                            return null;
-                          },
-                          mode: Mode.BOTTOM_SHEET,
-                          emptyBuilder: (context, searchEntry) => Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Text(
-                                'No Drivers Added Yet...',
-                                style: Theme.of(context).textTheme.headline6,
-                                textAlign: TextAlign.center,
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  api.driversService
-                                      .fetchDrivers(
-                                        jwt,
-                                        courierId,
-                                      )
-                                      .whenComplete(
-                                        () => setState(
-                                          () {
-                                            isLoading = false;
-                                          },
-                                        ),
-                                      );
-                                  setState(() {
-                                    isLoading = true;
-                                  });
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text('Refresh'),
-                              )
-                            ],
-                          ),
-                          showSearchBox: true,
-                          items: driverData.map(
-                            (item) {
-                              return item.name;
-                            },
-                          ).toList(),
+    return Consumer<SteadyApiService>(
+      builder: (context, api, child) {
+        final auth = Provider.of<AuthService>(context, listen: false);
+        jwt = auth.user.token;
+        courierId = auth.courier?.id ?? '';
+        // api.vehiclesService.fetchVehicles('');
+        print('build');
+        //  api.driversService.fetchDrivers(
+        //   jwt,
+        //   courierId,
+        // );
+        final driverData = api.driversService.drivers;
+        final vehicleData = api.vehiclesService.vehicles;
+        return SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+                  child: DropdownSearch<String>(
+                    showAsSuffixIcons: true,
+                    searchBoxDecoration: kTextFieldDecoration.copyWith(
+                      labelText: 'Driver Name',
+                      hintText: 'Search drivers',
+                    ),
+                    dropdownSearchDecoration: kTextFieldDecoration.copyWith(
+                      labelText: 'Driver Name',
+                      hintText: 'Choose a driver',
+                    ),
+                    showClearButton: true,
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select a driver';
+                      }
+                      return null;
+                    },
+                    mode: Mode.BOTTOM_SHEET,
+                    emptyBuilder: (context, searchEntry) {
+                      isLoading = true;
+                      api.driversService
+                          .fetchDrivers(
+                            jwt,
+                            courierId,
+                          ) 
+                          .whenComplete(() => isLoading = false);
+                      return isLoading
+                          ? const Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : const SizedBox();
+                    },
+                    showSearchBox: true,
+                    items: driverData.map(
+                      (item) {
+                        return item.name;
+                      },
+                    ).toList(),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 20,
+                  ),
+                  child: DropdownSearch<String>(
+                    showAsSuffixIcons: true,
+                    searchBoxDecoration: kTextFieldDecoration.copyWith(
+                      labelText: 'Vehicle Name',
+                      hintText: 'Search vehicles',
+                    ),
+                    dropdownSearchDecoration: kTextFieldDecoration.copyWith(
+                      labelText: 'Vehicle Name',
+                      hintText: 'Choose a vehicle',
+                    ),
+                    showClearButton: true,
+                    // validator: (value) {
+                    //   if (value == null) {
+                    //     return 'Please select a vehicle';
+                    //   }
+                    //   return null;
+                    // },
+                    mode: Mode.BOTTOM_SHEET,
+                    showSearchBox: true,
+                    items: vehicleData.map((item) {
+                      return item.name;
+                    }).toList(),
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+                  child: TextFormField(
+                    inputFormatters: [maskFormatter],
+                    controller: _fromDateController,
+                    keyboardType: TextInputType.datetime,
+                    decoration: kTextFieldDecoration.copyWith(
+                      labelText: 'From Date',
+                      hintText: '',
+                      suffixIcon: IconButton(
+                        icon: const Icon(
+                          Icons.calendar_today_sharp,
+                        ),
+                        onPressed: () => _selectDate(
+                          context,
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 20,
-                        ),
-                        child: DropdownSearch<String>(
-                          showAsSuffixIcons: true,
-                          searchBoxDecoration: kTextFieldDecoration.copyWith(
-                            labelText: 'Vehicle Name',
-                            hintText: 'Search vehicles',
-                          ),
-                          dropdownSearchDecoration:
-                              kTextFieldDecoration.copyWith(
-                            labelText: 'Vehicle Name',
-                            hintText: 'Choose a vehicle',
-                          ),
-                          showClearButton: true,
-                          // validator: (value) {
-                          //   if (value == null) {
-                          //     return 'Please select a vehicle';
-                          //   }
-                          //   return null;
-                          // },
-                          mode: Mode.BOTTOM_SHEET,
-                          showSearchBox: true,
-                          items: vehicleData.map((item) {
-                            return item.name;
-                          }).toList(),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 20),
-                        child: TextFormField(
-                          inputFormatters: [maskFormatter],
-                          controller: _fromDateController,
-                          keyboardType: TextInputType.datetime,
-                          decoration: kTextFieldDecoration.copyWith(
-                            labelText: 'From Date',
-                            hintText: '',
-                            suffixIcon: IconButton(
-                              icon: const Icon(
-                                Icons.calendar_today_sharp,
-                              ),
-                              onPressed: () => _selectDate(
-                                context,
-                              ),
-                            ),
-                          ),
+                    ),
 
-                          // The validator receives the text that the user has entered.
-                          validator: (value) {
-                            if (value == null ||
-                                value.isEmpty ||
-                                value.length < 10 ||
-                                value.length > 10) {
-                              return 'Please enter a valid Date';
-                            }
-                            return null;
-                          },
+                    // The validator receives the text that the user has entered.
+                    validator: (value) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.length < 10 ||
+                          value.length > 10) {
+                        return 'Please enter a valid Date';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+                  child: TextFormField(
+                    inputFormatters: [maskFormatter],
+                    keyboardType: TextInputType.datetime,
+                    controller: _toDateController,
+                    decoration: kTextFieldDecoration.copyWith(
+                      labelText: 'To Date',
+                      hintText: '',
+                      suffixIcon: IconButton(
+                        icon: const Icon(
+                          Icons.calendar_today_sharp,
+                        ),
+                        onPressed: () => _selectDate(
+                          context,
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 20),
-                        child: TextFormField(
-                          inputFormatters: [maskFormatter],
-                          keyboardType: TextInputType.datetime,
-                          controller: _toDateController,
-                          decoration: kTextFieldDecoration.copyWith(
-                            labelText: 'To Date',
-                            hintText: '',
-                            suffixIcon: IconButton(
-                              icon: const Icon(
-                                Icons.calendar_today_sharp,
-                              ),
-                              onPressed: () => _selectDate(
-                                context,
-                              ),
-                            ),
-                          ),
-                          // The validator receives the text that the user has entered.
-                          validator: (value) {
-                            if (value == null ||
-                                value.isEmpty ||
-                                value.length < 10 ||
-                                value.length > 10) {
-                              return 'Please enter a valid Date';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 20),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // !if (!isDriver) {
-                            //   const snackBar = SnackBar(
-                            //     content: Text('Please Select a Driver'),
-                            //     duration: Duration(seconds: 1),
-                            //     backgroundColor: Colors.red,
-                            //   );
-                            //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                            // }
+                    ),
+                    // The validator receives the text that the user has entered.
+                    validator: (value) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.length < 10 ||
+                          value.length > 10) {
+                        return 'Please enter a valid Date';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // !if (!isDriver) {
+                      //   const snackBar = SnackBar(
+                      //     content: Text('Please Select a Driver'),
+                      //     duration: Duration(seconds: 1),
+                      //     backgroundColor: Colors.red,
+                      //   );
+                      //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      // }
 
-                            // Validate returns true if the form is valid, or false otherwise.
-                            // if (_formKey.currentState!.validate()) {
-                            if (_formKey.currentState != null) {
-                              if (_formKey.currentState!.validate()) {
-                                //!isdriver
-                                // If the form is valid, display a snackbar. In the real world,
-                                // you'd often call a server or save the information in a database.
-                                /** 
+                      // Validate returns true if the form is valid, or false otherwise.
+                      // if (_formKey.currentState!.validate()) {
+                      if (_formKey.currentState != null) {
+                        if (_formKey.currentState!.validate()) {
+                          //!isdriver
+                          // If the form is valid, display a snackbar. In the real world,
+                          // you'd often call a server or save the information in a database.
+                          /** 
                        ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Processing Data'),
@@ -306,19 +283,18 @@ class _ReportInfoState extends State<ReportInfo> {
                       );
                       */
 
-                                Navigator.of(context)
-                                    .pushNamed(ReportList.routeName);
-                              }
-                            }
-                          },
-                          child: const Text('Submit'),
-                        ),
-                      ),
-                    ],
+                          Navigator.of(context).pushNamed(ReportList.routeName);
+                        }
+                      }
+                    },
+                    child: const Text('Submit'),
                   ),
                 ),
-              );
-            },
-          );
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

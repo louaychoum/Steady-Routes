@@ -1,9 +1,10 @@
+import 'package:steadyroutes/models/courier.dart';
 import 'package:steadyroutes/models/user.dart';
 
 class Driver {
-  final String id;
+  final String? id;
   final String name;
-  // final String email;
+  final Courier? courier;
   final User? user;
   final int phone;
   final String plateNumber;
@@ -16,10 +17,10 @@ class Driver {
   final String visaExDate; //*may require change
 
   Driver({
-    required this.id,
+    this.id,
     required this.name,
-    // required this.email,
     required this.user,
+    required this.courier,
     required this.phone,
     required this.plateNumber,
     required this.drivingLicense,
@@ -37,7 +38,9 @@ class Driver {
         user = json['user'] == null
             ? null
             : User.fromJson(json['user'] as Map<String, dynamic>),
-        // email = json['user']['email'].toString(),
+        courier = json['courier'] == null
+            ? null
+            : Courier.fromJson(json['courier'] as Map<String, dynamic>),
         phone = int.tryParse(json['phone'].toString()) ?? 0,
         drivingLicense = int.tryParse(json['licenseNo'].toString()) ?? 0,
         plateNumber = json['plateNumber'].toString(),
@@ -50,9 +53,9 @@ class Driver {
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    data['_id'] = id;
     data['name'] = name;
-    // data['email'] = email;
+    data['user'] = user?.toJson();
+    data['courier'] = courier?.toJson();
     data['phone'] = phone;
     data['plateNumber'] = plateNumber;
     data['licenseNo'] = drivingLicense;
@@ -68,9 +71,9 @@ class Driver {
   Driver copyWith({
     String? id,
     String? name,
-    String? email,
     int? phone,
     User? user,
+    Courier? courier,
     String? plateNumber,
     int? drivingLicense,
     String? drivingLicenseExDate, //*may require change
@@ -83,7 +86,7 @@ class Driver {
     return Driver(
       id: id ?? this.id,
       name: name ?? this.name,
-      // email: email ?? this.email,
+      courier: courier ?? this.courier,
       phone: phone ?? this.phone,
       user: user ?? this.user,
       plateNumber: plateNumber ?? this.plateNumber,

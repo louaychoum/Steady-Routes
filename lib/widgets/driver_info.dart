@@ -4,11 +4,11 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
+import 'package:steadyroutes/models/courier.dart';
 import 'package:steadyroutes/models/driver.dart';
 import 'package:steadyroutes/models/user.dart';
 import 'package:steadyroutes/services/auth_service.dart';
 import 'package:steadyroutes/services/steady_api_service.dart';
-import 'package:steadyroutes/services/web_auth_service.dart';
 
 class DriverInfo extends StatefulWidget {
   @override
@@ -17,16 +17,20 @@ class DriverInfo extends StatefulWidget {
 
 class _DriverInfoState extends State<DriverInfo> {
   final _formKey = GlobalKey<FormState>();
-
   final _licenseDateController = TextEditingController();
   final _passportDateController = TextEditingController();
   final _visaDateController = TextEditingController();
 
   final maskFormatter = MaskTextInputFormatter(
-      mask: '##/##/####', filter: {"#": RegExp(r'[0-9]')});
+    mask: '##/##/####',
+    filter: {
+      "#": RegExp(r'[0-9]'),
+    },
+  );
 
   DateTime selectedDate = DateTime.now();
   bool _isLoading = false;
+  Courier? courier;
 
   Driver _editedDriver = Driver(
     id: '',
@@ -37,7 +41,7 @@ class _DriverInfoState extends State<DriverInfo> {
     passportExDate: '',
     passportNumber: '',
     plateNumber: '',
-    // email: '',
+    courier: null,
     visaExDate: '',
     visaNumber: 0,
     phone: 0,
@@ -76,6 +80,11 @@ class _DriverInfoState extends State<DriverInfo> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = Provider.of<AuthService>(context, listen: false);
+    courier = auth.courier;
+    _editedDriver = _editedDriver.copyWith(
+      courier: courier,
+    );
     return Form(
       key: _formKey,
       child: Column(
@@ -106,7 +115,7 @@ class _DriverInfoState extends State<DriverInfo> {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
             child: TextFormField(
               onSaved: (newValue) {
-                _editedDriver = _editedDriver.copyWith(email: newValue);
+                // _editedDriver = _editedDriver.copyWith(email: newValue);
               },
               textInputAction: TextInputAction.next,
               decoration: kTextFieldDecoration.copyWith(
@@ -205,6 +214,7 @@ class _DriverInfoState extends State<DriverInfo> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
             child: TextFormField(
+              //!change to dropdown
               onSaved: (newValue) {
                 _editedDriver = _editedDriver.copyWith(company: newValue);
               },

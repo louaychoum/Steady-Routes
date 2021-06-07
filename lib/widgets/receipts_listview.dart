@@ -66,7 +66,7 @@ class _ReceiptListViewState extends State<ReceiptListView> {
           onRefresh: () {
             // jwt = Provider.of<AuthService>(context, listen: false).user.jwt;
             jwt = '';
-            return api.receiptsService.fetchReceipts(jwt, driver.id);
+            return api.receiptsService.fetchReceipts(jwt, driver.id ?? '');
           },
           child: ListView.builder(
             itemCount: api.receiptsService.receipts == null
