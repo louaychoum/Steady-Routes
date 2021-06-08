@@ -64,32 +64,11 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Steady Routes',
         debugShowCheckedModeBanner: false,
-        // home: AuthScreen(),
+        // home: s(),
         theme: ThemeData(
+          fontFamily: GoogleFonts.lato().fontFamily,
+          dividerColor: primaryColor,
           fixTextFieldOutlineLabel: true,
-          inputDecorationTheme: const InputDecorationTheme(
-            alignLabelWithHint: true,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(width: 2.0),
-              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.red),
-              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            ),
-            hintStyle: TextStyle(
-              color: Color(0xFF607D8B),
-            ),
-            labelStyle: TextStyle(
-              color: Color(0xFF000000),
-            ),
-          ),
           textTheme:
               GoogleFonts.latoTextTheme(Theme.of(context).textTheme).copyWith(),
           textButtonTheme: TextButtonThemeData(

@@ -216,30 +216,15 @@ class _LoginState extends State<Login> {
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: const EdgeInsets.all(8.0),
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: showUsernameInput(),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: showPasswordInput(),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: showAutoLoginCheck(),
-                ),
+                showUsernameInput(),
+                showPasswordInput(),
+                showAutoLoginCheck(),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: showErrorMessage(),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: showPrimaryButton(),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: showSignUpButton(),
-                ),
+                showPrimaryButton(),
+                showSignUpButton(),
                 // if (_isLoading)
                 //   CircularProgressIndicator()
                 // else

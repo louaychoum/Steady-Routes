@@ -9,6 +9,27 @@ const String apiBase = 'assets/json/';
 const kTextFieldDecoration = InputDecoration(
   labelText: '',
   hintText: '',
+  alignLabelWithHint: true,
+  border: OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+  ),
+  enabledBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+  ),
+  focusedBorder: OutlineInputBorder(
+    borderSide: BorderSide(width: 2.0),
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+  ),
+  errorBorder: OutlineInputBorder(
+    borderSide: BorderSide(color: Colors.red),
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+  ),
+  hintStyle: TextStyle(
+    color: Color(0xFF607D8B),
+  ),
+  labelStyle: TextStyle(
+    color: Color(0xFF000000),
+  ),
 );
 
 const kTextTitleStyle = TextStyle(

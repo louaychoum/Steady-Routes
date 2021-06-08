@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
+import 'package:steadyroutes/models/driver.dart';
 import 'package:steadyroutes/widgets/driver_info.dart';
 
 class AddDriver extends StatefulWidget {
@@ -13,6 +14,8 @@ class AddDriver extends StatefulWidget {
 class _AddDriverState extends State<AddDriver> {
   @override
   Widget build(BuildContext context) {
+     final loadedDriver =
+        ModalRoute.of(context)?.settings.arguments as Driver?;
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -20,14 +23,19 @@ class _AddDriverState extends State<AddDriver> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Driver Information',
-              style: kTextTitleStyle,
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(5),
-                child: DriverInfo(),
+             if (loadedDriver == null)
+              const Text(
+                'New Driver',
+                style: kTextTitleStyle,
+              )
+            else
+              Text(
+                loadedDriver.name,
+                style: kTextTitleStyle,
+              ),
+             Expanded(
+              child: DriverInfo(
+                driver: loadedDriver,
               ),
             ),
           ],

@@ -10,8 +10,7 @@ class ExpiryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final reportType =
-        ModalRoute.of(context)! .settings.arguments as String;
+    final reportType = ModalRoute.of(context)?.settings.arguments.toString();
 
     return Scaffold(
       appBar: AppBar(),
@@ -21,12 +20,10 @@ class ExpiryList extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              reportType,
+              reportType ?? '',
               style: kTextTitleStyle,
             ),
-            const Divider(
-              color: Colors.red,
-            ),
+            const Divider(),
             Expanded(
               child: ListView.builder(
                 itemCount: myProducts.length,

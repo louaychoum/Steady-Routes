@@ -4,11 +4,11 @@ import 'package:steadyroutes/models/user.dart';
 class Driver {
   final String? id;
   final String name;
-  final Courier? courier;
+  // final Courier? courier;
   final User? user;
   final int phone;
   final String plateNumber;
-  final int drivingLicense;
+  final String drivingLicense;
   final String drivingLicenseExDate; //*may require change
   final String company;
   final String passportNumber;
@@ -20,7 +20,7 @@ class Driver {
     this.id,
     required this.name,
     required this.user,
-    required this.courier,
+    // required this.courier,
     required this.phone,
     required this.plateNumber,
     required this.drivingLicense,
@@ -30,6 +30,7 @@ class Driver {
     required this.passportExDate,
     required this.visaNumber,
     required this.visaExDate,
+    courier,
   });
 // Driver.fromJson(Map<String, dynamic> json)
   Driver.fromJson(Map<String, dynamic> json)
@@ -38,11 +39,11 @@ class Driver {
         user = json['user'] == null
             ? null
             : User.fromJson(json['user'] as Map<String, dynamic>),
-        courier = json['courier'] == null
-            ? null
-            : Courier.fromJson(json['courier'] as Map<String, dynamic>),
+        // courier = json['courier'] == null
+        //     ? null
+        //     : Courier.fromJson(json['courier'] as Map<String, dynamic>),
         phone = int.tryParse(json['phone'].toString()) ?? 0,
-        drivingLicense = int.tryParse(json['licenseNo'].toString()) ?? 0,
+        drivingLicense = json['licenseNo'].toString(),
         plateNumber = json['plateNumber'].toString(),
         drivingLicenseExDate = json['drivingLicenseExDate'].toString(),
         company = json['company'].toString(),
@@ -55,7 +56,7 @@ class Driver {
     final data = <String, dynamic>{};
     data['name'] = name;
     data['user'] = user?.toJson();
-    data['courier'] = courier?.toJson();
+    // data['courier'] = courier?.toJson();
     data['phone'] = phone;
     data['plateNumber'] = plateNumber;
     data['licenseNo'] = drivingLicense;
@@ -75,7 +76,7 @@ class Driver {
     User? user,
     Courier? courier,
     String? plateNumber,
-    int? drivingLicense,
+    String? drivingLicense,
     String? drivingLicenseExDate, //*may require change
     String? company,
     String? passportNumber,
@@ -86,7 +87,7 @@ class Driver {
     return Driver(
       id: id ?? this.id,
       name: name ?? this.name,
-      courier: courier ?? this.courier,
+      // courier: courier ?? this.courier,
       phone: phone ?? this.phone,
       user: user ?? this.user,
       plateNumber: plateNumber ?? this.plateNumber,

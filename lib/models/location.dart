@@ -27,6 +27,12 @@ class Location {
     );
   }
 
+   Location.fromJsonLogin(String json)
+      : id = json.toString(),
+        address = '',
+        latitude = '',
+        longitude = '';
+
   Map<String, dynamic> toJson() => {
         '_id': id,
         'address': address,

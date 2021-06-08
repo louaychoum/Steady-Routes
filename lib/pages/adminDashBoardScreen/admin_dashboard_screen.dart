@@ -17,11 +17,12 @@ class AdminDashboard extends StatelessWidget {
     print(
       'Courier id: ${Provider.of<AuthService>(context, listen: false).courier?.id}',
     );
+    
     return Scaffold(
       appBar: AppBar(
         title: FittedBox(
           child: Text(
-            'Hello ${Provider.of<AuthService>(context, listen: false).user.email}\t${Provider.of<AuthService>(context, listen: false).courier?.name}',
+            'Hello ${Provider.of<AuthService>(context, listen: false).user.email}\n${Provider.of<AuthService>(context, listen: false).courier?.name}',
             style: kTextTitleStyle,
           ),
         ),

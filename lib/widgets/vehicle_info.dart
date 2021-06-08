@@ -3,6 +3,8 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/models/vehicle.dart';
+import 'package:steadyroutes/widgets/dashboard_button.dart';
+import 'package:steadyroutes/widgets/default_textfield.dart';
 
 class VehicleInfo extends StatefulWidget {
   const VehicleInfo({
@@ -15,14 +17,16 @@ class VehicleInfo extends StatefulWidget {
 
 class _VehicleInfoState extends State<VehicleInfo> {
   final _formKey = GlobalKey<FormState>();
-  int? vehicleId;
+  String? vehicleId;
 
   DateTime selectedDate = DateTime.now();
 
-  Vehicle? _editedVehicles = Vehicle(
-    id: 0,
+  Vehicle _editedVehicle = Vehicle(
+    id: '',
     name: '',
     plateNumber: '',
+    category: '',
+    status: '',
     registrationExDate: '',
     rtaExDate: '',
     rtaNumber: 0,
@@ -30,14 +34,15 @@ class _VehicleInfoState extends State<VehicleInfo> {
 
   var _initValues = {
     'name': '',
-    'plateNumber': '',
+    'plate': '',
+    'category': '',
+    'status': '',
     'registrationExDate': '',
     'rtaExDate': '',
     'rtaNumber': '',
   };
 
   var _isInit = true;
-
   var _isLoading = false;
 
   final _regDateController = TextEditingController();
@@ -53,19 +58,21 @@ class _VehicleInfoState extends State<VehicleInfo> {
   void didChangeDependencies() {
     if (_isInit) {
       widget._vehicle != null
-          ? vehicleId = widget._vehicle!.id
+          ? vehicleId = widget._vehicle?.id
           : vehicleId = null;
       if (vehicleId != null) {
-        _editedVehicles = widget._vehicle;
+        _editedVehicle = widget._vehicle!;
         _initValues = {
-          'name': _editedVehicles!.name,
-          'plateNumber': _editedVehicles!.plateNumber,
+          'name': _editedVehicle.name,
+          'plate': _editedVehicle.plateNumber,
+          'category': _editedVehicle.category,
+          'status': _editedVehicle.status,
           'registrationExDate': '',
           'rtaExDate': '',
-          'rtaNumber': _editedVehicles!.rtaNumber.toString(),
+          'rtaNumber': _editedVehicle.rtaNumber.toString(),
         };
-        _regDateController.text = _editedVehicles!.registrationExDate;
-        _rtaDateController.text = _editedVehicles!.rtaExDate;
+        _regDateController.text = _editedVehicle.registrationExDate;
+        _rtaDateController.text = _editedVehicle.rtaExDate;
       }
     }
     _isInit = false;
@@ -73,9 +80,9 @@ class _VehicleInfoState extends State<VehicleInfo> {
   }
 
   Future<void> _saveForm() async {
-    final isValid = _formKey.currentState!.validate();
-    if (!isValid) return;
-    _formKey.currentState!.save();
+    final isValid = _formKey.currentState?.validate();
+    if (isValid != null && !isValid) return;
+    _formKey.currentState?.save();
     setState(() {
       _isLoading = true;
     });
@@ -114,6 +121,41 @@ class _VehicleInfoState extends State<VehicleInfo> {
       _isLoading = false;
     });
     Navigator.of(context).pop();
+
+    // if (_formKey.currentState != null) {
+    // final isValid = _formKey.currentState?.validate();
+    // if (isValid != null && !isValid) return;
+    // _formKey.currentState?.save();
+    // setState(() {
+    //   _isLoading = true;
+    // });
+
+    // try {
+    //   final User user = Provider.of<AuthService>(context, listen: false).user;
+    //   await SteadyApiService().driversService.addDriver(user, _editedDriver);
+    // } catch (error) {
+    //   await showDialog<void>(
+    //     context: context,
+    //     builder: (ctx) => AlertDialog(
+    //       title: const Text('An error has occured!'),
+    //       content: Text(
+    //         error.toString(),
+    //       ),
+    //       actions: [
+    //         TextButton(
+    //           onPressed: () {
+    //             Navigator.of(ctx).pop();
+    //           },
+    //           child: const Text('Ok'),
+    //         )
+    //       ],
+    //     ),
+    //   );
+    // }
+    // setState(() {
+    //   _isLoading = false;
+    // });
+    // Navigator.of(context).pop();
   }
 
   @override
@@ -147,146 +189,119 @@ class _VehicleInfoState extends State<VehicleInfo> {
 
   @override
   Widget build(BuildContext context) {
-    // final receiptId = ModalRoute.of(context).settings.arguments as int;
-    // final loadedVehicles = Provider.of<Vehicles>(
-    //   context,
-    //   listen: false,
-    // ).findById(receiptId);
     return _isLoading
         ? const Center(
             child: CircularProgressIndicator(),
           )
         : Form(
             key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            child: ListView(
+              physics: const BouncingScrollPhysics(),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               children: [
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                  child: TextFormField(
-                    initialValue: _initValues['name'],
-                    decoration: kTextFieldDecoration.copyWith(
-                      labelText: 'Company Name',
-                      hintText: '',
-                    ),
-                    // The validator receives the text that the user has entered.
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
-                      }
-                      return null;
-                    },
+                DefaultTextfield(
+                  initialVal: _initValues['name'],
+                  decoration: kTextFieldDecoration.copyWith(
+                    labelText: 'Company Name',
+                  ),
+                  savedValue: (value) =>
+                      _editedVehicle = _editedVehicle.copyWith(
+                    name: value,
                   ),
                 ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                  child: TextFormField(
-                    initialValue: _initValues['plateNumber'],
-                    decoration: kTextFieldDecoration.copyWith(
-                      labelText: 'Vehicle Plate Number',
-                      hintText: '',
-                    ),
-                    // The validator receives the text that the user has entered.
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
-                      }
-                      return null;
-                    },
+                DefaultTextfield(
+                  initialVal: _initValues['plate'],
+                  decoration: kTextFieldDecoration.copyWith(
+                    labelText: 'Vehicle Plate Number',
+                  ),
+                  savedValue: (value) =>
+                      _editedVehicle = _editedVehicle.copyWith(
+                    plateNumber: value,
                   ),
                 ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                  child: TextFormField(
-                    inputFormatters: [maskFormatter],
-                    keyboardType: TextInputType.datetime,
-                    controller: _regDateController,
-                    decoration: kTextFieldDecoration.copyWith(
-                      suffixIcon: IconButton(
-                        icon: const Icon(
-                          Icons.calendar_today_sharp,
-                        ),
-                        onPressed: () => _selectDate(
-                          context,
-                          _regDateController,
-                        ),
+                DefaultTextfield(
+                  decoration: kTextFieldDecoration.copyWith(
+                    labelText: 'Category',
+                  ),
+                  initialVal: _initValues['category'],
+                  savedValue: (value) =>
+                      _editedVehicle = _editedVehicle.copyWith(
+                    category: value,
+                  ),
+                ),
+                DefaultTextfield(
+                  decoration: kTextFieldDecoration.copyWith(
+                    labelText: 'Status',
+                  ),
+                  initialVal: _initValues['status'],
+                  savedValue: (value) =>
+                      _editedVehicle = _editedVehicle.copyWith(
+                    status: value,
+                  ),
+                ),
+                DefaultTextfield(
+                  mask: maskFormatter,
+                  keyboard: TextInputType.datetime,
+                  controller: _regDateController,
+                  decoration: kTextFieldDecoration.copyWith(
+                    suffixIcon: IconButton(
+                      icon: const Icon(
+                        Icons.calendar_today_sharp,
                       ),
-                      labelText: 'Registration Expiry Date',
-                      hintText: '',
-                      suffix: const Text('DD/MM/YYYY'),
+                      onPressed: () => _selectDate(
+                        context,
+                        _regDateController,
+                      ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a date';
-                      }
-                      if (value.length != 10) {
-                        return 'Make sure the date format is correct';
-                      }
-                      return null;
-                    },
+                    labelText: 'Registration Expiry Date',
+                    suffix: const Text('DD/MM/YYYY'),
+                  ),
+                  savedValue: (value) =>
+                      _editedVehicle = _editedVehicle.copyWith(
+                    registrationExDate: value,
                   ),
                 ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                  child: TextFormField(
-                    initialValue: _initValues['rtaNumber'],
+                DefaultTextfield(
+                    keyboard: TextInputType.number,
+                    initialVal: _initValues['rtaNumber'],
                     decoration: kTextFieldDecoration.copyWith(
                       labelText: 'RTA License Number',
-                      hintText: '',
                     ),
-                    // The validator receives the text that the user has entered.
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                    savedValue: (value) {
+                      if (value != null) {
+                        _editedVehicle = _editedVehicle.copyWith(
+                          rtaNumber: int.tryParse(value),
+                        );
                       }
-                      return null;
-                    },
-                  ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                  child: TextFormField(
-                    inputFormatters: [maskFormatter],
-                    keyboardType: TextInputType.datetime,
-                    controller: _rtaDateController,
-                    decoration: kTextFieldDecoration.copyWith(
-                      suffixIcon: IconButton(
-                        icon: const Icon(
-                          Icons.calendar_today_sharp,
-                        ),
-                        onPressed: () => _selectDate(
-                          context,
-                          _rtaDateController,
-                        ),
+                    }),
+                DefaultTextfield(
+                  mask: maskFormatter,
+                  keyboard: TextInputType.datetime,
+                  controller: _rtaDateController,
+                  decoration: kTextFieldDecoration.copyWith(
+                    suffixIcon: IconButton(
+                      icon: const Icon(
+                        Icons.calendar_today_sharp,
                       ),
-                      labelText: 'RTA License Expiry Date',
-                      hintText: '',
-                      suffix: const Text('DD/MM/YYYY'),
+                      onPressed: () => _selectDate(
+                        context,
+                        _rtaDateController,
+                      ),
                     ),
-                    // The validator receives the text that the user has entered.
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a date';
-                      }
-                      if (value.length != 10) {
-                        return 'Make sure the date format is correct';
-                      }
-                      return null;
-                    },
+                    labelText: 'RTA License Expiry Date',
+                    suffix: const Text('DD/MM/YYYY'),
+                  ),
+                  savedValue: (value) =>
+                      _editedVehicle = _editedVehicle.copyWith(
+                    rtaExDate: value,
                   ),
                 ),
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                  child: ElevatedButton(
-                    onPressed: _saveForm,
-                    child: const Text('Submit'),
+                  child: DashboardButton(
+                    'Submit',
+                    _saveForm,
                   ),
                 ),
               ],

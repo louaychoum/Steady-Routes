@@ -9,7 +9,8 @@ class AddVehicle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loadedVehicles = ModalRoute.of(context)!.settings.arguments as Vehicle?;
+    final loadedVehicles =
+        ModalRoute.of(context)?.settings.arguments as Vehicle?;
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -28,11 +29,8 @@ class AddVehicle extends StatelessWidget {
                 style: kTextTitleStyle,
               ),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(5),
-                child: VehicleInfo(
-                  vehicle: loadedVehicles,
-                ),
+              child: VehicleInfo(
+                vehicle: loadedVehicles,
               ),
             ),
           ],

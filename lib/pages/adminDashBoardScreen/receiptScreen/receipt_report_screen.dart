@@ -18,17 +18,14 @@ class _ReceiptReportState extends State<ReceiptReport> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text(
               'Generate Report',
               style: kTextTitleStyle,
             ),
-            const Divider(
-              color: Colors.red,
-            ),
+            const Divider(),
             Expanded(
-              flex: 10,
               child: ReportInfo(),
             ),
           ],

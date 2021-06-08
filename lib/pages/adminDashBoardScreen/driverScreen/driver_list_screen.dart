@@ -33,9 +33,7 @@ class DriverList extends StatelessWidget {
               'Drivers List',
               style: kTextTitleStyle,
             ),
-            const Divider(
-              color: Colors.red,
-            ),
+            const Divider(),
             Expanded(
               child: DriversListView(),
             ),

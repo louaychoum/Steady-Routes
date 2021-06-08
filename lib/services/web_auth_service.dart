@@ -113,6 +113,9 @@ class WebAuthService with ChangeNotifier implements AuthService {
       append['email'] = email;
       append['password'] = password;
       _user = User.fromJson(append);
+      _courier = Courier.fromJsonLogin(
+        append['courier'] as Map<String, dynamic>,
+      );
       if (_user == null) {
         return false;
       }
@@ -121,10 +124,10 @@ class WebAuthService with ChangeNotifier implements AuthService {
         saveUserInPref();
       }
       if (_user?.role == 'courier') {
-        await fillCourierInfo(
-          _user?.userId ?? '',
-          _user?.token ?? '',
-        );
+        // await fillCourierInfo(
+        //   _user?.userId ?? '',
+        //   _user?.token ?? '',
+        // );
         setStatus(AuthStatus.adminLoggedIn);
         return true;
       }
@@ -331,6 +334,7 @@ class WebAuthService with ChangeNotifier implements AuthService {
         password: '',
         role: '',
         token: '',
+        courier: null,
       );
 
   @override

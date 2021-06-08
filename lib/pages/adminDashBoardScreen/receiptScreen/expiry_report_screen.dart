@@ -25,7 +25,7 @@ class _ExpiryReportState extends State<ExpiryReport> {
               style: kTextTitleStyle,
             ),
             const Divider(
-              color: Colors.red,
+              
             ),
             Expanded(
               flex: 8,

@@ -48,7 +48,11 @@ class UploadedReceiptInfo extends StatelessWidget {
     File? compressedImage;
     return Consumer<SteadyApiService>(
       builder: (context, api, child) {
-        api.vehiclesService.fetchVehicles('');
+        //!check if working
+        api.vehiclesService.fetchVehicles(
+          Provider.of<AuthService>(context, listen: false).user.token,
+          '',
+        );
         final vehicleData = api.vehiclesService.vehicles;
 
         return Form(

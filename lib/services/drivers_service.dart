@@ -26,17 +26,11 @@ class DriversService with ChangeNotifier {
     _log.info('fetching drivers');
     try {
       final response = await _dio.get(
-        '/drivers',
+        courierId.isNotEmpty ? '/drivers/courier/$courierId' : '/drivers',
         options: Options(
           headers: {'Authorization': ' x $jwt'},
         ),
       );
-      // final response = await _dio.get(
-      //   courierId.isNotEmpty ? '/drivers/courier/$courierId' : '/drivers',
-      //   options: Options(
-      //     headers: {'Authorization': ' x $jwt'},
-      //   ),
-      // );
       _drivers.clear();
       final parsedResponse =
           jsonDecode(response.toString()) as Map<String, dynamic>;
@@ -83,7 +77,7 @@ class DriversService with ChangeNotifier {
   }
 
   Future<bool> addDriver(
-    String jwt,
+    User user,
     Driver _editedDriver,
   ) async {
     _log.info('adding driver');
@@ -103,16 +97,16 @@ class DriversService with ChangeNotifier {
           email: '${_editedDriver.name}@${_editedDriver.company}.com',
           password: 'password',
           role: 'driver',
-          token: jwt,
+          token: user.token,
           userId: '',
+          courier: user.courier,
         ),
-        courier: _editedDriver.courier,
       );
 
       final response = await _dio.post(
         '/drivers/',
         options: Options(
-          headers: {'Authorization': ' x $jwt'},
+          headers: {'Authorization': ' x ${user.token}'},
         ),
         data: newDriver.toJson(),
       );
