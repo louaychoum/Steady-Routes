@@ -35,9 +35,9 @@ class Attendance {
 
     return Attendance(
       id: json['_id'].toString(),
-      driverId: json['driver'].toString(),
-      locationId: json['location'].toString(),
-      vehicleId: json['vehicle'].toString(),
+      driverId: json['driverId'].toString(),
+      locationId: json['locationId'].toString(),
+      vehicleId: json['vehicleId'].toString(),
       date: json['date'].toString(),
       action: json['action'].toString(),
       latitude: double.tryParse(
@@ -51,14 +51,15 @@ class Attendance {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        '_id': id,
-        'driver': driverId,
-        'location': locationId,
-        'vehicle': vehicleId,
-        'date': date,
-        'action': action,
-        'latitude': latitude,
-        'longitude': longitude,
-      };
+  Map<String, dynamic> toJson() {
+    final data = <String, dynamic>{};
+    data['driverId'] = driverId;
+    data['locationId'] = locationId;
+    data['vehicleId'] = vehicleId;
+    data['latitude'] = latitude;
+    data['longitude'] = longitude;
+    data['date'] = date;
+    data['action'] = action;
+    return data;
+  }
 }

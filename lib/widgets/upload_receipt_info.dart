@@ -11,20 +11,23 @@ import 'package:steadyroutes/services/auth_service.dart';
 import 'package:steadyroutes/services/navigator_sevice.dart';
 import 'package:steadyroutes/services/steady_api_service.dart';
 import 'package:steadyroutes/widgets/dashboard_button.dart';
+import 'package:steadyroutes/widgets/default_textfield.dart';
+import 'package:steadyroutes/widgets/dropdown_search.dart';
 
 class UploadedReceiptInfo extends StatelessWidget {
   UploadedReceiptInfo({
-    required File? images,
+    required File? image,
     required TextEditingController controller,
-  })  : _images = images,
+  })  : _image = image,
         _controller = controller;
 
-  final File? _images;
+  final File? _image;
+  File? compressedImage;
+  bool isLoading = false;
   final TextEditingController _controller;
-
   final _formKey = GlobalKey<FormState>();
 
-  Future<File> compressFile(File file) async {
+  Future<File?> compressFile(File file) async {
     //Todo make available for other formats
     final filePath = file.absolute.path;
     // Create output file path
@@ -38,159 +41,134 @@ class UploadedReceiptInfo extends StatelessWidget {
       file.absolute.path,
       outPath,
       quality: kCompressedImageQuality, //ca
-    ) as Future<File>);
+    ) as Future<File?>);
     debugPrint((file.lengthSync() / 1024).toString());
-    debugPrint((result.lengthSync() / 1024).toString());
+    debugPrint((result?.lengthSync() ?? 1024 / 1024).toString());
     return result;
   }
 
   @override
   Widget build(BuildContext context) {
-    File? compressedImage;
-    return Consumer<SteadyApiService>(
-      builder: (context, api, child) {
-        //!check if working
-        api.vehiclesService.fetchVehicles(
-          Provider.of<AuthService>(context, listen: false).user.token,
-          '',
-        );
-        final vehicleData = api.vehiclesService.vehicles;
-
-        return Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 8,
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  DropdownSearch<String>(
-                    searchBoxDecoration: kTextFieldDecoration.copyWith(
-                      labelText: 'Vehicle Name',
-                      hintText: 'Search vehicles',
-                      isDense: true,
-                    ),
-                    showAsSuffixIcons: true,
-                    dropdownSearchDecoration: kTextFieldDecoration.copyWith(
-                      labelText: 'Vehicle Name',
-                      hintText: 'Choose a vehicle',
-                    ),
-                    showClearButton: true,
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please select a vehicle';
-                      }
-                      return null;
-                    },
-                    mode: Mode.BOTTOM_SHEET,
-                    showSearchBox: true,
-                    items: vehicleData.map((item) {
-                      return item.name;
-                    }).toList(),
+    final auth = Provider.of<AuthService>(context, listen: false);
+    final String jwt = auth.user.token;
+    final String courierId = auth.courier?.id ?? '';
+    return isLoading
+        ? const Center(
+            child: CircularProgressIndicator(),
+          )
+        : Consumer<SteadyApiService>(
+            builder: (context, api, child) {
+              return Form(
+                key: _formKey,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 8,
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    keyboardType: TextInputType.number,
-                    controller: _controller,
-                    decoration: kTextFieldDecoration.copyWith(
-                      prefixText: 'AED ',
-                      labelText: 'Amount',
-                      hintText: '',
-                    ),
-                    // The validator receives the text that the user has entered.
-                    validator: (value) {
-                      print('na $value');
-                      if (value == null) {
-                        return 'Please enter a valid cash amount';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  if (_images == null)
-                    Container()
-                  else
-                    DashboardButton(
-                      'Upload',
-                      () async {
-                        // Validate returns true if the form is valid, or false otherwise.
-                        // if (_formKey.currentState!.validate()) {
-                        if (_formKey.currentState != null) {
-                          if (_formKey.currentState!.validate()) {
-                            debugPrint(_images.toString());
-                            compressedImage = await compressFile(
-                              _images!,
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        DropDownSearch(
+                          jwt: jwt,
+                          name: 'Vehicle',
+                          savedValue: (value) => null,
+                          // String? selectedVehicle;
+                          // selectedVehicle = value,
+                          onFind: (_) async {
+                            await api.vehiclesService.fetchVehicles(
+                              jwt,
+                              courierId, //courierId,
                             );
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                backgroundColor: kDefaultScaffoldColor,
-                                behavior: SnackBarBehavior.floating,
-                                content: Text('Uploading receipt...'),
-                              ),
-                            );
-
-                            // final String jwt = Provider.of<AuthService>(
-                            //         context,
-                            //         listen: false)
-                            //     .user.token
-                            //     ;
-                            final SteadyApiService api =
-                                Provider.of<SteadyApiService>(context,
-                                    listen: false);
-                            final bool uploadRes = await Future.delayed(
-                              const Duration(
-                                seconds: 3,
-                              ),
-                            ).then(
-                              (value) => true,
-                            );
-                            // await api.receiptsService
-                            //     .upload('jwt', File(compressedImage.path));
-
-                            if (uploadRes) {
-                              NavigationService.popUntilRoot();
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  backgroundColor: kErrorScaffoldColor,
-                                  content: Text('Upload failed.'),
-                                ),
-                              );
+                            return api.vehiclesService.vehicles
+                                .map(
+                                  (item) => item.name,
+                                )
+                                .toList();
+                          },
+                        ),
+                        DefaultTextfield(
+                          keyboard: TextInputType.number,
+                          controller: _controller,
+                          decoration: kTextFieldDecoration.copyWith(
+                            prefixText: 'AED ',
+                            labelText: 'Amount',
+                          ),
+                          savedValue: (String? value) {},
+                        ),
+                        if (_image == null)
+                          const SizedBox()
+                        else if (isLoading)
+                          const Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        else
+                          DashboardButton('Upload', () async {
+                            if (_formKey.currentState != null) {
+                              final isValid = _formKey.currentState?.validate();
+                              if (isValid != null && !isValid) return;
+                              _formKey.currentState?.save();
+                              //   setState(() {
+                              //   _isLoading = true;
+                              // });
+                              if (_image != null) {
+                                compressedImage = await compressFile(
+                                  _image!,
+                                );
+                              }
+                              try {
+                                if (compressedImage != null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      backgroundColor: kDefaultScaffoldColor,
+                                      behavior: SnackBarBehavior.floating,
+                                      content: Text('Uploading receipt...'),
+                                    ),
+                                  );
+                                  final bool addedReceipt = await api
+                                      .receiptsService
+                                      .upload(jwt, compressedImage!);
+                                  if (!addedReceipt) {
+                                    throw 'Try Logging out and Sign In again';
+                                  }
+                                }
+                              } catch (error) {
+                                await showDialog<void>(
+                                  context: NavigationService
+                                      .navigatorKey.currentContext!,
+                                  builder: (ctx) => AlertDialog(
+                                    title: const Text('An error has occured!'),
+                                    content: Text(
+                                      error.toString(),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(ctx).pop();
+                                        },
+                                        child: const Text('Ok'),
+                                      )
+                                    ],
+                                  ),
+                                );
+                              }
                             }
-
-                            //                 If the form is valid, display a snackbar. In the real world,
-                            //                 you'd often call a server or save the information in a database.
-                            //                 /**
-                            //  ScaffoldMessenger.of(context).showSnackBar(
-                            //   SnackBar(
-                            //     content: Text('Processing Data'),
-                            //   ),
-                            // );
-
-                          }
-                        }
-                      },
+                          }),
+                        if (compressedImage != null)
+                          SizedBox(
+                            child: Image.file(compressedImage!),
+                          )
+                        else
+                          const SizedBox(),
+                      ],
                     ),
-                  if (compressedImage != null)
-                    SizedBox(
-                      child: Image.file(compressedImage!),
-                    )
-                  else
-                    const SizedBox(),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
+                  ),
+                ),
+              );
+            },
+          );
   }
 }

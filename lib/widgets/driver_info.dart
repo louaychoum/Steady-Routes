@@ -207,7 +207,7 @@ class _DriverInfoState extends State<DriverInfo> {
                       //   decoration: kTextFieldDecoration.copyWith(
                       //     labelText: 'Vehicle Plate Number',
                       //   ),
-                      // ), //todo change to dropdown
+                      // ),
                       DefaultTextfield(
                         initialVal: _initValues['phone'],
                         keyboard: TextInputType.number,
@@ -337,9 +337,6 @@ class _DriverInfoState extends State<DriverInfo> {
                         DashboardButton(
                           'Submit',
                           () async {
-                            // Validate returns true if the form is valid, or false otherwise.
-                            // if (_formKey.currentState!.validate()) {
-                            //
                             if (_formKey.currentState != null) {
                               final isValid = _formKey.currentState?.validate();
                               if (isValid != null && !isValid) return;
@@ -353,7 +350,7 @@ class _DriverInfoState extends State<DriverInfo> {
                                     .driversService
                                     .addDriver(jwt, courierId, _editedDriver);
                                 if (!addedDriver) {
-                                  throw 'Try Logging out and Sign In again';
+                                  throw 'Try Logging out and Signing In again';
                                 }
                               } catch (error) {
                                 await showDialog<void>(

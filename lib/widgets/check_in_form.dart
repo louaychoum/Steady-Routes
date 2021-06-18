@@ -24,6 +24,7 @@ class CheckInForm extends StatefulWidget {
 
 class _CheckInFormState extends State<CheckInForm> {
   late DateTime now;
+  late Position position;
   late Location selectedLocation;
   late String jwt;
   bool isLoading = false;
@@ -114,24 +115,6 @@ class _CheckInFormState extends State<CheckInForm> {
                   showSearchBox: true,
                 ),
               ),
-              // DropDownSearch(
-              //   jwt: jwt,
-              //   name: 'Mall',
-              //   onFind: (_) async {
-              //     await api.locationsService.fetchLocation(
-              //       jwt,
-              //     );
-              //     return api.locationsService.locations.map(
-              //       (item) {
-              //         return item.address;
-              //       },
-              //     ).toList();
-              //   },
-              //   savedValue: (value) {
-              //     print('value $value');
-              //     selectedLocation = value.toString();
-              //   },
-              // ),
               const Spacer(),
               if (isLoading)
                 const Center(
@@ -142,7 +125,10 @@ class _CheckInFormState extends State<CheckInForm> {
                   'Check In',
                   () async {
                     if (_formKey.currentState != null) {
-                      if (_formKey.currentState!.validate()) {
+                      if (_formKey.currentState != null) {
+                        final isValid = _formKey.currentState?.validate();
+                        if (isValid != null && !isValid) return;
+                        _formKey.currentState?.save();
                         now = DateTime.now();
                         setState(
                           () => isLoading = true,
@@ -150,41 +136,34 @@ class _CheckInFormState extends State<CheckInForm> {
                         final String convertedDateTime =
                             "${now.year.toString()}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString()}-${now.minute.toString()}";
                         try {
-                          final Position position = await determinePosition();
-                          await api.attendanceService
-                              .addAttendance(
-                                action: 'checkin',
-                                date: now.toIso8601String(),
-                                driver: auth.driver,
-                                locationId: selectedLocation.id,
-                                lat: position.latitude,
-                                long: position.longitude,
-                                token: jwt,
-                              )
-                              .whenComplete(
-                                () => _showMyDialog(
-                                  position,
-                                  selectedLocation.address,
-                                  convertedDateTime,
-                                ),
-                              );
-
-                          //Todo handle errors
-
+                          position = await determinePosition();
+                          final bool addedCheckIn =
+                              await api.attendanceService.addAttendance(
+                            action: 'checkin',
+                            date: now.toIso8601String(),
+                            driver: auth.driver,
+                            locationId: selectedLocation.id,
+                            lat: position.latitude,
+                            long: position.longitude,
+                            token: jwt,
+                          );
                           setState(() {
                             isLoading = false;
                           });
-                        } on TimeoutException catch (e) {
+                          if (!addedCheckIn) {
+                            throw 'Try Logging out and Signing In again';
+                          }
+                          _showMyDialog(
+                            position,
+                            selectedLocation.address,
+                            convertedDateTime,
+                          );
+//Todo handle errors
+                        } catch (error) {
                           setState(() {
                             isLoading = false;
                           });
-
-                          debugPrint('timeout $e');
-                        } catch (e) {
-                          setState(() {
-                            isLoading = false;
-                          });
-                          if (e == 'LOCATION_NOT_ENABLED') {
+                          if (error == 'LOCATION_NOT_ENABLED') {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: const Text(
@@ -197,8 +176,26 @@ class _CheckInFormState extends State<CheckInForm> {
                                 ),
                               ),
                             );
+                          } else {
+                            await showDialog<void>(
+                              context: NavigationService
+                                  .navigatorKey.currentContext!,
+                              builder: (ctx) => AlertDialog(
+                                title: const Text('An error has occured!'),
+                                content: Text(
+                                  error.toString(),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(ctx).pop();
+                                    },
+                                    child: const Text('Ok'),
+                                  )
+                                ],
+                              ),
+                            );
                           }
-                          debugPrint('error is $e');
                         }
                       }
                     }

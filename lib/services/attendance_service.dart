@@ -103,9 +103,6 @@ class AttendanceService with ChangeNotifier {
         latitude: lat,
         longitude: long,
       );
-      print(
-        'driverId ${driver?.id}\nlocation $locationId\ndate $date\naction $action\nlat $lat\nlong $long',
-      );
       final response = await _dio.post(
         '/attendance/',
         options: Options(
@@ -131,6 +128,10 @@ class AttendanceService with ChangeNotifier {
       if (error.response == null) {
         return false;
       }
+      if (error.response?.statusCode == 400) {
+        //Todo show error message
+        return true;
+      }
       if (error.response?.statusCode != 200) {
         final errorMessage = DioExceptions.fromDioError(error).toString();
         _log.warning('[Dio] $errorMessage');
@@ -139,9 +140,6 @@ class AttendanceService with ChangeNotifier {
       }
       final errorMessage = DioExceptions.fromDioError(error).toString();
       _log.warning('[Dio] $errorMessage');
-      return false;
-    } on Exception catch (error) {
-      _log.warning('[Exception] $error');
       return false;
     } catch (error) {
       _log.warning('[Other] $error');
