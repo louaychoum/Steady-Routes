@@ -41,8 +41,9 @@ const kTextTitleStyle = TextStyle(
 
 final BaseOptions options = BaseOptions(
   baseUrl: 'https://dropshoptest.herokuapp.com',
-  connectTimeout: 10000,
-  receiveTimeout: 10000,
+  sendTimeout: 20000,
+  connectTimeout: 20000,
+  receiveTimeout: 20000,
 );
 
 const kErrorScaffoldColor = Color(0xFFB71C1C);

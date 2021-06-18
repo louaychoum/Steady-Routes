@@ -82,6 +82,113 @@ class VehiclesService with ChangeNotifier {
     }
   }
 
+  Future<bool> deleteVehicle(
+    String jwt,
+    String id,
+  ) async {
+    _log.info('deleting vehicle');
+    try {
+      final response = await _dio.delete(
+        '/vehicles/$id',
+        options: Options(
+          headers: {'Authorization': ' x $jwt'},
+        ),
+      );
+      final existingVehicleIndex = _vehicles.indexWhere(
+        (driver) => driver.id == id,
+      );
+      Vehicle? existingVehicles = _vehicles[existingVehicleIndex];
+      _vehicles.removeAt(existingVehicleIndex);
+      notifyListeners();
+      existingVehicles = null;
+      return true;
+    } on TimeoutException catch (error) {
+      _log.warning('[Timeout] $error');
+      return false;
+    } on SocketException catch (error) {
+      _log.warning('[Socket] $error');
+      return false;
+    } on DioError catch (error) {
+      if (error.response == null) {
+        return false;
+      }
+      if (error.response?.statusCode != 200) {
+        final errorMessage = DioExceptions.fromDioError(error).toString();
+        _log.warning('[Dio] $errorMessage');
+        WebAuthService().processApiError(error.response!);
+        return false;
+      }
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      _log.warning('[Dio] $errorMessage');
+      return false;
+    } on Exception catch (error) {
+      _log.warning('[Exception] $error');
+      return false;
+    } catch (error) {
+      _log.warning('[Other] $error');
+      return false;
+    }
+  }
+
+  Future<bool> addVehicle(
+    String jwt,
+    String courierId,
+    Vehicle _editedVehicle,
+  ) async {
+    _log.info('adding vehicle');
+    try {
+      final newVehicle = Vehicle(
+        name: _editedVehicle.name,
+        plateNumber: _editedVehicle.plateNumber,
+        category: _editedVehicle.category,
+        status: _editedVehicle.status,
+        registrationExDate: _editedVehicle.registrationExDate,
+        rtaNumber: _editedVehicle.rtaNumber,
+        rtaExDate: _editedVehicle.rtaExDate,
+      );
+      final response = await _dio.post(
+        '/vehicles/',
+        options: Options(
+          headers: {
+            'Authorization': ' x $jwt',
+          },
+        ),
+        data: newVehicle.toJson(),
+      );
+
+      vehicles.add(newVehicle);
+      notifyListeners();
+      return true;
+    } on TimeoutException catch (error) {
+      _log.warning('[Timeout] $error');
+      return false;
+      // throw TimeoutException(error.toString());
+    } on SocketException catch (error) {
+      _log.warning('[Socket] $error');
+      return false;
+      // throw SocketException(error.toString());
+    } on DioError catch (error) {
+      if (error.response == null) {
+        return false;
+      }
+      if (error.response?.statusCode != 200) {
+        final errorMessage = DioExceptions.fromDioError(error).toString();
+        _log.warning('[Dio] $errorMessage');
+        WebAuthService().processApiError(error.response!);
+        return false;
+      }
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      _log.warning('[Dio] $errorMessage');
+      return false;
+    } on Exception catch (error) {
+      _log.warning('[Exception] $error');
+      return false;
+    } catch (error) {
+      _log.warning('[Other] $error');
+      return false;
+    }
+  }
+
   // Future<bool> assignReceiptToTransaction(
   //     String jwt, int receiptId, int transactionId) async {
   //   try {

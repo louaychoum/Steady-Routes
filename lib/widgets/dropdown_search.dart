@@ -6,14 +6,12 @@ class DropDownSearch extends StatelessWidget {
   const DropDownSearch(
       {Key? key,
       required this.jwt,
-      required this.courierId,
       required this.name,
       required this.savedValue,
       required this.onFind})
       : super(key: key);
 
   final String jwt;
-  final String courierId;
   final String name;
   final ValueChanged<String?> savedValue;
   final Future<List<String>> Function(String)? onFind;
@@ -22,7 +20,7 @@ class DropDownSearch extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: 8,
+        horizontal: 10,
         vertical: 10,
       ),
       child: DropdownSearch<String>(

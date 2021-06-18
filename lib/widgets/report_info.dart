@@ -117,7 +117,6 @@ class _ReportInfoState extends State<ReportInfo> {
             children: [
               DropDownSearch(
                 jwt: jwt,
-                courierId: courierId,
                 name: 'Driver',
                 savedValue: (value) => selectedDriver = value,
                 onFind: (_) async {
@@ -134,7 +133,6 @@ class _ReportInfoState extends State<ReportInfo> {
               ),
               DropDownSearch(
                 jwt: jwt,
-                courierId: courierId,
                 name: 'Vehicle',
                 savedValue: (value) => selectedVehicle = value,
                 onFind: (_) async {
@@ -185,43 +183,37 @@ class _ReportInfoState extends State<ReportInfo> {
                 controller: _toDateController,
                 keyboard: TextInputType.datetime,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 10,
-                ),
-                child: DashboardButton(
-                  'Submit',
-                  () {
-                    // !if (!isDriver) {
-                    //   const snackBar = SnackBar(
-                    //     content: Text('Please Select a Driver'),
-                    //     duration: Duration(seconds: 1),
-                    //     backgroundColor: Colors.red,
-                    //   );
-                    //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    // }
+              DashboardButton(
+                'Submit',
+                () {
+                  // !if (!isDriver) {
+                  //   const snackBar = SnackBar(
+                  //     content: Text('Please Select a Driver'),
+                  //     duration: Duration(seconds: 1),
+                  //     backgroundColor: Colors.red,
+                  //   );
+                  //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  // }
 
-                    // Validate returns true if the form is valid, or false otherwise.
-                    // if (_formKey.currentState!.validate()) {
-                    if (_formKey.currentState != null) {
-                      if (_formKey.currentState!.validate()) {
-                        //!isdriver
-                        // If the form is valid, display a snackbar. In the real world,
-                        // you'd often call a server or save the information in a database.
-                        /** 
-                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Processing Data'),
-                        ),
-                      );
-                      */
+                  // Validate returns true if the form is valid, or false otherwise.
+                  // if (_formKey.currentState!.validate()) {
+                  if (_formKey.currentState != null) {
+                    if (_formKey.currentState!.validate()) {
+                      //!isdriver
+                      // If the form is valid, display a snackbar. In the real world,
+                      // you'd often call a server or save the information in a database.
+                      /** 
+                     ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Processing Data'),
+                      ),
+                    );
+                    */
 
-                        Navigator.of(context).pushNamed(ReportList.routeName);
-                      }
+                      Navigator.of(context).pushNamed(ReportList.routeName);
                     }
-                  },
-                ),
+                  }
+                },
               ),
             ],
           ),

@@ -4,6 +4,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/pages/driverDashboardScreen/driver_dashboard_screen.dart';
 import 'package:steadyroutes/services/navigator_sevice.dart';
+import 'package:steadyroutes/widgets/dashboard_button.dart';
 import 'package:steadyroutes/widgets/mall_dropdown.dart';
 
 class CheckOutForm extends StatefulWidget {
@@ -91,8 +92,9 @@ class _CheckOutFormState extends State<CheckOutForm> {
               },
             ),
             const Spacer(),
-            ElevatedButton(
-              onPressed: () async {
+            DashboardButton(
+              'Check Out',
+              () async {
                 if (_formKey.currentState != null) {
                   if (_formKey.currentState!.validate()) {
                     now = DateTime.now();
@@ -102,9 +104,6 @@ class _CheckOutFormState extends State<CheckOutForm> {
                   }
                 }
               },
-              child: const Text(
-                'Check Out',
-              ),
             ),
             const Spacer(
               flex: 4,

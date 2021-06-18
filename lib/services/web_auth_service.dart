@@ -11,6 +11,7 @@ import 'package:dio/dio.dart';
 import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/models/courier.dart';
 import 'package:steadyroutes/models/dio_exception.dart';
+import 'package:steadyroutes/models/driver.dart';
 import 'package:steadyroutes/models/user.dart';
 import 'package:steadyroutes/root.dart';
 import 'package:steadyroutes/services/auth_service.dart';
@@ -24,6 +25,7 @@ class WebAuthService with ChangeNotifier implements AuthService {
   final Dio _dio = Dio(options);
   User? _user;
   Courier? _courier;
+  Driver? _driver;
   late AuthStatus _status;
 
   factory WebAuthService() {
@@ -113,9 +115,7 @@ class WebAuthService with ChangeNotifier implements AuthService {
       append['email'] = email;
       append['password'] = password;
       _user = User.fromJson(append);
-      _courier = Courier.fromJsonLogin(
-        append['courier'] as Map<String, dynamic>,
-      );
+      print(append);
       if (_user == null) {
         return false;
       }
@@ -124,6 +124,9 @@ class WebAuthService with ChangeNotifier implements AuthService {
         saveUserInPref();
       }
       if (_user?.role == 'courier') {
+        _courier = Courier.fromJsonLogin(
+          append['courier'] as Map<String, dynamic>,
+        );
         // await fillCourierInfo(
         //   _user?.userId ?? '',
         //   _user?.token ?? '',
@@ -132,7 +135,18 @@ class WebAuthService with ChangeNotifier implements AuthService {
         return true;
       }
       if (_user?.role == 'supplier') {
+        //todo create supplier class model
+        // _supplier = Supplier.fromJsonLogin(
+        //   append['supplier'] as Map<String, dynamic>,
+        // );
         setStatus(AuthStatus.adminLoggedIn);
+        return true;
+      }
+      if (_user?.role == 'driver') {
+        _driver = Driver.fromJsonLogin(
+          append['driver'] as Map<String, dynamic>,
+        );
+        setStatus(AuthStatus.driverLoggedIn);
         return true;
       } else {
         setStatus(AuthStatus.driverLoggedIn);
@@ -293,7 +307,8 @@ class WebAuthService with ChangeNotifier implements AuthService {
     //   '${API_BASE}firebase/${this.firebaseToken}',
     //   headers: {"Content-Type": "application/json", "api-token": user.jwt},
     // );
-
+    _courier = null;
+    _user = null;
     SharedPreferences.getInstance().then((pref) {
       pref.remove(userPrefKey);
     });
@@ -346,5 +361,26 @@ class WebAuthService with ChangeNotifier implements AuthService {
         phone: null,
         user: _user,
         location: null,
+      );
+
+  @override
+  Driver get driver =>
+      _driver ??
+      Driver(
+        company: '',
+        courierId: null,
+        email: '',
+        password: '',
+        drivingLicense: '',
+        drivingLicenseExDate: '',
+        name: '',
+        passportExDate: '',
+        passportNumber: '',
+        phone: null,
+        plateNumber: '',
+        user: null,
+        visaExDate: '',
+        visaNumber: null,
+        id: '',
       );
 }

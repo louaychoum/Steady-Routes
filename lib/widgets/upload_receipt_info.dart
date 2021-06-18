@@ -10,6 +10,7 @@ import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/services/auth_service.dart';
 import 'package:steadyroutes/services/navigator_sevice.dart';
 import 'package:steadyroutes/services/steady_api_service.dart';
+import 'package:steadyroutes/widgets/dashboard_button.dart';
 
 class UploadedReceiptInfo extends StatelessWidget {
   UploadedReceiptInfo({
@@ -116,8 +117,9 @@ class UploadedReceiptInfo extends StatelessWidget {
                   if (_images == null)
                     Container()
                   else
-                    ElevatedButton(
-                      onPressed: () async {
+                    DashboardButton(
+                      'Upload',
+                      () async {
                         // Validate returns true if the form is valid, or false otherwise.
                         // if (_formKey.currentState!.validate()) {
                         if (_formKey.currentState != null) {
@@ -176,7 +178,6 @@ class UploadedReceiptInfo extends StatelessWidget {
                           }
                         }
                       },
-                      child: const Text('Upload'),
                     ),
                   if (compressedImage != null)
                     SizedBox(

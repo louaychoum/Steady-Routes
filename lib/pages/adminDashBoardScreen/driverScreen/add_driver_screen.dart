@@ -4,15 +4,10 @@ import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/models/driver.dart';
 import 'package:steadyroutes/widgets/driver_info.dart';
 
-class AddDriver extends StatefulWidget {
+class AddDriver extends StatelessWidget {
   static const routeName = '/add-driver';
 
-  @override
-  _AddDriverState createState() => _AddDriverState();
-}
-
-class _AddDriverState extends State<AddDriver> {
-  @override
+ @override
   Widget build(BuildContext context) {
      final loadedDriver =
         ModalRoute.of(context)?.settings.arguments as Driver?;
@@ -42,18 +37,6 @@ class _AddDriverState extends State<AddDriver> {
         ),
       ),
     );
-    //providers driver
-
-    // saveForm() {
-    //
-    //   final isValid = _formKey.currentState.validate();
-    //   if (!isValid) {
-    //     return;
-    //   }
-    //   _formKey.currentState.save();
-    //   Provider.of<Products>(ctx, llisten: false).addProduct(editedpr);
-    // }
   }
 }
-//ToDo
-//dispose controllers
+

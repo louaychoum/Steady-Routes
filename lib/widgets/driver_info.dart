@@ -4,13 +4,13 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
-import 'package:steadyroutes/models/courier.dart';
 import 'package:steadyroutes/models/driver.dart';
-import 'package:steadyroutes/models/user.dart';
 import 'package:steadyroutes/services/auth_service.dart';
+import 'package:steadyroutes/services/navigator_sevice.dart';
 import 'package:steadyroutes/services/steady_api_service.dart';
 import 'package:steadyroutes/widgets/dashboard_button.dart';
 import 'package:steadyroutes/widgets/default_textfield.dart';
+import 'package:steadyroutes/widgets/dropdown_search.dart';
 
 class DriverInfo extends StatefulWidget {
   const DriverInfo({
@@ -38,11 +38,13 @@ class _DriverInfoState extends State<DriverInfo> {
   bool _isLoading = false;
   bool _isInit = true;
   String? driverId;
-  Courier? courier;
+  late String courierId;
 
   Driver _editedDriver = Driver(
     id: '',
     name: '',
+    email: '',
+    password: '',
     company: '',
     drivingLicense: '',
     drivingLicenseExDate: '',
@@ -53,10 +55,13 @@ class _DriverInfoState extends State<DriverInfo> {
     visaNumber: 0,
     phone: 0,
     user: null,
+    courierId: '',
   );
 
   Map<String, dynamic> _initValues = {
     'name': '',
+    'email': '',
+    'password': '',
     'licenseNo': '',
     'phone': '',
     'courier': '',
@@ -79,6 +84,8 @@ class _DriverInfoState extends State<DriverInfo> {
           'name': _editedDriver.name,
           'licenseNo': _editedDriver.drivingLicense,
           'phone': _editedDriver.phone,
+          'email': _editedDriver.email,
+          'password': _editedDriver.password,
           // 'courier': _editedDriver.courier,
           // 'rtaExDate': '',
           // 'rtaNumber': _editedDriver.rtaNumber.toString(),
@@ -90,56 +97,6 @@ class _DriverInfoState extends State<DriverInfo> {
     }
     _isInit = false;
     super.didChangeDependencies();
-  }
-
-  Future<void> _saveForm() async {
-    // Validate returns true if the form is valid, or false otherwise.
-    // if (_formKey.currentState!.validate()) {
-    //
-    if (_formKey.currentState != null) {
-      final isValid = _formKey.currentState?.validate();
-      if (isValid != null && !isValid) return;
-      _formKey.currentState?.save();
-      setState(() {
-        _isLoading = true;
-      });
-
-      try {
-        final User user = Provider.of<AuthService>(context, listen: false).user;
-        await SteadyApiService().driversService.addDriver(user, _editedDriver);
-      } catch (error) {
-        await showDialog<void>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('An error has occured!'),
-            content: Text(
-              error.toString(),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(ctx).pop();
-                },
-                child: const Text('Ok'),
-              )
-            ],
-          ),
-        );
-      }
-      setState(() {
-        _isLoading = false;
-      });
-      Navigator.of(context).pop();
-      //
-      //
-      //
-      //*if(editedpr.id != null)
-      // Provider.of<Products>(ctx, llisten: false).updateProduct(editedpr);
-      //* else
-      // Provider.of<Products>(ctx, llisten: false).aaProduct(editedpr);
-      // If the form is valid, display a snackbar. In the real world,
-      // you'd often call a server or save the information in a database.
-    }
   }
 
   Future<void> _selectDate(
@@ -175,180 +132,269 @@ class _DriverInfoState extends State<DriverInfo> {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context, listen: false);
-    courier = auth.courier;
-    _editedDriver = _editedDriver.copyWith(
-      courier: courier,
-    );
+    final String jwt = auth.user.token;
+    courierId = auth.courier?.id ?? '';
     return _isLoading
         ? const Center(
             child: CircularProgressIndicator(),
           )
-        : Form(
-            key: _formKey,
-            child: ListView(
-              physics: const BouncingScrollPhysics(),
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              children: [
-                DefaultTextfield(
-                  initialVal: _initValues['name'],
-                  savedValue: (newValue) {
-                    _editedDriver = _editedDriver.copyWith(name: newValue);
-                  },
-                  decoration: kTextFieldDecoration.copyWith(
-                    labelText: 'Driver Name',
-                  ),
-                ),
-                DefaultTextfield(
-                  savedValue: (newValue) {
-                    // _editedDriver = _editedDriver.copyWith(email: newValue);
-                  },
-                  decoration: kTextFieldDecoration.copyWith(
-                    labelText: 'Username',
-                  ),
-                ),
-                DefaultTextfield(
-                  savedValue: (newValue) {
-                    _editedDriver =
-                        _editedDriver.copyWith(plateNumber: newValue);
-                  },
-                  decoration: kTextFieldDecoration.copyWith(
-                    labelText: 'Vehicle Plate Number',
-                  ),
-                ), //todo change to dropdown
-                DefaultTextfield(
-                  initialVal: _initValues['phone'],
-                  keyboard: TextInputType.number,
-                  savedValue: (newValue) {
-                    _editedDriver = _editedDriver.copyWith(
-                      phone: int.tryParse(newValue ?? ''),
-                    );
-                  },
-                  decoration: kTextFieldDecoration.copyWith(
-                    labelText: 'Phone Number',
-                  ),
-                ),
-                DefaultTextfield(
-                  initialVal: _initValues['licenseNo'],
-                  keyboard: TextInputType.number,
-                  savedValue: (newValue) {
-                    _editedDriver = _editedDriver.copyWith(
-                      drivingLicense: newValue,
-                    );
-                  },
-                  decoration: kTextFieldDecoration.copyWith(
-                    labelText: 'Driving License',
-                  ),
-                ),
-                DefaultTextfield(
-                  savedValue: (newValue) {
-                    _editedDriver =
-                        _editedDriver.copyWith(drivingLicenseExDate: newValue);
-                  },
-                  mask: maskFormatter,
-                  controller: _licenseDateController,
-                  keyboard: TextInputType.datetime,
-                  decoration: kTextFieldDecoration.copyWith(
-                    suffixIcon: IconButton(
-                      icon: const Icon(
-                        Icons.calendar_today_sharp,
+        : Consumer<SteadyApiService>(
+            builder: (context, api, child) {
+              return Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      DefaultTextfield(
+                        initialVal: _initValues['name'],
+                        savedValue: (newValue) {
+                          _editedDriver =
+                              _editedDriver.copyWith(name: newValue);
+                        },
+                        decoration: kTextFieldDecoration.copyWith(
+                          labelText: 'Driver Name',
+                        ),
                       ),
-                      onPressed: () => _selectDate(
-                        context,
-                        _licenseDateController,
+                      DefaultTextfield(
+                        initialVal: _initValues['email'],
+                        savedValue: (newValue) {
+                          _editedDriver = _editedDriver.copyWith(
+                            email: newValue,
+                          );
+                        },
+                        decoration: kTextFieldDecoration.copyWith(
+                          labelText: 'Email',
+                        ),
                       ),
-                    ),
-                    labelText: 'Driving License Expiry Date',
-                    suffix: const Text('DD/MM/YYYY'),
-                  ),
-                ),
-                DefaultTextfield(
-                  //!change to dropdown
-                  savedValue: (newValue) {
-                    _editedDriver = _editedDriver.copyWith(company: newValue);
-                  },
+                      DefaultTextfield(
+                        initialVal: _initValues['password'],
+                        savedValue: (newValue) {
+                          _editedDriver = _editedDriver.copyWith(
+                            password: newValue,
+                          );
+                        },
+                        decoration: kTextFieldDecoration.copyWith(
+                          labelText: 'Password',
+                        ),
+                      ),
+                      DropDownSearch(
+                        jwt: jwt,
+                        name: 'Vehicle',
+                        savedValue: (value) => null,
+                        // String? selectedVehicle;
+                        // selectedVehicle = value,
+                        onFind: (_) async {
+                          await api.vehiclesService.fetchVehicles(
+                            jwt,
+                            courierId, //courierId,
+                          );
+                          return api.vehiclesService.vehicles
+                              .map(
+                                (item) => item.name,
+                              )
+                              .toList();
+                        },
+                      ),
+                      // DefaultTextfield(
+                      //   savedValue: (newValue) {
+                      //     _editedDriver =
+                      //         _editedDriver.copyWith(plateNumber: newValue);
+                      //   },
+                      //   decoration: kTextFieldDecoration.copyWith(
+                      //     labelText: 'Vehicle Plate Number',
+                      //   ),
+                      // ), //todo change to dropdown
+                      DefaultTextfield(
+                        initialVal: _initValues['phone'],
+                        keyboard: TextInputType.number,
+                        savedValue: (newValue) {
+                          _editedDriver = _editedDriver.copyWith(
+                            phone: int.tryParse(newValue ?? ''),
+                          );
+                        },
+                        decoration: kTextFieldDecoration.copyWith(
+                          labelText: 'Phone Number',
+                        ),
+                      ),
+                      DefaultTextfield(
+                        initialVal: _initValues['licenseNo'],
+                        keyboard: TextInputType.number,
+                        savedValue: (newValue) {
+                          _editedDriver = _editedDriver.copyWith(
+                            drivingLicense: newValue,
+                          );
+                        },
+                        decoration: kTextFieldDecoration.copyWith(
+                          labelText: 'Driving License',
+                        ),
+                      ),
+                      DefaultTextfield(
+                        savedValue: (newValue) {
+                          _editedDriver = _editedDriver.copyWith(
+                              drivingLicenseExDate: newValue);
+                        },
+                        mask: maskFormatter,
+                        controller: _licenseDateController,
+                        keyboard: TextInputType.datetime,
+                        decoration: kTextFieldDecoration.copyWith(
+                          suffixIcon: IconButton(
+                            icon: const Icon(
+                              Icons.calendar_today_sharp,
+                            ),
+                            onPressed: () => _selectDate(
+                              context,
+                              _licenseDateController,
+                            ),
+                          ),
+                          labelText: 'Driving License Expiry Date',
+                          suffix: const Text('DD/MM/YYYY'),
+                        ),
+                      ),
+                      DefaultTextfield(
+                        //!change to dropdown
+                        savedValue: (newValue) {
+                          _editedDriver =
+                              _editedDriver.copyWith(company: newValue);
+                        },
 
-                  decoration: kTextFieldDecoration.copyWith(
-                    labelText: 'Company',
-                  ),
-                ),
-                DefaultTextfield(
-                  savedValue: (newValue) {
-                    _editedDriver =
-                        _editedDriver.copyWith(passportNumber: newValue);
-                  },
-                  decoration: kTextFieldDecoration.copyWith(
-                    labelText: 'Passport Number',
-                  ),
-                ),
-                DefaultTextfield(
-                  savedValue: (newValue) {
-                    _editedDriver =
-                        _editedDriver.copyWith(passportExDate: newValue);
-                  },
-                  mask: maskFormatter,
-                  keyboard: TextInputType.datetime,
-                  controller: _passportDateController,
-                  decoration: kTextFieldDecoration.copyWith(
-                    suffixIcon: IconButton(
-                      icon: const Icon(
-                        Icons.calendar_today_sharp,
+                        decoration: kTextFieldDecoration.copyWith(
+                          labelText: 'Company',
+                        ),
                       ),
-                      onPressed: () => _selectDate(
-                        context,
-                        _passportDateController,
+                      DefaultTextfield(
+                        savedValue: (newValue) {
+                          _editedDriver =
+                              _editedDriver.copyWith(passportNumber: newValue);
+                        },
+                        decoration: kTextFieldDecoration.copyWith(
+                          labelText: 'Passport Number',
+                        ),
                       ),
-                    ),
-                    labelText: 'Passport Expiry Date',
-                    suffix: const Text('DD/MM/YYYY'),
-                  ),
-                ),
-                DefaultTextfield(
-                  keyboard: TextInputType.number,
-                  savedValue: (newValue) {
-                    _editedDriver = _editedDriver.copyWith(
-                      visaNumber: int.tryParse(newValue!),
-                    );
-                  },
-                  decoration: kTextFieldDecoration.copyWith(
-                    labelText: 'Visa Number',
-                  ),
-                ),
-                DefaultTextfield(
-                  savedValue: (newValue) {
-                    _editedDriver =
-                        _editedDriver.copyWith(visaExDate: newValue);
-                  },
-                  mask: maskFormatter,
-                  keyboard: TextInputType.datetime,
-                  controller: _visaDateController,
-                  decoration: kTextFieldDecoration.copyWith(
-                    suffixIcon: IconButton(
-                      icon: const Icon(
-                        Icons.calendar_today_sharp,
+                      DefaultTextfield(
+                        savedValue: (newValue) {
+                          _editedDriver =
+                              _editedDriver.copyWith(passportExDate: newValue);
+                        },
+                        mask: maskFormatter,
+                        keyboard: TextInputType.datetime,
+                        controller: _passportDateController,
+                        decoration: kTextFieldDecoration.copyWith(
+                          suffixIcon: IconButton(
+                            icon: const Icon(
+                              Icons.calendar_today_sharp,
+                            ),
+                            onPressed: () => _selectDate(
+                              context,
+                              _passportDateController,
+                            ),
+                          ),
+                          labelText: 'Passport Expiry Date',
+                          suffix: const Text('DD/MM/YYYY'),
+                        ),
                       ),
-                      onPressed: () => _selectDate(
-                        context,
-                        _visaDateController,
+                      DefaultTextfield(
+                        keyboard: TextInputType.number,
+                        savedValue: (newValue) {
+                          _editedDriver = _editedDriver.copyWith(
+                            visaNumber: int.tryParse(newValue!),
+                          );
+                        },
+                        decoration: kTextFieldDecoration.copyWith(
+                          labelText: 'Visa Number',
+                        ),
                       ),
-                    ),
-                    labelText: 'Visa Expiry Date',
-                    suffix: const Text('DD/MM/YYYY'),
-                  ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                  child: _isLoading
-                      ? const Center(
+                      DefaultTextfield(
+                        savedValue: (newValue) {
+                          _editedDriver =
+                              _editedDriver.copyWith(visaExDate: newValue);
+                        },
+                        mask: maskFormatter,
+                        keyboard: TextInputType.datetime,
+                        controller: _visaDateController,
+                        decoration: kTextFieldDecoration.copyWith(
+                          suffixIcon: IconButton(
+                            icon: const Icon(
+                              Icons.calendar_today_sharp,
+                            ),
+                            onPressed: () => _selectDate(
+                              context,
+                              _visaDateController,
+                            ),
+                          ),
+                          labelText: 'Visa Expiry Date',
+                          suffix: const Text('DD/MM/YYYY'),
+                        ),
+                      ),
+                      if (_isLoading)
+                        const Center(
                           child: CircularProgressIndicator(),
                         )
-                      : DashboardButton(
+                      else
+                        DashboardButton(
                           'Submit',
-                          _saveForm,
+                          () async {
+                            // Validate returns true if the form is valid, or false otherwise.
+                            // if (_formKey.currentState!.validate()) {
+                            //
+                            if (_formKey.currentState != null) {
+                              final isValid = _formKey.currentState?.validate();
+                              if (isValid != null && !isValid) return;
+                              _formKey.currentState?.save();
+                              setState(() {
+                                _isLoading = true;
+                              });
+
+                              try {
+                                final bool addedDriver = await api
+                                    .driversService
+                                    .addDriver(jwt, courierId, _editedDriver);
+                                if (!addedDriver) {
+                                  throw 'Try Logging out and Sign In again';
+                                }
+                              } catch (error) {
+                                await showDialog<void>(
+                                  context: NavigationService
+                                      .navigatorKey.currentContext!,
+                                  builder: (ctx) => AlertDialog(
+                                    title: const Text('An error has occured!'),
+                                    content: Text(
+                                      error.toString(),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(ctx).pop();
+                                        },
+                                        child: const Text('Ok'),
+                                      )
+                                    ],
+                                  ),
+                                );
+                              }
+                              setState(() {
+                                _isLoading = false;
+                              });
+                              NavigationService.goBack(); //
+                              //
+                              //
+                              //*if(editedpr.id != null)
+                              // Provider.of<Products>(ctx, llisten: false).updateProduct(editedpr);
+                              //* else
+                              // Provider.of<Products>(ctx, llisten: false).aaProduct(editedpr);
+                              // If the form is valid, display a snackbar. In the real world,
+                              // you'd often call a server or save the information in a database.
+                            }
+                          },
                         ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              );
+            },
           );
   }
 }

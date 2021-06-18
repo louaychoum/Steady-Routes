@@ -4,6 +4,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class DefaultTextfield extends StatelessWidget {
   const DefaultTextfield({
+    Key? key,
     required this.decoration,
     this.isPassword = false,
     this.initialVal = '',
@@ -11,7 +12,7 @@ class DefaultTextfield extends StatelessWidget {
     this.keyboard = TextInputType.text,
     this.controller,
     this.mask,
-  });
+  }) : super(key: key);
   final InputDecoration decoration;
   final bool isPassword;
   final dynamic initialVal;

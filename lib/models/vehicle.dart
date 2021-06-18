@@ -9,7 +9,7 @@ class Vehicle {
   final String rtaExDate;
 
   Vehicle({
-    required this.id,
+    this.id,
     required this.name,
     required this.plateNumber,
     required this.category,
@@ -30,12 +30,11 @@ class Vehicle {
         rtaExDate = json['rtaExDate'].toString();
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
+    final data = <String, dynamic>{};
     data['name'] = name;
     data['category'] = category;
     data['status'] = status;
-    data['plateNumber'] = plateNumber;
+    data['plate'] = plateNumber;
     data['registrationExDate'] = registrationExDate;
     data['rtaNumber'] = rtaNumber;
     data['rtaExDate'] = rtaExDate;

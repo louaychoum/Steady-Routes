@@ -37,10 +37,21 @@ class Courier {
         phone = json['phone'] == null ? 0 : json['phone'] as int,
         user = json['user'] == null
             ? null
-            : User.fromJsonLogin(json['user'].toString()),
+            : User.fromJsonLogin(
+                json['user'].toString(),
+              ),
         location = json['location'] == null
             ? null
-            : Location.fromJsonLogin(json['location'].toString());
+            : Location.fromJsonLogin(
+                json['location'].toString(),
+              );
+
+  Courier.fromJsonLoginId(String json)
+      : id = json.toString(),
+        name = '',
+        phone = 0,
+        location = null,
+        user = null;
 
   Map<String, dynamic> toJson() => {
         '_id': id,

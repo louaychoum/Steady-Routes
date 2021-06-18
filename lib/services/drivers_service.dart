@@ -18,9 +18,11 @@ class DriversService with ChangeNotifier {
   final Dio _dio = Dio(options);
   List<Driver> _drivers = [];
   List<Driver> get drivers => [..._drivers];
-  // Driver findById(int id) {
-  //   return _drivers.firstWhere((driver) => driver.id == id);
-  // }
+  Driver findById(String id) {
+    return _drivers.firstWhere(
+      (driver) => driver.id == id,
+    );
+  }
 
   Future<bool> fetchDrivers(String jwt, String courierId) async {
     _log.info('fetching drivers');
@@ -77,7 +79,8 @@ class DriversService with ChangeNotifier {
   }
 
   Future<bool> addDriver(
-    User user,
+    String jwt,
+    String courierId,
     Driver _editedDriver,
   ) async {
     _log.info('adding driver');
@@ -94,19 +97,23 @@ class DriversService with ChangeNotifier {
         visaExDate: _editedDriver.visaExDate,
         visaNumber: _editedDriver.visaNumber,
         user: User(
-          email: '${_editedDriver.name}@${_editedDriver.company}.com',
-          password: 'password',
+          email: _editedDriver.email ?? '',
+          password: _editedDriver.password ?? '',
           role: 'driver',
-          token: user.token,
+          token: jwt,
           userId: '',
-          courier: user.courier,
+          courier: null,
         ),
+        courierId: courierId,
+        email: _editedDriver.email,
+        password: _editedDriver.password,
       );
-
       final response = await _dio.post(
         '/drivers/',
         options: Options(
-          headers: {'Authorization': ' x ${user.token}'},
+          headers: {
+            'Authorization': ' x $jwt',
+          },
         ),
         data: newDriver.toJson(),
       );
@@ -144,59 +151,54 @@ class DriversService with ChangeNotifier {
     }
   }
 
-  Future<void> deleteDriver(
+  Future<bool> deleteDriver(
     String jwt,
     String id,
   ) async {
-    // final response = await _dio.delete(
-    //   '/drivers/$id',
-    //   options: Options(
-    //     headers: {'Authorization': ' x $jwt'},
-    //   ),
-    // );
-    final existingDriverIndex = _drivers.indexWhere(
-      (driver) => driver.id == id,
-    );
-    Driver? existingDrivers = _drivers[existingDriverIndex];
-    _drivers.removeAt(existingDriverIndex);
-    notifyListeners();
-    // if (response.statusCode! >= 400) {
-    //   _drivers.insert(existingDriverIndex, existingDrivers);
-    //   notifyListeners();
-    //   throw 'Could not delete product.';
-    // }
-    existingDrivers = null;
+    _log.info('deleting driver');
+    try {
+      final response = await _dio.delete(
+        '/drivers/$id',
+        options: Options(
+          headers: {'Authorization': ' x $jwt'},
+        ),
+      );
+      final existingDriverIndex = _drivers.indexWhere(
+        (driver) => driver.id == id,
+      );
+      Driver? existingDrivers = _drivers[existingDriverIndex];
+      _drivers.removeAt(existingDriverIndex);
+      notifyListeners();
+
+      existingDrivers = null;
+      return true;
+    } on TimeoutException catch (error) {
+      _log.warning('[Timeout] $error');
+      return false;
+    } on SocketException catch (error) {
+      _log.warning('[Socket] $error');
+      return false;
+    } on DioError catch (error) {
+      if (error.response == null) {
+        return false;
+      }
+      if (error.response?.statusCode != 200) {
+        final errorMessage = DioExceptions.fromDioError(error).toString();
+        _log.warning('[Dio] $errorMessage');
+        WebAuthService().processApiError(error.response!);
+        return false;
+      }
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      _log.warning('[Dio] $errorMessage');
+      return false;
+    } on Exception catch (error) {
+      _log.warning('[Exception] $error');
+      return false;
+    } catch (error) {
+      _log.warning('[Other] $error');
+      return false;
+    }
   }
-  // Future<bool> assignReceiptToTransaction(
-  //     String jwt, int receiptId, int transactionId) async {
-  //   try {
-  //     var url = '${API_BASE}receipts/$receiptId';
-  //     var response = await http
-  //         .put(
-  //           url,
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //             "api-token": jwt,
-  //           },
-  //           body: json.encode(
-  //             {'transaction_id': transactionId},
-  //           ),
-  //         )
-  //         .timeout(
-  //           const Duration(seconds: 10),
-  //         );
-  //     print('Response body: ${response.body}');
-  //     print('Response body: ${response.statusCode}');
-  //     if (response.statusCode != 200) {
-  //       return false;
-  //     }
-  //     return true;
-  //   } on TimeoutException catch (_) {
-  //     return false;
-  //   } on SocketException catch (_) {
-  //     return false;
-  //   }
-  // }
 
   // Future<bool> upload(String jwt, File img) async {
   //   try {

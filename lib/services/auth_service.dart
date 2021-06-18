@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:steadyroutes/models/courier.dart';
+import 'package:steadyroutes/models/driver.dart';
 
 import 'package:steadyroutes/models/user.dart';
 
@@ -15,6 +16,7 @@ enum AuthStatus {
 abstract class AuthService extends ChangeNotifier {
   User get user;
   Courier? get courier;
+  Driver? get driver;
   AuthStatus get status;
 
   Future<bool> signIn({

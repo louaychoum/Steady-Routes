@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/models/driver.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/driverScreen/add_driver_screen.dart';
 
 import 'package:steadyroutes/pages/adminDashBoardScreen/driverScreen/driver_receipts_screen.dart';
 import 'package:steadyroutes/services/auth_service.dart';
@@ -84,19 +85,7 @@ class _DriversListViewState extends State<DriversListView> {
     // final driversData = Provider.of<DriversService>(context);
     // final drivers = driversData.drivers;
 
-    return
-        // _isLoading
-        //     ? const Center(
-        //         child: CircularProgressIndicator(),
-        //       )
-        //     :
-        ///!!!
-        // drivers.isEmpty
-        //     ? const Center(
-        //         child: Text('No drivers added yetpackage:steadyroutes.'),
-        //       )
-        //     :
-        Consumer<SteadyApiService>(
+    return Consumer<SteadyApiService>(
       builder: (context, api, child) {
         final auth = Provider.of<AuthService>(context, listen: false);
         final driversList = api.driversService.drivers;
@@ -119,7 +108,7 @@ class _DriversListViewState extends State<DriversListView> {
                   itemBuilder: (context, index) {
                     final driver = driversList[index];
                     return Dismissible(
-                      key: ValueKey<int>(index),
+                      key: UniqueKey(),
                       background: Container(
                         color: Colors.red,
                         child: const Icon(Icons.delete),
@@ -137,13 +126,13 @@ class _DriversListViewState extends State<DriversListView> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text("${driver.name} was deleted"),
-                              action: SnackBarAction(
-                                label: 'Undo',
-                                onPressed: () => setState(
-                                  () =>
-                                      driversList.insert(index, deletedDriver),
-                                ),
-                              ),
+                              // action: SnackBarAction(
+                              //   label: 'Undo',
+                              //   onPressed: () => setState(
+                              //     () =>
+                              //         driversList.insert(index, deletedDriver),
+                              //   ),
+                              // ),
                             ),
                           );
                         });
@@ -174,9 +163,15 @@ class _DriversListViewState extends State<DriversListView> {
                       },
                       child: ListTile(
                         title: Text(driver.name),
-                        trailing: Text(
-                          driver.user?.email ?? '',
-                          overflow: TextOverflow.ellipsis,
+                        trailing: IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () => Navigator.of(context).pushNamed(
+                            AddDriver.routeName,
+                            arguments: api.driversService.findById(
+                              driver.id ?? '',
+                            ),
+                          ),
+                          color: Theme.of(context).errorColor,
                         ),
                         onTap: () => Navigator.of(context).pushNamed(
                           DriverReceiptsScreen.routeName,

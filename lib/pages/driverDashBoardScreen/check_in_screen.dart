@@ -9,10 +9,7 @@ class CheckInScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: CheckInForm(),
-      ),
+      body: CheckInForm(),
     );
   }
 }

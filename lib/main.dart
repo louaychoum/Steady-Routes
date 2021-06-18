@@ -88,7 +88,7 @@ class MyApp extends StatelessWidget {
             backgroundColor: Color(0xffffffff),
             elevation: 0,
           ),
-
+          
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               textStyle: GoogleFonts.bungee(
