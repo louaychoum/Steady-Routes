@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:logging/logging.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
@@ -35,6 +34,7 @@ class VehiclesService with ChangeNotifier {
           headers: {'Authorization': ' x $jwt'},
         ),
       );
+      _log.info(response);
       _vehicles.clear();
       final parsedResponse =
           jsonDecode(response.toString()) as Map<String, dynamic>;
@@ -94,6 +94,7 @@ class VehiclesService with ChangeNotifier {
           headers: {'Authorization': ' x $jwt'},
         ),
       );
+      _log.info(response);
       final existingVehicleIndex = _vehicles.indexWhere(
         (driver) => driver.id == id,
       );
@@ -155,7 +156,7 @@ class VehiclesService with ChangeNotifier {
         ),
         data: newVehicle.toJson(),
       );
-
+      _log.info(response);
       vehicles.add(newVehicle);
       notifyListeners();
       return true;

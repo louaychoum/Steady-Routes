@@ -24,11 +24,8 @@ class _ExpiryReportState extends State<ExpiryReport> {
               'Near Expiry Report',
               style: kTextTitleStyle,
             ),
-            const Divider(
-              
-            ),
+            const Divider(),
             Expanded(
-              flex: 8,
               child: ExpiryInfo(),
             ),
           ],

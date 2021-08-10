@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:steadyroutes/helpers/constants.dart';
-import 'package:steadyroutes/models/driver.dart';
-import 'package:steadyroutes/pages/adminDashBoardScreen/driverScreen/add_driver_screen.dart';
 
+import 'package:steadyroutes/pages/adminDashBoardScreen/driverScreen/add_driver_screen.dart';
 import 'package:steadyroutes/pages/adminDashBoardScreen/driverScreen/driver_receipts_screen.dart';
 import 'package:steadyroutes/services/auth_service.dart';
+import 'package:steadyroutes/services/navigator_sevice.dart';
 import 'package:steadyroutes/services/steady_api_service.dart';
 
 class DriversListView extends StatefulWidget {
@@ -23,8 +22,9 @@ class _DriversListViewState extends State<DriversListView> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!
-        .addPostFrameCallback((_) => _refreshKey.currentState!.show());
+    WidgetsBinding.instance!.addPostFrameCallback(
+      (_) => _refreshKey.currentState!.show(),
+    );
   }
 
   Future<void> fetchDrivers(SteadyApiService api) {
@@ -136,6 +136,9 @@ class _DriversListViewState extends State<DriversListView> {
                             ),
                           );
                         });
+                        WidgetsBinding.instance?.addPostFrameCallback(
+                          (_) => _refreshKey.currentState?.show(),
+                        );
                       },
                       confirmDismiss: (direction) {
                         return showDialog(
@@ -165,10 +168,16 @@ class _DriversListViewState extends State<DriversListView> {
                         title: Text(driver.name),
                         trailing: IconButton(
                           icon: const Icon(Icons.edit),
-                          onPressed: () => Navigator.of(context).pushNamed(
+                          onPressed: () =>
+                              NavigationService.navigateToWithArguments(
                             AddDriver.routeName,
-                            arguments: api.driversService.findById(
+                            api.driversService.findById(
                               driver.id ?? '',
+                            ),
+                          )?.then(
+                            (value) =>
+                                WidgetsBinding.instance?.addPostFrameCallback(
+                              (_) => _refreshKey.currentState?.show(),
                             ),
                           ),
                           color: Theme.of(context).errorColor,

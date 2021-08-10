@@ -37,13 +37,11 @@ class UploadedReceiptInfo extends StatelessWidget {
     );
     final splitted = filePath.substring(0, lastIndex);
     final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
-    final result = await (FlutterImageCompress.compressAndGetFile(
+    final result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path,
       outPath,
       quality: kCompressedImageQuality, //ca
-    ) as Future<File?>);
-    debugPrint((file.lengthSync() / 1024).toString());
-    debugPrint((result?.lengthSync() ?? 1024 / 1024).toString());
+    );
     return result;
   }
 
@@ -73,7 +71,6 @@ class UploadedReceiptInfo extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         DropDownSearch(
-                          jwt: jwt,
                           name: 'Vehicle',
                           savedValue: (value) => null,
                           // String? selectedVehicle;

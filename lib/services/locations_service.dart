@@ -7,11 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
-import 'package:steadyroutes/models/courier.dart';
 import 'package:steadyroutes/models/dio_exception.dart';
-import 'package:steadyroutes/models/driver.dart';
 import 'package:steadyroutes/models/location.dart';
-import 'package:steadyroutes/models/user.dart';
 import 'package:steadyroutes/services/web_auth_service.dart';
 
 class LocationsService with ChangeNotifier {
@@ -36,6 +33,7 @@ class LocationsService with ChangeNotifier {
           headers: {'Authorization': ' x $jwt'},
         ),
       );
+      _log.info(response);
       _locations.clear();
       final parsedResponse =
           jsonDecode(response.toString()) as Map<String, dynamic>;

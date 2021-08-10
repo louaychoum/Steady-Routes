@@ -1,21 +1,16 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
-import 'package:steadyroutes/helpers/constants.dart';
 
 import 'package:steadyroutes/helpers/geolocator.dart';
 import 'package:steadyroutes/models/location.dart';
-import 'package:steadyroutes/pages/driverDashBoardScreen/driver_dashboard_screen.dart';
 import 'package:steadyroutes/services/auth_service.dart';
 import 'package:steadyroutes/services/navigator_sevice.dart';
 import 'package:steadyroutes/services/steady_api_service.dart';
 import 'package:steadyroutes/widgets/dashboard_button.dart';
-import 'package:steadyroutes/widgets/dropdown_search.dart';
+import 'package:steadyroutes/widgets/error_dialog.dart';
 import 'package:steadyroutes/widgets/mall_dropdown.dart';
+import 'package:steadyroutes/widgets/operation_dialog.dart';
 
 class CheckInForm extends StatefulWidget {
   @override
@@ -25,39 +20,10 @@ class CheckInForm extends StatefulWidget {
 class _CheckInFormState extends State<CheckInForm> {
   late DateTime now;
   late Position position;
-  late Location selectedLocation;
+  Location? selectedLocation;
   late String jwt;
   bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
-
-  Future<void> _showMyDialog(Position pos, String value, String time) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('\u{2705} Operation Successful'),
-          content: Text(
-            'Checked In At ${pos.latitude} , ${pos.longitude} \nMall: $value \nAt time: $time',
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                NavigationService.popUntilRoot();
-              },
-              child: const Text('Approve'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,54 +34,18 @@ class _CheckInFormState extends State<CheckInForm> {
         return Form(
           key: _formKey,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Spacer(
                 flex: 4,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 10,
-                ),
-                child: DropdownSearch<Location>(
-                  onFind: (_) async {
-                    await api.locationsService.fetchLocation(
-                      jwt,
-                    );
-                    return api.locationsService.locations.map(
-                      (item) {
-                        return item;
-                      },
-                    ).toList();
-                  },
-                  itemAsString: (item) => item.address,
-                  onChanged: (Location? picked) {
-                    if (picked != null) {
-                      selectedLocation = picked;
-                    }
-                  },
-                  showAsSuffixIcons: true,
-                  dropdownSearchDecoration: kTextFieldDecoration.copyWith(
-                    labelText: 'Mall Name',
-                    hintText: 'Choose a Mall',
-                  ),
-                  searchBoxDecoration: kTextFieldDecoration.copyWith(
-                    labelText: 'Mall Name',
-                    hintText: 'Search Malls',
-                  ),
-                  showClearButton: true,
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select a Mall';
-                    }
-                    return null;
-                  },
-                  showSearchBox: true,
-                ),
+              MallDropDown(
+                jwt: jwt,
+                api: api,
+                savedValue: (Location? value) {
+                  selectedLocation = value;
+                },
               ),
-              const Spacer(),
               if (isLoading)
                 const Center(
                   child: CircularProgressIndicator(),
@@ -130,19 +60,19 @@ class _CheckInFormState extends State<CheckInForm> {
                         if (isValid != null && !isValid) return;
                         _formKey.currentState?.save();
                         now = DateTime.now();
+                        final String convertedDateTime =
+                            "${now.year.toString()}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString()}-${now.minute.toString()}";
                         setState(
                           () => isLoading = true,
                         );
-                        final String convertedDateTime =
-                            "${now.year.toString()}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString()}-${now.minute.toString()}";
                         try {
                           position = await determinePosition();
-                          final bool addedCheckIn =
+                          final addedCheck =
                               await api.attendanceService.addAttendance(
                             action: 'checkin',
                             date: now.toIso8601String(),
                             driver: auth.driver,
-                            locationId: selectedLocation.id,
+                            locationId: selectedLocation?.id,
                             lat: position.latitude,
                             long: position.longitude,
                             token: jwt,
@@ -150,13 +80,13 @@ class _CheckInFormState extends State<CheckInForm> {
                           setState(() {
                             isLoading = false;
                           });
-                          if (!addedCheckIn) {
-                            throw 'Try Logging out and Signing In again';
+                          if (addedCheck != null && addedCheck.isNotEmpty) {
+                            throw addedCheck;
                           }
-                          _showMyDialog(
-                            position,
-                            selectedLocation.address,
-                            convertedDateTime,
+                          showMyDialog(
+                            context: context,
+                            message:
+                                'Checked In At ${position.latitude} , ${position.longitude}\nMall: ${selectedLocation?.address}\nAt time: $convertedDateTime',
                           );
 //Todo handle errors
                         } catch (error) {
@@ -177,24 +107,7 @@ class _CheckInFormState extends State<CheckInForm> {
                               ),
                             );
                           } else {
-                            await showDialog<void>(
-                              context: NavigationService
-                                  .navigatorKey.currentContext!,
-                              builder: (ctx) => AlertDialog(
-                                title: const Text('An error has occured!'),
-                                content: Text(
-                                  error.toString(),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(ctx).pop();
-                                    },
-                                    child: const Text('Ok'),
-                                  )
-                                ],
-                              ),
-                            );
+                            await buildErrorDialog(error);
                           }
                         }
                       }

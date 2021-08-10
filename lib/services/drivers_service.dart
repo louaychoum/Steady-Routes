@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
-import 'package:steadyroutes/models/courier.dart';
 import 'package:steadyroutes/models/dio_exception.dart';
 import 'package:steadyroutes/models/driver.dart';
 import 'package:steadyroutes/models/user.dart';
@@ -33,6 +32,7 @@ class DriversService with ChangeNotifier {
           headers: {'Authorization': ' x $jwt'},
         ),
       );
+      _log.info(response);
       _drivers.clear();
       final parsedResponse =
           jsonDecode(response.toString()) as Map<String, dynamic>;
@@ -88,12 +88,127 @@ class DriversService with ChangeNotifier {
       final Driver newDriver = Driver(
         name: _editedDriver.name,
         phone: _editedDriver.phone,
-        drivingLicense: _editedDriver.drivingLicense,
-        company: _editedDriver.company,
-        drivingLicenseExDate: _editedDriver.drivingLicenseExDate,
+        licenseNo: _editedDriver.licenseNo,
+        licenseExpiryDate: _editedDriver.licenseExpiryDate,
         passportExDate: _editedDriver.passportExDate,
         passportNumber: _editedDriver.passportNumber,
-        plateNumber: _editedDriver.plateNumber,
+        vehicleId: _editedDriver.vehicleId,
+        visaExDate: _editedDriver.visaExDate,
+        visaNumber: _editedDriver.visaNumber,
+        zoneId: _editedDriver.zoneId,
+        user: User(
+          email: _editedDriver.email ?? '',
+          password: _editedDriver.password ?? '',
+          role: 'driver',
+          token: jwt,
+          userId: '',
+          courier: null,
+        ),
+        courierId: courierId,
+        email: _editedDriver.email,
+        password: _editedDriver.password,
+      );
+      final response = await _dio.post(
+        '/drivers',
+        options: Options(
+          headers: {
+            'Authorization': ' x $jwt',
+          },
+        ),
+        data: newDriver.toJson(),
+      );
+      _log.info(response);
+      drivers.add(newDriver);
+      notifyListeners();
+      return true;
+    } on TimeoutException catch (error) {
+      _log.warning('[Timeout] ${error.message}');
+      return false;
+      // throw TimeoutException(error.toString());
+    } on SocketException catch (error) {
+      _log.warning('[Socket] ${error.message}');
+      return false;
+      // throw SocketException(error.toString());
+    } on DioError catch (error) {
+      if (error.response == null) {
+        _log.warning('[Dio] ${error.message}');
+        return false;
+      }
+      if (error.response?.statusCode != 200) {
+        final errorMessage = DioExceptions.fromDioError(error).toString();
+        _log.warning('[Dio] $errorMessage');
+        WebAuthService().processApiError(error.response!);
+        return false;
+      }
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      _log.warning('[Dio] $errorMessage');
+      return false;
+    } on Exception catch (error) {
+      _log.warning('[Exception] $error');
+      return false;
+    } catch (error) {
+      _log.warning('[Other] $error');
+      return false;
+    }
+  }
+
+  Future<bool> updateDriver(
+    String jwt,
+    String? id,
+    String courierId,
+    Driver _editedDriver,
+  ) async {
+    _log.info('updating driver');
+    final driverIndex = _drivers.indexWhere((index) => index.id == id);
+    if (driverIndex >= 0) {
+      final Driver newDriver = Driver(
+        name: _editedDriver.name,
+        phone: _editedDriver.phone,
+        licenseNo: _editedDriver.licenseNo,
+        zoneId: _editedDriver.zoneId,
+        licenseExpiryDate: _editedDriver.licenseExpiryDate,
+        passportExDate: _editedDriver.passportExDate,
+        passportNumber: _editedDriver.passportNumber,
+        vehicleId: _editedDriver.vehicleId,
+        visaExDate: _editedDriver.visaExDate,
+        visaNumber: _editedDriver.visaNumber,
+        user: User(
+          email: _editedDriver.email ?? '',
+          password: _editedDriver.password ?? '',
+          role: 'driver',
+          token: jwt,
+          userId: '',
+          courier: null,
+        ),
+        courierId: courierId,
+        email: _editedDriver.email,
+        password: _editedDriver.password,
+      );
+      final response = await _dio.put(
+        '/drivers/$id',
+        options: Options(
+          headers: {
+            'Authorization': ' x $jwt',
+          },
+        ),
+        data: newDriver.toJson(),
+      );
+      _log.info(response);
+      _drivers[driverIndex] = newDriver;
+      notifyListeners();
+    } else {
+      _log.warning('UpdateDriver(): driverIndex less than zero');
+    }
+    try {
+      final Driver newDriver = Driver(
+        name: _editedDriver.name,
+        phone: _editedDriver.phone,
+        licenseNo: _editedDriver.licenseNo,
+        zoneId: _editedDriver.zoneId,
+        licenseExpiryDate: _editedDriver.licenseExpiryDate,
+        passportExDate: _editedDriver.passportExDate,
+        passportNumber: _editedDriver.passportNumber,
+        vehicleId: _editedDriver.vehicleId,
         visaExDate: _editedDriver.visaExDate,
         visaNumber: _editedDriver.visaNumber,
         user: User(
@@ -109,7 +224,7 @@ class DriversService with ChangeNotifier {
         password: _editedDriver.password,
       );
       final response = await _dio.post(
-        '/drivers/',
+        '/drivers',
         options: Options(
           headers: {
             'Authorization': ' x $jwt',
@@ -117,20 +232,21 @@ class DriversService with ChangeNotifier {
         ),
         data: newDriver.toJson(),
       );
-
+      _log.info(response);
       drivers.add(newDriver);
       notifyListeners();
       return true;
     } on TimeoutException catch (error) {
-      _log.warning('[Timeout] $error');
+      _log.warning('[Timeout] ${error.message}');
       return false;
       // throw TimeoutException(error.toString());
     } on SocketException catch (error) {
-      _log.warning('[Socket] $error');
+      _log.warning('[Socket] ${error.message}');
       return false;
       // throw SocketException(error.toString());
     } on DioError catch (error) {
       if (error.response == null) {
+        _log.warning('[Dio] ${error.message}');
         return false;
       }
       if (error.response?.statusCode != 200) {
@@ -163,6 +279,7 @@ class DriversService with ChangeNotifier {
           headers: {'Authorization': ' x $jwt'},
         ),
       );
+      _log.info(response);
       final existingDriverIndex = _drivers.indexWhere(
         (driver) => driver.id == id,
       );
@@ -173,13 +290,14 @@ class DriversService with ChangeNotifier {
       existingDrivers = null;
       return true;
     } on TimeoutException catch (error) {
-      _log.warning('[Timeout] $error');
+      _log.warning('[Timeout] ${error.message}');
       return false;
     } on SocketException catch (error) {
-      _log.warning('[Socket] $error');
+      _log.warning('[Socket] ${error.message}');
       return false;
     } on DioError catch (error) {
       if (error.response == null) {
+        _log.warning('[Dio] ${error.message}');
         return false;
       }
       if (error.response?.statusCode != 200) {

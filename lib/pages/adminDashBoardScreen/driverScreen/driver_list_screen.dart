@@ -19,8 +19,9 @@ class DriverList extends StatelessWidget {
             icon: const Icon(
               Icons.add,
             ),
-            onPressed: () =>
-                Navigator.of(context).pushNamed(AddDriver.routeName),
+            onPressed: () => Navigator.of(context).pushReplacementNamed(
+              AddDriver.routeName,
+            ),
           ),
         ],
       ),

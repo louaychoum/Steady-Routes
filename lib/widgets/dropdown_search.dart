@@ -3,18 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:steadyroutes/helpers/constants.dart';
 
 class DropDownSearch extends StatelessWidget {
-  const DropDownSearch(
-      {Key? key,
-      required this.jwt,
-      required this.name,
-      required this.savedValue,
-      required this.onFind})
-      : super(key: key);
+  const DropDownSearch({
+    Key? key,
+    required this.name,
+    required this.savedValue,
+    this.onFind,
+    this.items,
+    this.initialValue,
+  }) : super(key: key);
 
-  final String jwt;
   final String name;
   final ValueChanged<String?> savedValue;
   final Future<List<String>> Function(String)? onFind;
+  final List<String>? items;
+  final String? initialValue;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +26,8 @@ class DropDownSearch extends StatelessWidget {
         vertical: 10,
       ),
       child: DropdownSearch<String>(
+        selectedItem: initialValue == '' ? null : initialValue,
+        items: items,
         onFind: onFind,
         onChanged: (String? picked) {
           if (picked != null) {
@@ -34,12 +38,12 @@ class DropDownSearch extends StatelessWidget {
         },
         showAsSuffixIcons: true,
         dropdownSearchDecoration: kTextFieldDecoration.copyWith(
-          labelText: '$name Name',
+          labelText: name,
           hintText: 'Choose a $name',
         ),
         searchBoxDecoration: kTextFieldDecoration.copyWith(
-          labelText: '$name Name',
-          hintText: 'Search ${name}s',
+          labelText: name,
+          hintText: 'Search $name',
         ),
         showClearButton: true,
         validator: (value) {

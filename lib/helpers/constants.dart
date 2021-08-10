@@ -41,26 +41,36 @@ const kTextTitleStyle = TextStyle(
 
 final BaseOptions options = BaseOptions(
   baseUrl: 'https://dropshoptest.herokuapp.com',
-  sendTimeout: 20000,
-  connectTimeout: 20000,
-  receiveTimeout: 20000,
+  sendTimeout: 30000,
+  connectTimeout: 30000,
+  receiveTimeout: 30000,
 );
 
 const kErrorScaffoldColor = Color(0xFFB71C1C);
 const kDefaultScaffoldColor = Color(0xFF009688);
 
 const kExReportDropDownItems = [
-  'Driver Passport',
-  'Driver Visa',
-  'Driver License',
+  'drivinglicense',
+  'visa',
+  'passport',
   'Vehicle Registration',
   'Vehicle RTA License'
 ];
-
 const kMonthCountDropDownItems = [
   1,
   2,
   3,
+];
+const kVehicleCategoryDropDownItems = [
+  'Truck',
+  'Bike',
+  'Sedan',
+];
+const kVehicleStatusDropDownItems = [
+  'In Operation',
+  'In Repair',
+  'In Service',
+  'End Of Life',
 ];
 
 // [

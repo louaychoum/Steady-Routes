@@ -116,7 +116,6 @@ class _ReportInfoState extends State<ReportInfo> {
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             children: [
               DropDownSearch(
-                jwt: jwt,
                 name: 'Driver',
                 savedValue: (value) => selectedDriver = value,
                 onFind: (_) async {
@@ -132,7 +131,6 @@ class _ReportInfoState extends State<ReportInfo> {
                 },
               ),
               DropDownSearch(
-                jwt: jwt,
                 name: 'Vehicle',
                 savedValue: (value) => selectedVehicle = value,
                 onFind: (_) async {

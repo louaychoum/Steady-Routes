@@ -80,6 +80,7 @@ class WebAuthService with ChangeNotifier implements AuthService {
             headers: {'Authorization': ' x $jwt'},
           ),
         );
+        _log.info(request);
         final response = json.decode(
           request.toString(),
         );
@@ -99,9 +100,6 @@ class WebAuthService with ChangeNotifier implements AuthService {
     bool? autoLogin,
   }) async {
     _log.info('Sign In Called');
-    print('username $email');
-    print('password $password');
-    print(_user?.role);
     // final uri = Uri.parse('${_baseUrl}users/login');
     try {
       final response = await _dio.post(
@@ -111,11 +109,11 @@ class WebAuthService with ChangeNotifier implements AuthService {
           'password': password,
         },
       );
+      _log.info(response);
       final append = json.decode(response.toString()) as Map<String, dynamic>;
       append['email'] = email;
       append['password'] = password;
       _user = User.fromJson(append);
-      print(append);
       if (_user == null) {
         return false;
       }
@@ -268,6 +266,7 @@ class WebAuthService with ChangeNotifier implements AuthService {
   //   return true;
   // }
   Future<bool> processApiError(Response<dynamic> response) async {
+    _log.warning('processApiError() $response');
     if (response.statusCode! < 400 || response.statusCode! > 499) {
       return false;
     }
@@ -367,17 +366,17 @@ class WebAuthService with ChangeNotifier implements AuthService {
   Driver get driver =>
       _driver ??
       Driver(
-        company: '',
+        zoneId: '',
         courierId: null,
         email: '',
         password: '',
-        drivingLicense: '',
-        drivingLicenseExDate: '',
+        licenseNo: '',
+        licenseExpiryDate: '',
         name: '',
         passportExDate: '',
         passportNumber: '',
         phone: null,
-        plateNumber: '',
+        vehicleId: '',
         user: null,
         visaExDate: '',
         visaNumber: null,

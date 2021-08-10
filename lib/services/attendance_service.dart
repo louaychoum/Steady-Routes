@@ -8,11 +8,8 @@ import 'package:logging/logging.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/models/attendance.dart';
-import 'package:steadyroutes/models/courier.dart';
 import 'package:steadyroutes/models/dio_exception.dart';
 import 'package:steadyroutes/models/driver.dart';
-import 'package:steadyroutes/models/location.dart';
-import 'package:steadyroutes/models/user.dart';
 import 'package:steadyroutes/services/web_auth_service.dart';
 
 class AttendanceService with ChangeNotifier {
@@ -37,6 +34,7 @@ class AttendanceService with ChangeNotifier {
           headers: {'Authorization': ' x $jwt'},
         ),
       );
+      _log.info(response);
       _attendances.clear();
       final parsedResponse =
           jsonDecode(response.toString()) as Map<String, dynamic>;
@@ -82,7 +80,7 @@ class AttendanceService with ChangeNotifier {
     }
   }
 
-  Future<bool> addAttendance({
+  Future<String?> addAttendance({
     required Driver? driver,
     //todo: vehicleId
     required String? locationId,
@@ -112,38 +110,37 @@ class AttendanceService with ChangeNotifier {
         ),
         data: newAttendance.toJson(),
       );
-      print('attendance $response');
+      _log.info(response);
       attendances.add(newAttendance);
       notifyListeners();
-      return true;
     } on TimeoutException catch (error) {
       _log.warning('[Timeout] $error');
-      return false;
+      return error.toString();
       // throw TimeoutException(error.toString());
     } on SocketException catch (error) {
       _log.warning('[Socket] $error');
-      return false;
+      return error.toString();
       // throw SocketException(error.toString());
     } on DioError catch (error) {
       if (error.response == null) {
-        return false;
+        return error.response?.data.toString();
       }
       if (error.response?.statusCode == 400) {
         //Todo show error message
-        return true;
+        return error.response?.data.toString();
       }
       if (error.response?.statusCode != 200) {
         final errorMessage = DioExceptions.fromDioError(error).toString();
         _log.warning('[Dio] $errorMessage');
         WebAuthService().processApiError(error.response!);
-        return false;
+        return error.response?.data.toString();
       }
       final errorMessage = DioExceptions.fromDioError(error).toString();
       _log.warning('[Dio] $errorMessage');
-      return false;
+      return error.response?.data.toString();
     } catch (error) {
       _log.warning('[Other] $error');
-      return false;
+      return error.toString();
     }
   }
 }

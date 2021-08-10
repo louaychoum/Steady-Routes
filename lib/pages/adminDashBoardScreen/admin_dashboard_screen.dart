@@ -14,10 +14,6 @@ class AdminDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(
-      'Courier id: ${Provider.of<AuthService>(context, listen: false).courier?.id}',
-    );
-    
     return Scaffold(
       appBar: AppBar(
         title: FittedBox(

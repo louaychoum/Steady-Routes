@@ -17,8 +17,9 @@ class VehicleList extends StatelessWidget {
             icon: const Icon(
               Icons.add,
             ),
-            onPressed: () =>
-                Navigator.of(context).pushNamed(AddVehicle.routeName),
+            onPressed: () => Navigator.of(context).pushReplacementNamed(
+              AddVehicle.routeName,
+            ),
           ),
         ],
       ),

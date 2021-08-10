@@ -9,6 +9,7 @@ import 'package:steadyroutes/services/navigator_sevice.dart';
 import 'package:steadyroutes/services/steady_api_service.dart';
 import 'package:steadyroutes/widgets/dashboard_button.dart';
 import 'package:steadyroutes/widgets/default_textfield.dart';
+import 'package:steadyroutes/widgets/dropdown_search.dart';
 
 class VehicleInfo extends StatefulWidget {
   const VehicleInfo({
@@ -150,25 +151,23 @@ class _VehicleInfoState extends State<VehicleInfo> {
                           plateNumber: value,
                         ),
                       ),
-                      DefaultTextfield(
-                        decoration: kTextFieldDecoration.copyWith(
-                          labelText: 'Category',
-                        ),
-                        initialVal: _initValues['category'],
+                      DropDownSearch(
+                        name: 'Category',
                         savedValue: (value) =>
                             _editedVehicle = _editedVehicle.copyWith(
                           category: value,
                         ),
+                        items: kVehicleCategoryDropDownItems,
+                        initialValue: _initValues['category'],
                       ),
-                      DefaultTextfield(
-                        decoration: kTextFieldDecoration.copyWith(
-                          labelText: 'Status',
-                        ),
-                        initialVal: _initValues['status'],
+                      DropDownSearch(
+                        name: 'Status',
                         savedValue: (value) =>
                             _editedVehicle = _editedVehicle.copyWith(
                           status: value,
                         ),
+                        items: kVehicleStatusDropDownItems,
+                        initialValue: _initValues['status'],
                       ),
                       DefaultTextfield(
                         mask: maskFormatter,

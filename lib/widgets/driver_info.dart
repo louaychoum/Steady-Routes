@@ -45,14 +45,14 @@ class _DriverInfoState extends State<DriverInfo> {
     name: '',
     email: '',
     password: '',
-    company: '',
-    drivingLicense: '',
-    drivingLicenseExDate: '',
+    zoneId: '',
+    licenseNo: '',
+    licenseExpiryDate: '',
     passportExDate: '',
     passportNumber: '',
-    plateNumber: '',
+    vehicleId: '',
     visaExDate: '',
-    visaNumber: 0,
+    visaNumber: '',
     phone: 0,
     user: null,
     courierId: '',
@@ -61,7 +61,7 @@ class _DriverInfoState extends State<DriverInfo> {
   Map<String, dynamic> _initValues = {
     'name': '',
     'email': '',
-    'password': '',
+    'password': 'password',
     'licenseNo': '',
     'phone': '',
     'courier': '',
@@ -82,7 +82,7 @@ class _DriverInfoState extends State<DriverInfo> {
         _editedDriver = widget._driver!;
         _initValues = {
           'name': _editedDriver.name,
-          'licenseNo': _editedDriver.drivingLicense,
+          'licenseNo': _editedDriver.licenseNo,
           'phone': _editedDriver.phone,
           'email': _editedDriver.email,
           'password': _editedDriver.password,
@@ -90,7 +90,7 @@ class _DriverInfoState extends State<DriverInfo> {
           // 'rtaExDate': '',
           // 'rtaNumber': _editedDriver.rtaNumber.toString(),
         };
-        _licenseDateController.text = _editedDriver.drivingLicenseExDate;
+        _licenseDateController.text = _editedDriver.licenseExpiryDate;
         _passportDateController.text = _editedDriver.passportExDate;
         _visaDateController.text = _editedDriver.visaExDate;
       }
@@ -170,19 +170,23 @@ class _DriverInfoState extends State<DriverInfo> {
                           labelText: 'Email',
                         ),
                       ),
-                      DefaultTextfield(
-                        initialVal: _initValues['password'],
-                        savedValue: (newValue) {
-                          _editedDriver = _editedDriver.copyWith(
-                            password: newValue,
-                          );
-                        },
-                        decoration: kTextFieldDecoration.copyWith(
-                          labelText: 'Password',
-                        ),
-                      ),
+                      if (_initValues['password'] == null ||
+                          _initValues['password'].toString() == 'password' ||
+                          _initValues['password'].toString().isEmpty)
+                        DefaultTextfield(
+                          initialVal: _initValues['password'],
+                          savedValue: (newValue) {
+                            _editedDriver = _editedDriver.copyWith(
+                              password: newValue,
+                            );
+                          },
+                          decoration: kTextFieldDecoration.copyWith(
+                            labelText: 'Password',
+                          ),
+                        )
+                      else
+                        const SizedBox(),
                       DropDownSearch(
-                        jwt: jwt,
                         name: 'Vehicle',
                         savedValue: (value) => null,
                         // String? selectedVehicle;
@@ -225,7 +229,7 @@ class _DriverInfoState extends State<DriverInfo> {
                         keyboard: TextInputType.number,
                         savedValue: (newValue) {
                           _editedDriver = _editedDriver.copyWith(
-                            drivingLicense: newValue,
+                            licenseNo: newValue,
                           );
                         },
                         decoration: kTextFieldDecoration.copyWith(
@@ -235,7 +239,7 @@ class _DriverInfoState extends State<DriverInfo> {
                       DefaultTextfield(
                         savedValue: (newValue) {
                           _editedDriver = _editedDriver.copyWith(
-                              drivingLicenseExDate: newValue);
+                              licenseExpiryDate: newValue);
                         },
                         mask: maskFormatter,
                         controller: _licenseDateController,
@@ -254,17 +258,16 @@ class _DriverInfoState extends State<DriverInfo> {
                           suffix: const Text('DD/MM/YYYY'),
                         ),
                       ),
-                      DefaultTextfield(
-                        //!change to dropdown
-                        savedValue: (newValue) {
-                          _editedDriver =
-                              _editedDriver.copyWith(company: newValue);
-                        },
-
-                        decoration: kTextFieldDecoration.copyWith(
-                          labelText: 'Company',
-                        ),
-                      ),
+                      // DefaultTextfield(
+                      //   savedValue: (newValue) {
+                      //     _editedDriver =
+                      //         _editedDriver.copyWith(company: newValue);
+                      //   },
+                      //   initialVal: auth.courier?.name,
+                      //   decoration: kTextFieldDecoration.copyWith(
+                      //     labelText: 'Company',
+                      //   ),
+                      // ),
                       DefaultTextfield(
                         savedValue: (newValue) {
                           _editedDriver =
@@ -300,7 +303,7 @@ class _DriverInfoState extends State<DriverInfo> {
                         keyboard: TextInputType.number,
                         savedValue: (newValue) {
                           _editedDriver = _editedDriver.copyWith(
-                            visaNumber: int.tryParse(newValue!),
+                            visaNumber: newValue,
                           );
                         },
                         decoration: kTextFieldDecoration.copyWith(
@@ -346,11 +349,19 @@ class _DriverInfoState extends State<DriverInfo> {
                               });
 
                               try {
-                                final bool addedDriver = await api
-                                    .driversService
-                                    .addDriver(jwt, courierId, _editedDriver);
-                                if (!addedDriver) {
-                                  throw 'Try Logging out and Signing In again';
+                                if (_editedDriver.id != null) {
+                                  await api.driversService.updateDriver(
+                                      jwt,
+                                      _editedDriver.id,
+                                      courierId,
+                                      _editedDriver);
+                                } else {
+                                  final bool addedDriver = await api
+                                      .driversService
+                                      .addDriver(jwt, courierId, _editedDriver);
+                                  if (!addedDriver) {
+                                    throw 'Try Logging out and Signing In again';
+                                  }
                                 }
                               } catch (error) {
                                 await showDialog<void>(

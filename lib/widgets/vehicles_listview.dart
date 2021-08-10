@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:steadyroutes/pages/adminDashboardScreen/vehicleScreen/add_vehicle_screen.dart';
 import 'package:steadyroutes/services/auth_service.dart';
+import 'package:steadyroutes/services/navigator_sevice.dart';
 import 'package:steadyroutes/services/steady_api_service.dart';
 
 class VehiclesListView extends StatefulWidget {
@@ -112,6 +113,9 @@ class _VehiclesListViewState extends State<VehiclesListView> {
                             ),
                           );
                         });
+                        WidgetsBinding.instance?.addPostFrameCallback(
+                          (_) => _refreshKey.currentState?.show(),
+                        );
                       },
                       confirmDismiss: (direction) {
                         return showDialog(
@@ -138,13 +142,17 @@ class _VehiclesListViewState extends State<VehiclesListView> {
                         );
                       },
                       key: UniqueKey(),
-                                          child: ListTile(
+                      child: ListTile(
                         title: Text(vehicle.name),
                         trailing: Text(vehicle.plateNumber),
-                        onTap: () => Navigator.of(context).pushNamed(
+                        onTap: () => NavigationService.navigateToWithArguments(
                           AddVehicle.routeName,
-                          arguments:
-                              api.vehiclesService.findById(vehicle.id ?? ''),
+                          api.vehiclesService.findById(vehicle.id ?? ''),
+                        )?.then(
+                          (value) =>
+                              WidgetsBinding.instance?.addPostFrameCallback(
+                            (_) => _refreshKey.currentState?.show(),
+                          ),
                         ),
                       ),
                     );

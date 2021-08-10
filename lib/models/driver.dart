@@ -1,22 +1,21 @@
-import 'package:steadyroutes/models/courier.dart';
 import 'package:steadyroutes/models/user.dart';
 
 class Driver {
   final String? id;
   final String name;
-  final String? email;
-  final String? password;
-  final String? courierId;
-  final User? user;
   final int? phone;
-  final String plateNumber;
-  final String drivingLicense;
-  final String drivingLicenseExDate; //*may require change
-  final String company;
+  final String licenseNo;
+  final String vehicleId;
+  final String? zoneId;//todo add in new driver page
+  final String? courierId;//todo add in new driver page
+  final String licenseExpiryDate; //*may require change
   final String passportNumber;
   final String passportExDate; //*may require change
-  final int? visaNumber; //*may require change
+  final String? visaNumber; //*may require change
   final String visaExDate; //*may require change
+  final String? email;
+  final String? password;
+  final User? user;
 
   Driver({
     this.id,
@@ -26,53 +25,41 @@ class Driver {
     required this.password,
     required this.courierId,
     required this.phone,
-    required this.plateNumber,
-    required this.drivingLicense,
-    required this.drivingLicenseExDate,
-    required this.company,
+    required this.vehicleId,
+    required this.licenseNo,
+    required this.licenseExpiryDate,
     required this.passportNumber,
     required this.passportExDate,
     required this.visaNumber,
     required this.visaExDate,
+    required this.zoneId,
   });
 
 // Driver.fromJson(Map<String, dynamic> json)
   Driver.fromJson(Map<String, dynamic> json)
       : id = json['_id'].toString(),
         name = json['name'].toString(),
-        email = json['user'] == null
-            ? null
-            : User.fromJson(json['user'] as Map<String, dynamic>).email,
-        password = json['user'] == null
-            ? null
-            : User.fromJson(json['user'] as Map<String, dynamic>).password,
+        email = json['email'].toString(),
+        password = json['password'].toString(),
         user = json['user'] == null
             ? null
             : User.fromJson(json['user'] as Map<String, dynamic>),
         courierId = json['courierId'].toString(),
         phone = int.tryParse(json['phone'].toString()) ?? 0,
-        drivingLicense = json['licenseNo'].toString(),
-        plateNumber = json['plateNumber'].toString(),
-        drivingLicenseExDate = json['drivingLicenseExDate'].toString(),
-        company = json['company'].toString(),
+        licenseNo = json['licenseNo'].toString(),
+        vehicleId = json['vehicleId'].toString(),
+        zoneId = json['zoneId'].toString(),
+        licenseExpiryDate = json['licenseExpiryDate'].toString(),
         passportNumber = json['passportNumber'].toString(),
-        passportExDate = json['passportExDate'].toString(),
-        visaNumber = int.tryParse(json['visaNumber'].toString()) ?? 0,
-        visaExDate = json['visaExDate'].toString();
+        passportExDate = json['passportExpiryDate'].toString(),
+        visaNumber = json['visaNumber'].toString(),
+        visaExDate = json['visaExpiryDate'].toString();
 
   Driver.fromJsonLogin(Map<String, dynamic> json)
       : id = json['_id'].toString(),
         name = json['name'].toString(),
-        email = json['user'] == null
-            ? null
-            : User.fromJsonLogin(
-                json['user'].toString(),
-              ).email,
-        password = json['user'] == null
-            ? null
-            : User.fromJsonLogin(
-                json['user'].toString(),
-              ).password,
+        email = json['email'].toString(),
+        password = json['password'].toString(),
         user = json['user'] == null
             ? null
             : User.fromJsonLogin(
@@ -80,31 +67,31 @@ class Driver {
               ),
         courierId = json['courierId'].toString(),
         phone = int.tryParse(json['phone'].toString()) ?? 0,
-        drivingLicense = json['licenseNo'].toString(),
-        plateNumber = json['plateNumber'].toString(),
-        drivingLicenseExDate = json['drivingLicenseExDate'].toString(),
-        company = json['company'].toString(),
+        licenseNo = json['licenseNo'].toString(),
+        vehicleId = json['vehicleId'].toString(),
+        zoneId = json['zoneId'].toString(),
+        licenseExpiryDate = json['licenseExpiryDate'].toString(),
         passportNumber = json['passportNumber'].toString(),
-        passportExDate = json['passportExDate'].toString(),
-        visaNumber = int.tryParse(json['visaNumber'].toString()) ?? 0,
-        visaExDate = json['visaExDate'].toString();
+        passportExDate = json['passportExpiryDate'].toString(),
+        visaNumber = json['visaNumber'].toString(),
+        visaExDate = json['visaExpiryDate'].toString();
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     data['name'] = name;
     data['user'] = user?.toJson();
-    data['email'] = user?.email;
-    data['password'] = user?.password;
+    data['email'] = email;
+    data['password'] = password;
     data['courierId'] = courierId;
     data['phone'] = phone;
-    data['plateNumber'] = plateNumber;
-    data['licenseNo'] = drivingLicense;
-    data['drivingLicenseExDate'] = drivingLicenseExDate;
-    data['company'] = company;
+    data['vehicleId'] = vehicleId;
+    data['zoneId'] = zoneId;
+    data['licenseNo'] = licenseNo;
+    data['licenseExpiryDate'] = licenseExpiryDate;
     data['passportNumber'] = passportNumber;
-    data['passportExDate'] = passportExDate;
+    data['passportExpiryDate'] = passportExDate;
     data['visaNumber'] = visaNumber;
-    data['visaExDate'] = visaExDate;
+    data['visaExpiryDate'] = visaExDate;
     return data;
   }
 
@@ -116,13 +103,13 @@ class Driver {
     int? phone,
     User? user,
     String? courierId,
-    String? plateNumber,
-    String? drivingLicense,
-    String? drivingLicenseExDate, //*may require change
-    String? company,
+    String? zoneId,
+    String? vehicleId,
+    String? licenseNo,
+    String? licenseExpiryDate, //*may require change
     String? passportNumber,
     String? passportExDate, //*may require change
-    int? visaNumber, //*may require change
+    String? visaNumber, //*may require change
     String? visaExDate, //*may require change
   }) {
     return Driver(
@@ -133,10 +120,10 @@ class Driver {
       courierId: courierId ?? this.courierId,
       phone: phone ?? this.phone,
       user: user ?? this.user,
-      plateNumber: plateNumber ?? this.plateNumber,
-      drivingLicense: drivingLicense ?? this.drivingLicense,
-      drivingLicenseExDate: drivingLicenseExDate ?? this.drivingLicenseExDate,
-      company: company ?? this.company,
+      vehicleId: vehicleId ?? this.vehicleId,
+      zoneId: zoneId ?? this.zoneId,
+      licenseNo: licenseNo ?? this.licenseNo,
+      licenseExpiryDate: licenseExpiryDate ?? this.licenseExpiryDate,
       passportNumber: passportNumber ?? this.passportNumber,
       passportExDate: passportExDate ?? this.passportExDate,
       visaNumber: visaNumber ?? this.visaNumber,
