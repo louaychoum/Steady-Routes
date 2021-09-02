@@ -3,24 +3,24 @@ import 'package:provider/provider.dart';
 
 import 'package:steadyroutes/services/steady_api_service.dart';
 
-class ExpiryDrivers extends StatefulWidget {
+class ExpiryVehicle extends StatefulWidget {
   @override
-  _ExpiryDriversState createState() => _ExpiryDriversState();
+  _ExpiryVehicleState createState() => _ExpiryVehicleState();
 }
 
-class _ExpiryDriversState extends State<ExpiryDrivers> {
+class _ExpiryVehicleState extends State<ExpiryVehicle> {
   @override
   Widget build(BuildContext context) {
     return Consumer<SteadyApiService>(
       builder: (context, api, child) {
-        final driversList = api.receiptsService.driversReport;
-        return driversList.isNotEmpty
+        final vehiclesList = api.receiptsService.vehiclesReport;
+        return vehiclesList.isNotEmpty
             ? ListView.builder(
-                itemCount: driversList.length,
+                itemCount: vehiclesList.length,
                 itemBuilder: (context, index) {
-                  final driver = driversList[index];
+                  final vehicle = vehiclesList[index];
                   return ListTile(
-                    title: Text(driver.name),
+                    title: Text(vehicle.name),
                     // onTap: () => Navigator.of(context).pushNamed(
                     //     DriverReceiptsScreen.routeName,
                     //     arguments: DriverReceiptsArguments(
@@ -32,7 +32,7 @@ class _ExpiryDriversState extends State<ExpiryDrivers> {
               )
             : const Center(
                 child: Text(
-                  'No drivers available...',
+                  'No vehicles available...',
                   textAlign: TextAlign.center,
                 ),
               );

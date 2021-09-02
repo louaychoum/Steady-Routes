@@ -32,8 +32,8 @@ class AdminDashboard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Spacer(
-              flex: 1, //3
-            ),
+                //3
+                ),
             DashboardButton(
               'Drivers',
               () => Navigator.of(context).pushNamed(

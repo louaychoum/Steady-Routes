@@ -2,14 +2,14 @@ import 'package:steadyroutes/models/location.dart';
 import 'package:steadyroutes/models/user.dart';
 
 class Courier {
-  final String id;
+  final String? id;
   final String name;
   final int? phone;
   final User? user;
   final Location? location;
 
   Courier({
-    required this.id,
+    this.id,
     required this.name,
     required this.phone,
     required this.user,
@@ -60,4 +60,22 @@ class Courier {
         'user': user,
         'location': location,
       };
+
+  Courier copyWith({
+    String? id,
+    String? name,
+    int? phone,
+    User? user,
+    Location? location,
+    //String? zoneId,
+  }) {
+    return Courier(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      phone: phone ?? this.phone,
+      user: user ?? this.user,
+      location: location ?? this.location,
+      //zoneId: zoneId ?? this.zoneId,
+    );
+  }
 }

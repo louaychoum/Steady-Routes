@@ -8,11 +8,11 @@ class Driver {
   final String vehicleId;
   final String? zoneId;//todo add in new driver page
   final String? courierId;//todo add in new driver page
-  final String licenseExpiryDate; //*may require change
+  final String licenseExpiryDate; 
   final String passportNumber;
-  final String passportExDate; //*may require change
-  final String? visaNumber; //*may require change
-  final String visaExDate; //*may require change
+  final String passportExDate; 
+  final String? visaNumber; 
+  final String visaExDate; 
   final String? email;
   final String? password;
   final User? user;

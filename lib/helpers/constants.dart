@@ -1,10 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 //* Could be config file
 
-const String apiBase = 'assets/json/';
+const kCompressedImageQuality = 20;
 
 const kTextFieldDecoration = InputDecoration(
   labelText: '',
@@ -53,8 +52,8 @@ const kExReportDropDownItems = [
   'drivinglicense',
   'visa',
   'passport',
-  'Vehicle Registration',
-  'Vehicle RTA License'
+  'registration',
+  'license',
 ];
 const kMonthCountDropDownItems = [
   1,
@@ -72,28 +71,3 @@ const kVehicleStatusDropDownItems = [
   'In Service',
   'End Of Life',
 ];
-
-// [
-//   DropdownMenuItem(
-//     value: 'Driver Passport',
-//     child: Text('Driver Passport'),
-//   ),
-//   DropdownMenuItem(
-//     value: 'Driver Visa',
-//     child: Text('Driver Visa'),
-//   ),
-//   DropdownMenuItem(
-//     value: 'Driver License',
-//     child: Text('Driver License'),
-//   ),
-//   DropdownMenuItem(
-//     value: 'Vehicle Registration',
-//     child: Text('Vehicle Registration'),
-//   ),
-//   DropdownMenuItem(
-//     value: 'Vehicle RTA License',
-//     child: Text('Vehicle RTA License'),
-//   ),
-// ];
-
-const kCompressedImageQuality = 20;

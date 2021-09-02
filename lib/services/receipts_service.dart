@@ -14,6 +14,7 @@ import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/models/dio_exception.dart';
 import 'package:steadyroutes/models/driver.dart';
 import 'package:steadyroutes/models/receipt.dart';
+import 'package:steadyroutes/models/vehicle.dart';
 import 'package:steadyroutes/services/web_auth_service.dart';
 
 class ReceiptsService with ChangeNotifier {
@@ -23,10 +24,12 @@ class ReceiptsService with ChangeNotifier {
   List<Receipt> get receipts => [..._receipt];
   List<Driver> _driversReport = [];
   List<Driver> get driversReport => [..._driversReport];
+  List<Vehicle> _vehiclesReport = [];
+  List<Vehicle> get vehiclesReport => [..._vehiclesReport];
 
   Future<bool> fetchReceipts(String jwt, String driverId) async {
     try {
-      const url = '${apiBase}Receipt_DataModel.json';
+      const url = 'Receipt_DataModel.json';
       final response = await rootBundle.loadString(url);
 
       // final response = await http.get(
@@ -74,12 +77,12 @@ class ReceiptsService with ChangeNotifier {
     // }
   }
 
-  Future<bool> fetchExpiryReports(
-      String jwt, String type, int monthsCount, String courierId) async {
+  Future<bool> fetchExpiryReports(String jwt, String category, String type,
+      int monthsCount, String courierId) async {
     _log.info('Fetching Expiry Reports');
     try {
       final response = await _dio.get(
-        '/drivers/$type/expiry/$courierId',
+        '/$category/$type/expiry/$courierId',
         options: Options(
           headers: {
             'Authorization': ' x $jwt',
@@ -89,19 +92,27 @@ class ReceiptsService with ChangeNotifier {
       );
       _log.info(response);
       _driversReport.clear();
+      _vehiclesReport.clear();
       final parsedResponse =
           jsonDecode(response.toString()) as Map<String, dynamic>;
       final driversCount = parsedResponse['count'] as int;
+      final vehiclesCount = parsedResponse['count'] as int;
       final List<Driver> loadedDrivers = [];
-  
-      for (int i = 0; i < driversCount; i++) {
-        final parsedDriverItem =
-            parsedResponse['drivers'][i] as Map<String, dynamic>;
-        loadedDrivers.add(
-          Driver.fromJsonLogin(parsedDriverItem),
-        );
+      final List<Vehicle> loadedVehicles = [];
+      for (int i = 0; i < driversCount || i < vehiclesCount; i++) {
+        final parsedItem = parsedResponse[category][i] as Map<String, dynamic>;
+        if (category.contains('v')) {
+          loadedVehicles.add(
+            Vehicle.fromJson(parsedItem),
+          );
+          _vehiclesReport = loadedVehicles;
+        } else {
+          loadedDrivers.add(
+            Driver.fromJsonLogin(parsedItem),
+          );
+          _driversReport = loadedDrivers;
+        }
       }
-      _driversReport = loadedDrivers;
       notifyListeners();
       return true;
     } on TimeoutException catch (error) {
@@ -155,7 +166,7 @@ class ReceiptsService with ChangeNotifier {
       );
       _log.info(response);
       final List<String> mime = lookupMimeType(img.path)!.split('/');
-      final uri = Uri.parse('${apiBase}Receipt_DataModel.json/');
+      final uri = Uri.parse('Receipt_DataModel.json/');
       final request = http.MultipartRequest('POST', uri)
         ..headers[HttpHeaders.acceptHeader] = "application/json"
         ..headers['api-token'] = jwt

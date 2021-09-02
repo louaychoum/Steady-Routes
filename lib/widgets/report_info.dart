@@ -1,4 +1,3 @@
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -136,7 +135,7 @@ class _ReportInfoState extends State<ReportInfo> {
                 onFind: (_) async {
                   await api.vehiclesService.fetchVehicles(
                     jwt,
-                    '', //courierId,
+                    courierId,
                   );
                   return api.vehiclesService.vehicles
                       .map(

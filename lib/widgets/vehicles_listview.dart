@@ -31,7 +31,7 @@ class _VehiclesListViewState extends State<VehiclesListView> {
     return api.vehiclesService
         .fetchVehicles(
       jwt,
-      '',
+      courierId,
     )
         .then(
       (value) {
@@ -71,7 +71,7 @@ class _VehiclesListViewState extends State<VehiclesListView> {
           key: _refreshKey,
           onRefresh: () {
             jwt = auth.user.token;
-            //! courierId = auth.courier?.id ?? '';
+            courierId = auth.courier?.id ?? '';
             return fetchVehicles(api).whenComplete(() => {
                   if (mounted)
                     {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/expiry_drivers.dart';
-import 'package:steadyroutes/widgets/drivers_listview.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/expiry_vehicles.dart';
 
 class ExpiryList extends StatelessWidget {
   static const routeName = '/expiry-list';
@@ -23,7 +23,9 @@ class ExpiryList extends StatelessWidget {
             ),
             const Divider(),
             Expanded(
-              child: ExpiryDrivers(),
+              child: reportType == 'registration' || reportType == 'license'
+                  ? ExpiryVehicle()
+                  : ExpiryDrivers(),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,

@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
-import 'package:steadyroutes/helpers/constants.dart';
+import 'package:steadyroutes/pages/add_new_user.dart';
 
 import 'package:steadyroutes/pages/adminDashBoardScreen/admin_dashboard_screen.dart';
 import 'package:steadyroutes/pages/adminDashBoardScreen/driverScreen/add_driver_screen.dart';
@@ -88,7 +88,7 @@ class MyApp extends StatelessWidget {
             backgroundColor: Color(0xffffffff),
             elevation: 0,
           ),
-          
+
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               textStyle: GoogleFonts.bungee(
@@ -136,6 +136,8 @@ class MyApp extends StatelessWidget {
           //  ***  //
           VehicleList.routeName: (ctx) => VehicleList(),
           AddVehicle.routeName: (ctx) => AddVehicle(),
+          // *** //
+          AddUser.routeName: (ctx) => AddUser(),
         },
       ),
     );

@@ -34,17 +34,19 @@ class _VehicleInfoState extends State<VehicleInfo> {
     status: '',
     registrationExDate: '',
     rtaExDate: '',
-    rtaNumber: 0,
+    rtaNumber: '',
+    courierId: '',
   );
 
   var _initValues = {
     'name': '',
     'plate': '',
     'category': '',
+    'courierId': '',
     'status': '',
-    'registrationExDate': '',
-    'rtaExDate': '',
-    'rtaNumber': '',
+    'registrationExpiryDate': '',
+    'licenseExpiryDate': '',
+    'licenseNo': '',
   };
 
   var _isInit = true;
@@ -200,7 +202,7 @@ class _VehicleInfoState extends State<VehicleInfo> {
                           savedValue: (value) {
                             if (value != null) {
                               _editedVehicle = _editedVehicle.copyWith(
-                                rtaNumber: int.tryParse(value),
+                                rtaNumber: value,
                               );
                             }
                           }),

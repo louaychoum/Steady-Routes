@@ -7,7 +7,11 @@ Future<void> buildErrorDialog(Object error) {
     builder: (ctx) => AlertDialog(
       title: const Text('An error has occured!'),
       content: Text(
-        error.toString(),
+        error
+            .toString()
+            .replaceAll('{', '')
+            .replaceAll('}', '')
+            .replaceAll('error:', ''),
       ),
       actions: [
         TextButton(

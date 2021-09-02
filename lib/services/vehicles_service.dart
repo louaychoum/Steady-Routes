@@ -28,8 +28,7 @@ class VehiclesService with ChangeNotifier {
     _log.info('fetching vehicles');
     try {
       final response = await _dio.get(
-        // courierId.isNotEmpty ? '/vehicles/courier/$courierId' : '/vehicles',
-        '/vehicles',
+        courierId.isNotEmpty ? '/vehicles/courier/$courierId' : '/vehicles',
         options: Options(
           headers: {'Authorization': ' x $jwt'},
         ),
@@ -141,6 +140,7 @@ class VehiclesService with ChangeNotifier {
       final newVehicle = Vehicle(
         name: _editedVehicle.name,
         plateNumber: _editedVehicle.plateNumber,
+        courierId: _editedVehicle.courierId,
         category: _editedVehicle.category,
         status: _editedVehicle.status,
         registrationExDate: _editedVehicle.registrationExDate,

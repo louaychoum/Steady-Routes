@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:steadyroutes/services/attendance_service.dart';
+import 'package:steadyroutes/services/courier_service.dart';
 
 import 'package:steadyroutes/services/drivers_service.dart';
 import 'package:steadyroutes/services/locations_service.dart';
@@ -7,6 +8,7 @@ import 'package:steadyroutes/services/receipts_service.dart';
 import 'package:steadyroutes/services/vehicles_service.dart';
 
 class SteadyApiService with ChangeNotifier {
+  CouriersService courierService = CouriersService();
   DriversService driversService = DriversService();
   ReceiptsService receiptsService = ReceiptsService();
   VehiclesService vehiclesService = VehiclesService();
@@ -15,6 +17,9 @@ class SteadyApiService with ChangeNotifier {
 
   SteadyApiService() {
     driversService.addListener(() {
+      notifyListeners();
+    });
+    courierService.addListener(() {
       notifyListeners();
     });
     receiptsService.addListener(() {

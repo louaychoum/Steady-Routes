@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
+import 'package:steadyroutes/pages/add_new_user.dart';
 import 'package:steadyroutes/services/auth_service.dart';
 import 'package:steadyroutes/widgets/dashboard_button.dart';
 import 'package:steadyroutes/widgets/default_textfield.dart';
@@ -343,7 +344,9 @@ class _LoginState extends State<Login> {
 
   Widget showSignUpButton() {
     return TextButton(
-      onPressed: () => null,
+      onPressed: () => Navigator.of(context).pushNamed(
+        AddUser.routeName,
+      ),
       child: const Text('Create a new account'),
     );
   }
