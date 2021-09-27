@@ -59,6 +59,26 @@ class _CourierInfoState extends State<CourierInfo> {
                         ),
                       ),
                       DefaultTextfield(
+                        savedValue: (newValue) {
+                          _editedCourier =
+                              _editedCourier.copyWith(user: newValue);
+                        },
+                        decoration: kTextFieldDecoration.copyWith(
+                          labelText: 'Email',
+                        ),
+                        keyboard: TextInputType.emailAddress,
+                      ),
+                      DefaultTextfield(
+                        savedValue: (newValue) {
+                          _editedCourier =
+                              _editedCourier.copyWith(user: newValue);
+                        },
+                        decoration: kTextFieldDecoration.copyWith(
+                          labelText: 'Password',
+                        ),
+                        isPassword: true,
+                      ),
+                      DefaultTextfield(
                         keyboard: TextInputType.number,
                         savedValue: (newValue) {
                           _editedCourier = _editedCourier.copyWith(
@@ -67,6 +87,15 @@ class _CourierInfoState extends State<CourierInfo> {
                         },
                         decoration: kTextFieldDecoration.copyWith(
                           labelText: 'Phone Number',
+                        ),
+                      ),
+                      DefaultTextfield(
+                        savedValue: (newValue) {
+                          _editedCourier =
+                              _editedCourier.copyWith(location: newValue);
+                        },
+                        decoration: kTextFieldDecoration.copyWith(
+                          labelText: 'Location',
                         ),
                       ),
                       if (_isLoading)

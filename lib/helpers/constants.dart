@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 //* Could be config file
 
@@ -37,6 +38,8 @@ const kTextTitleStyle = TextStyle(
   fontSize: 28,
   letterSpacing: 1,
 );
+
+DateFormat dateFormat = DateFormat("yyyy-MM-dd");
 
 final BaseOptions options = BaseOptions(
   baseUrl: 'https://dropshoptest.herokuapp.com',

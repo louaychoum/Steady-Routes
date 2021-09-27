@@ -25,7 +25,7 @@ class DropDownSearch extends StatelessWidget {
         horizontal: 10,
         vertical: 10,
       ),
-      child: DropdownSearch<String>(
+      child: DropdownSearch(
         selectedItem: initialValue == '' ? null : initialValue,
         items: items,
         onFind: onFind,

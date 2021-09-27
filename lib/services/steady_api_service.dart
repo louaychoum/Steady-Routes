@@ -3,6 +3,7 @@ import 'package:steadyroutes/services/attendance_service.dart';
 import 'package:steadyroutes/services/courier_service.dart';
 
 import 'package:steadyroutes/services/drivers_service.dart';
+import 'package:steadyroutes/services/ledger_service.dart';
 import 'package:steadyroutes/services/locations_service.dart';
 import 'package:steadyroutes/services/receipts_service.dart';
 import 'package:steadyroutes/services/vehicles_service.dart';
@@ -14,6 +15,7 @@ class SteadyApiService with ChangeNotifier {
   VehiclesService vehiclesService = VehiclesService();
   LocationsService locationsService = LocationsService();
   AttendanceService attendanceService = AttendanceService();
+  LedgerService ledgerService = LedgerService();
 
   SteadyApiService() {
     driversService.addListener(() {
@@ -32,6 +34,9 @@ class SteadyApiService with ChangeNotifier {
       notifyListeners();
     });
     attendanceService.addListener(() {
+      notifyListeners();
+    });
+    ledgerService.addListener(() {
       notifyListeners();
     });
   }

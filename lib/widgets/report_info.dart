@@ -5,10 +5,12 @@ import 'package:provider/provider.dart';
 import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/report_list_screen.dart';
 import 'package:steadyroutes/services/auth_service.dart';
+import 'package:steadyroutes/services/navigator_sevice.dart';
 import 'package:steadyroutes/services/steady_api_service.dart';
 import 'package:steadyroutes/widgets/dashboard_button.dart';
 import 'package:steadyroutes/widgets/default_textfield.dart';
 import 'package:steadyroutes/widgets/dropdown_search.dart';
+import 'package:steadyroutes/widgets/error_dialog.dart';
 
 class ReportInfo extends StatefulWidget {
   @override
@@ -19,14 +21,13 @@ class _ReportInfoState extends State<ReportInfo> {
   final _formKey = GlobalKey<FormState>();
   String? selectedDriver;
   String? selectedVehicle;
-  // bool isDriver = false;
-  bool isLoading = false;
+  bool _isLoading = false;
   late String jwt;
   late String courierId;
   final TextEditingController _fromDateController = TextEditingController();
   final TextEditingController _toDateController = TextEditingController();
   final maskFormatter = MaskTextInputFormatter(
-    mask: '##/##/####',
+    mask: '##-##-####',
     filter: {
       "#": RegExp(r'[0-9]'),
     },
@@ -107,7 +108,6 @@ class _ReportInfoState extends State<ReportInfo> {
         final auth = Provider.of<AuthService>(context, listen: false);
         jwt = auth.user.token;
         courierId = auth.courier?.id ?? '';
-        print('build');
         return Form(
           key: _formKey,
           child: ListView(
@@ -180,38 +180,46 @@ class _ReportInfoState extends State<ReportInfo> {
                 controller: _toDateController,
                 keyboard: TextInputType.datetime,
               ),
-              DashboardButton(
-                'Submit',
-                () {
-                  // !if (!isDriver) {
-                  //   const snackBar = SnackBar(
-                  //     content: Text('Please Select a Driver'),
-                  //     duration: Duration(seconds: 1),
-                  //     backgroundColor: Colors.red,
-                  //   );
-                  //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  // }
-
-                  // Validate returns true if the form is valid, or false otherwise.
-                  // if (_formKey.currentState!.validate()) {
-                  if (_formKey.currentState != null) {
-                    if (_formKey.currentState!.validate()) {
-                      //!isdriver
-                      // If the form is valid, display a snackbar. In the real world,
-                      // you'd often call a server or save the information in a database.
-                      /** 
-                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Processing Data'),
-                      ),
-                    );
-                    */
-
-                      Navigator.of(context).pushNamed(ReportList.routeName);
+              if (_isLoading)
+                const Center(
+                  child: CircularProgressIndicator(),
+                )
+              else
+                DashboardButton(
+                  'Submit',
+                  () async {
+                    if (_formKey.currentState != null) {
+                      if (_formKey.currentState!.validate()) {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        try {
+                          api.ledgerService
+                              .fetchLedger(
+                            jwt,
+                          )
+                              .then((value) {
+                            if (value) {
+                              setState(() {
+                                _isLoading = false;
+                              });
+                            }
+                          }).whenComplete(() {
+                            setState(() {
+                              _isLoading = false;
+                            });
+                            NavigationService.navigateToWithArguments(
+                              ReportList.routeName,
+                              [api.ledgerService.ledgers, selectedDriver],
+                            );
+                          });
+                        } catch (error) {
+                          await buildErrorDialog(error);
+                        }
+                      }
                     }
-                  }
-                },
-              ),
+                  },
+                ),
             ],
           ),
         );

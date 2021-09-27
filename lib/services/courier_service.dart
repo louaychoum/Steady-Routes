@@ -16,6 +16,13 @@ class CouriersService with ChangeNotifier {
   final List<Courier> _couriers = [];
   List<Courier> get couriers => [..._couriers];
 
+  Courier findById(String id) {
+    print('couriers $_couriers');
+    return _couriers.firstWhere(
+      (courier) => courier.id == id,
+    );
+  }
+
   Future<bool> addCourier(
     String jwt,
     Courier _editedCourier,

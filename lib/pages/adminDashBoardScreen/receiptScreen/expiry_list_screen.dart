@@ -24,8 +24,8 @@ class ExpiryList extends StatelessWidget {
             const Divider(),
             Expanded(
               child: reportType == 'registration' || reportType == 'license'
-                  ? ExpiryVehicle()
-                  : ExpiryDrivers(),
+                  ? ExpiryVehicle(reportType)
+                  : ExpiryDrivers(reportType),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,

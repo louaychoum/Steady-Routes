@@ -90,6 +90,7 @@ class ReceiptsService with ChangeNotifier {
           },
         ),
       );
+      print(category);
       _log.info(response);
       _driversReport.clear();
       _vehiclesReport.clear();
@@ -101,7 +102,7 @@ class ReceiptsService with ChangeNotifier {
       final List<Vehicle> loadedVehicles = [];
       for (int i = 0; i < driversCount || i < vehiclesCount; i++) {
         final parsedItem = parsedResponse[category][i] as Map<String, dynamic>;
-        if (category.contains('v')) {
+        if (category.contains('vehicles')) {
           loadedVehicles.add(
             Vehicle.fromJson(parsedItem),
           );
@@ -154,43 +155,6 @@ class ReceiptsService with ChangeNotifier {
       debugPrint('...');
     }
   }
-
-  Future<bool> upload(String jwt, File img) async {
-    try {
-      _log.info('uploading receipt');
-      final response = await _dio.get(
-        '/ledgers',
-        options: Options(
-          headers: {'Authorization': ' x $jwt'},
-        ),
-      );
-      _log.info(response);
-      final List<String> mime = lookupMimeType(img.path)!.split('/');
-      final uri = Uri.parse('Receipt_DataModel.json/');
-      final request = http.MultipartRequest('POST', uri)
-        ..headers[HttpHeaders.acceptHeader] = "application/json"
-        ..headers['api-token'] = jwt
-        ..files.add(await http.MultipartFile.fromPath('files', img.path,
-            filename: img.path.split('/').last,
-            contentType: MediaType(mime[0], mime[1])));
-
-      // final response = await http.Response.fromStream(await request.send());
-
-      final parsed = jsonDecode(response.toString())
-          as Map<String, dynamic>?; //response body
-      if (response.statusCode != 200) {
-        return false;
-      }
-      return true;
-    } on TimeoutException catch (_) {
-      return false;
-    } on SocketException catch (_) {
-      return false;
-    } on FormatException catch (_) {
-      return false;
-    }
-  }
-
   // Future<void> deleteDriver(int id) async {
   //   final url = Uri.parse(
   //     'https://myshop-d5f4e-default-rtdb.firebaseio.com/products/$id.json?auth=$authToken',

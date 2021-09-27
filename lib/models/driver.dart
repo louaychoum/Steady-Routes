@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+import 'package:steadyroutes/helpers/constants.dart';
 import 'package:steadyroutes/models/user.dart';
 
 class Driver {
@@ -6,13 +8,13 @@ class Driver {
   final int? phone;
   final String licenseNo;
   final String vehicleId;
-  final String? zoneId;//todo add in new driver page
-  final String? courierId;//todo add in new driver page
-  final String licenseExpiryDate; 
+  final String? zoneId; //todo add in new driver page
+  final String? courierId; //todo add in new driver page
+  final DateTime licenseExpiryDate;
   final String passportNumber;
-  final String passportExDate; 
-  final String? visaNumber; 
-  final String visaExDate; 
+  final DateTime passportExDate;
+  final String? visaNumber;
+  final DateTime visaExDate;
   final String? email;
   final String? password;
   final User? user;
@@ -49,11 +51,23 @@ class Driver {
         licenseNo = json['licenseNo'].toString(),
         vehicleId = json['vehicleId'].toString(),
         zoneId = json['zoneId'].toString(),
-        licenseExpiryDate = json['licenseExpiryDate'].toString(),
+        licenseExpiryDate = dateFormat
+            .parse(
+              json['licenseExpiryDate'].toString(),
+            )
+            .toLocal(),
         passportNumber = json['passportNumber'].toString(),
-        passportExDate = json['passportExpiryDate'].toString(),
+        passportExDate = dateFormat
+            .parse(
+              json['passportExpiryDate'].toString(),
+            )
+            .toLocal(),
         visaNumber = json['visaNumber'].toString(),
-        visaExDate = json['visaExpiryDate'].toString();
+        visaExDate = dateFormat
+            .parse(
+              json['visaExpiryDate'].toString(),
+            )
+            .toLocal();
 
   Driver.fromJsonLogin(Map<String, dynamic> json)
       : id = json['_id'].toString(),
@@ -70,11 +84,23 @@ class Driver {
         licenseNo = json['licenseNo'].toString(),
         vehicleId = json['vehicleId'].toString(),
         zoneId = json['zoneId'].toString(),
-        licenseExpiryDate = json['licenseExpiryDate'].toString(),
+        licenseExpiryDate = dateFormat
+            .parse(
+              json['licenseExpiryDate'].toString(),
+            )
+            .toLocal(),
         passportNumber = json['passportNumber'].toString(),
-        passportExDate = json['passportExpiryDate'].toString(),
+        passportExDate = dateFormat
+            .parse(
+              json['passportExpiryDate'].toString(),
+            )
+            .toLocal(),
         visaNumber = json['visaNumber'].toString(),
-        visaExDate = json['visaExpiryDate'].toString();
+        visaExDate = dateFormat
+            .parse(
+              json['visaExpiryDate'].toString(),
+            )
+            .toLocal();
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
@@ -106,11 +132,11 @@ class Driver {
     String? zoneId,
     String? vehicleId,
     String? licenseNo,
-    String? licenseExpiryDate, //*may require change
+    DateTime? licenseExpiryDate, //*may require change
     String? passportNumber,
-    String? passportExDate, //*may require change
+    DateTime? passportExDate, //*may require change
     String? visaNumber, //*may require change
-    String? visaExDate, //*may require change
+    DateTime? visaExDate, //*may require change
   }) {
     return Driver(
       id: id ?? this.id,

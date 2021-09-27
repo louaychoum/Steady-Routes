@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 
@@ -47,11 +48,11 @@ class _DriverInfoState extends State<DriverInfo> {
     password: '',
     zoneId: '',
     licenseNo: '',
-    licenseExpiryDate: '',
-    passportExDate: '',
+    licenseExpiryDate: DateTime.now(),
+    passportExDate: DateTime.now(),
     passportNumber: '',
     vehicleId: '',
-    visaExDate: '',
+    visaExDate: DateTime.now(),
     visaNumber: '',
     phone: 0,
     user: null,
@@ -90,9 +91,15 @@ class _DriverInfoState extends State<DriverInfo> {
           // 'rtaExDate': '',
           // 'rtaNumber': _editedDriver.rtaNumber.toString(),
         };
-        _licenseDateController.text = _editedDriver.licenseExpiryDate;
-        _passportDateController.text = _editedDriver.passportExDate;
-        _visaDateController.text = _editedDriver.visaExDate;
+        _licenseDateController.text = dateFormat.format(
+          _editedDriver.licenseExpiryDate,
+        );
+        _passportDateController.text = dateFormat.format(
+          _editedDriver.passportExDate,
+        );
+        _visaDateController.text = dateFormat.format(
+          _editedDriver.visaExDate,
+        );
       }
     }
     _isInit = false;
@@ -239,7 +246,10 @@ class _DriverInfoState extends State<DriverInfo> {
                       DefaultTextfield(
                         savedValue: (newValue) {
                           _editedDriver = _editedDriver.copyWith(
-                              licenseExpiryDate: newValue);
+                            licenseExpiryDate: dateFormat.parse(
+                              newValue ?? '',
+                            ),
+                          );
                         },
                         mask: maskFormatter,
                         controller: _licenseDateController,
@@ -279,8 +289,11 @@ class _DriverInfoState extends State<DriverInfo> {
                       ),
                       DefaultTextfield(
                         savedValue: (newValue) {
-                          _editedDriver =
-                              _editedDriver.copyWith(passportExDate: newValue);
+                          _editedDriver = _editedDriver.copyWith(
+                            passportExDate: dateFormat.parse(
+                              newValue ?? '',
+                            ),
+                          );
                         },
                         mask: maskFormatter,
                         keyboard: TextInputType.datetime,
@@ -312,8 +325,11 @@ class _DriverInfoState extends State<DriverInfo> {
                       ),
                       DefaultTextfield(
                         savedValue: (newValue) {
-                          _editedDriver =
-                              _editedDriver.copyWith(visaExDate: newValue);
+                          _editedDriver = _editedDriver.copyWith(
+                            visaExDate: dateFormat.parse(
+                              newValue ?? '',
+                            ),
+                          );
                         },
                         mask: maskFormatter,
                         keyboard: TextInputType.datetime,

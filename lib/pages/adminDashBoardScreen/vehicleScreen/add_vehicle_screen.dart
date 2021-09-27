@@ -9,6 +9,7 @@ class AddVehicle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //todo consider using provider to pass vehicle
     final loadedVehicles =
         ModalRoute.of(context)?.settings.arguments as Vehicle?;
     return Scaffold(

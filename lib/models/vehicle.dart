@@ -1,3 +1,6 @@
+import 'package:intl/intl.dart';
+import 'package:steadyroutes/helpers/constants.dart';
+
 class Vehicle {
   final String? id;
   final String courierId;
@@ -5,9 +8,9 @@ class Vehicle {
   final String plateNumber;
   final String category;
   final String status;
-  final String registrationExDate;
+  final DateTime registrationExDate;
   final String rtaNumber;
-  final String rtaExDate;
+  final DateTime rtaExDate;
 
   Vehicle({
     this.id,
@@ -24,13 +27,21 @@ class Vehicle {
   Vehicle.fromJson(Map<String, dynamic> json)
       : id = json['_id'].toString(),
         name = json['name'].toString(),
-        courierId = json['courierId'].toString(),
+        courierId = json['courier'].toString(),
         plateNumber = json['plate'].toString(),
         category = json['category'].toString(),
         status = json['status'].toString(),
-        registrationExDate = json['registrationExpiryDate'].toString(),
+        registrationExDate = dateFormat
+            .parse(
+              json['registrationExpiryDate'].toString(),
+            )
+            .toLocal(),
         rtaNumber = json['licenseNo'].toString(),
-        rtaExDate = json['licenseExpiryDate'].toString();
+        rtaExDate = dateFormat
+            .parse(
+              json['licenseExpiryDate'].toString(),
+            )
+            .toLocal();
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
@@ -41,7 +52,7 @@ class Vehicle {
     data['registrationExpiryDate'] = registrationExDate;
     data['licenseNo'] = rtaNumber;
     data['licenseExpiryDate'] = rtaExDate;
-    data['courierId'] = courierId;
+    data['courier'] = courierId;
     return data;
   }
 
@@ -52,9 +63,9 @@ class Vehicle {
     String? courierId,
     String? category,
     String? status,
-    String? registrationExDate,
+    DateTime? registrationExDate,
     String? rtaNumber,
-    String? rtaExDate,
+    DateTime? rtaExDate,
   }) {
     return Vehicle(
       id: id ?? this.id,

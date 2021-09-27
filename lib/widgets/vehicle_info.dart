@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 
@@ -32,8 +33,8 @@ class _VehicleInfoState extends State<VehicleInfo> {
     plateNumber: '',
     category: '',
     status: '',
-    registrationExDate: '',
-    rtaExDate: '',
+    registrationExDate: DateTime.now(),
+    rtaExDate: DateTime.now(),
     rtaNumber: '',
     courierId: '',
   );
@@ -42,7 +43,7 @@ class _VehicleInfoState extends State<VehicleInfo> {
     'name': '',
     'plate': '',
     'category': '',
-    'courierId': '',
+    'courier': '',
     'status': '',
     'registrationExpiryDate': '',
     'licenseExpiryDate': '',
@@ -55,7 +56,7 @@ class _VehicleInfoState extends State<VehicleInfo> {
   final _regDateController = TextEditingController();
   final _rtaDateController = TextEditingController();
   final maskFormatter = MaskTextInputFormatter(
-    mask: '##/##/####',
+    mask: '####-##-##',
     filter: {
       "#": RegExp(r'[0-9]'),
     },
@@ -72,12 +73,17 @@ class _VehicleInfoState extends State<VehicleInfo> {
         _initValues = {
           'name': _editedVehicle.name,
           'plate': _editedVehicle.plateNumber,
+          'courier': _editedVehicle.courierId,
           'category': _editedVehicle.category,
           'status': _editedVehicle.status,
-          'rtaNumber': _editedVehicle.rtaNumber.toString(),
+          'licenseNo': _editedVehicle.rtaNumber,
         };
-        _regDateController.text = _editedVehicle.registrationExDate;
-        _rtaDateController.text = _editedVehicle.rtaExDate;
+        _regDateController.text = dateFormat.format(
+          _editedVehicle.registrationExDate,
+        );
+        _rtaDateController.text = dateFormat.format(
+          _editedVehicle.rtaExDate,
+        );
       }
     }
     _isInit = false;
@@ -104,9 +110,10 @@ class _VehicleInfoState extends State<VehicleInfo> {
       setState(
         () {
           selectedDate = picked;
-          final String startDateSlug =
-              "${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year.toString()}";
-          controller.text = startDateSlug;
+          final String date = dateFormat.format(selectedDate);
+          // final String startDateSlug =
+          //     "${selectedDate.day.toString().padLeft(2, '0')}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.year.toString()}";
+          controller.text = date;
           selectedDate = DateTime.now();
         },
       );
@@ -134,9 +141,19 @@ class _VehicleInfoState extends State<VehicleInfo> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       DefaultTextfield(
+                        initialVal: auth.courier?.name,
+                        decoration: kTextFieldDecoration.copyWith(
+                          labelText: 'Courier Name',
+                        ),
+                        savedValue: (value) =>
+                            _editedVehicle = _editedVehicle.copyWith(
+                          name: value,
+                        ),
+                      ),
+                      DefaultTextfield(
                         initialVal: _initValues['name'],
                         decoration: kTextFieldDecoration.copyWith(
-                          labelText: 'Company Name',
+                          labelText: 'Vehicle Name',
                         ),
                         savedValue: (value) =>
                             _editedVehicle = _editedVehicle.copyWith(
@@ -186,26 +203,30 @@ class _VehicleInfoState extends State<VehicleInfo> {
                             ),
                           ),
                           labelText: 'Registration Expiry Date',
-                          suffix: const Text('DD/MM/YYYY'),
+                          suffix: const Text('YYYY-MM-DD'),
+                        ),
+                        savedValue: (value) {
+                          // var dateLocal = dateUtc.toLocal();
+                          // final dateTime =
+                          //     DateFormat("yyyy-MM-dd").parse(value ?? '', true);
+                          // final dateLocal = dateTime.toLocal().toString();
+                          _editedVehicle = _editedVehicle.copyWith(
+                            registrationExDate: dateFormat.parse(
+                              value ?? '',
+                            ),
+                          );
+                        },
+                      ),
+                      DefaultTextfield(
+                        initialVal: _initValues['licenseNo'],
+                        decoration: kTextFieldDecoration.copyWith(
+                          labelText: 'Vehicle License Number',
                         ),
                         savedValue: (value) =>
                             _editedVehicle = _editedVehicle.copyWith(
-                          registrationExDate: value,
+                          rtaNumber: value,
                         ),
                       ),
-                      DefaultTextfield(
-                          keyboard: TextInputType.number,
-                          initialVal: _initValues['rtaNumber'],
-                          decoration: kTextFieldDecoration.copyWith(
-                            labelText: 'RTA License Number',
-                          ),
-                          savedValue: (value) {
-                            if (value != null) {
-                              _editedVehicle = _editedVehicle.copyWith(
-                                rtaNumber: value,
-                              );
-                            }
-                          }),
                       DefaultTextfield(
                         mask: maskFormatter,
                         keyboard: TextInputType.datetime,
@@ -220,12 +241,14 @@ class _VehicleInfoState extends State<VehicleInfo> {
                               _rtaDateController,
                             ),
                           ),
-                          labelText: 'RTA License Expiry Date',
-                          suffix: const Text('DD/MM/YYYY'),
+                          labelText: 'License Expiry Date',
+                          suffix: const Text('YYYY-MM-DD'),
                         ),
                         savedValue: (value) =>
                             _editedVehicle = _editedVehicle.copyWith(
-                          rtaExDate: value,
+                          rtaExDate: dateFormat.parse(
+                            value ?? '',
+                          ),
                         ),
                       ),
                       DashboardButton(

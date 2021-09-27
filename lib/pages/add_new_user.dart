@@ -9,16 +9,18 @@ class AddUser extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        centerTitle: false,
+        title: const Text(
+          'New Courier',
+          style: kTextTitleStyle,
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'New Courier',
-              style: kTextTitleStyle,
-            ),
             const Divider(),
             Expanded(
               child: CourierInfo(),
