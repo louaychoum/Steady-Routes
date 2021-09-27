@@ -18,23 +18,24 @@ class ReceiptReviewArguments {
 
 class ReceiptReview extends StatelessWidget {
   static const routeName = '/receipt-review';
-  static late ReceiptReviewArguments args;
+  static ReceiptReviewArguments? args;
 
   @override
   Widget build(BuildContext context) {
-    args = ModalRoute.of(context)!.settings.arguments as ReceiptReviewArguments;
+    args =
+        ModalRoute.of(context)?.settings.arguments as ReceiptReviewArguments?;
     // final receiptId = ModalRoute.of(context).settings.arguments as int;
     // final loadedReceipt = Provider.of<Receipts>(
     //   context,
     //   listen: false,
     // ).findById(receiptId);
-    final loadedReceipt = args.receipt;
-    final loadedDriver = args.driver;
+    final loadedReceipt = args?.receipt;
+    final loadedDriver = args?.driver;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          '${loadedReceipt.date}\t${loadedDriver.name}',
+          '${loadedReceipt?.date}\t${loadedDriver?.name}',
           style: kTextTitleStyle,
         ),
       ),
@@ -44,7 +45,7 @@ class ReceiptReview extends StatelessWidget {
           children: [
             Expanded(
               flex: 7,
-              child: Image.network(loadedReceipt.url),
+              child: Image.network(loadedReceipt!.url),
             ),
             const Spacer(),
             Expanded(

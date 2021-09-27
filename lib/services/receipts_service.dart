@@ -2,22 +2,34 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:logging/logging.dart';
 import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
+import 'package:steadyroutes/models/dio_exception.dart';
+import 'package:steadyroutes/models/driver.dart';
 import 'package:steadyroutes/models/receipt.dart';
+import 'package:steadyroutes/models/vehicle.dart';
+import 'package:steadyroutes/services/web_auth_service.dart';
 
 class ReceiptsService with ChangeNotifier {
+  static final _log = Logger('Receipt Service');
+  final Dio _dio = Dio(options);
   List<Receipt> _receipt = [];
   List<Receipt> get receipts => [..._receipt];
+  List<Driver> _driversReport = [];
+  List<Driver> get driversReport => [..._driversReport];
+  List<Vehicle> _vehiclesReport = [];
+  List<Vehicle> get vehiclesReport => [..._vehiclesReport];
 
-  Future<bool> fetchReceipts(String jwt, int driverId) async {
+  Future<bool> fetchReceipts(String jwt, String driverId) async {
     try {
-      const url = '${apiBase}Receipt_DataModel.json';
+      const url = 'Receipt_DataModel.json';
       final response = await rootBundle.loadString(url);
 
       // final response = await http.get(
@@ -65,6 +77,75 @@ class ReceiptsService with ChangeNotifier {
     // }
   }
 
+  Future<bool> fetchExpiryReports(String jwt, String category, String type,
+      int monthsCount, String courierId) async {
+    _log.info('Fetching Expiry Reports');
+    try {
+      final response = await _dio.get(
+        '/$category/$type/expiry/$courierId',
+        options: Options(
+          headers: {
+            'Authorization': ' x $jwt',
+            'aheadMonths': monthsCount,
+          },
+        ),
+      );
+      print(category);
+      _log.info(response);
+      _driversReport.clear();
+      _vehiclesReport.clear();
+      final parsedResponse =
+          jsonDecode(response.toString()) as Map<String, dynamic>;
+      final driversCount = parsedResponse['count'] as int;
+      final vehiclesCount = parsedResponse['count'] as int;
+      final List<Driver> loadedDrivers = [];
+      final List<Vehicle> loadedVehicles = [];
+      for (int i = 0; i < driversCount || i < vehiclesCount; i++) {
+        final parsedItem = parsedResponse[category][i] as Map<String, dynamic>;
+        if (category.contains('vehicles')) {
+          loadedVehicles.add(
+            Vehicle.fromJson(parsedItem),
+          );
+          _vehiclesReport = loadedVehicles;
+        } else {
+          loadedDrivers.add(
+            Driver.fromJsonLogin(parsedItem),
+          );
+          _driversReport = loadedDrivers;
+        }
+      }
+      notifyListeners();
+      return true;
+    } on TimeoutException catch (error) {
+      _log.warning('[Timeout] $error');
+      return false;
+      // throw TimeoutException(error.toString());
+    } on SocketException catch (error) {
+      _log.warning('[Socket] $error');
+      return false;
+      // throw SocketException(error.toString());
+    } on DioError catch (error) {
+      if (error.response == null) {
+        return false;
+      }
+      if (error.response?.statusCode != 200) {
+        final errorMessage = DioExceptions.fromDioError(error).toString();
+        _log.warning('[Dio] $errorMessage');
+        WebAuthService().processApiError(error.response!);
+        return false;
+      }
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      _log.warning('[Dio] $errorMessage');
+      return false;
+    } on Exception catch (error) {
+      _log.warning('[Exception] $error');
+      return false;
+    } catch (error) {
+      _log.warning('[Other] $error');
+      return false;
+    }
+  }
+
   void updateReceiptStatus(int id, Status newStatus) {
     final receiptIndex = receipts.indexWhere((index) => index.id == id);
     if (receiptIndex >= 0) {
@@ -74,38 +155,6 @@ class ReceiptsService with ChangeNotifier {
       debugPrint('...');
     }
   }
-
-  Future<bool> upload(String jwt, File img) async {
-    try {
-      final List<String> mime = lookupMimeType(img.path)!.split('/');
-      final uri = Uri.parse('${apiBase}Receipt_DataModel.json/');
-
-      final request = http.MultipartRequest('POST', uri)
-        ..headers[HttpHeaders.acceptHeader] = "application/json"
-        ..headers['api-token'] = jwt
-        ..files.add(await http.MultipartFile.fromPath('files', img.path,
-            filename: img.path.split('/').last,
-            contentType: MediaType(mime[0], mime[1])));
-
-      final response = await http.Response.fromStream(await request.send());
-
-      print(response.statusCode);
-      print(response.body);
-
-      final parsed = jsonDecode(response.body) as Map<String, dynamic>?;
-      if (response.statusCode != 200) {
-        return false;
-      }
-      return true;
-    } on TimeoutException catch (_) {
-      return false;
-    } on SocketException catch (_) {
-      return false;
-    } on FormatException catch (_) {
-      return false;
-    }
-  }
-
   // Future<void> deleteDriver(int id) async {
   //   final url = Uri.parse(
   //     'https://myshop-d5f4e-default-rtdb.firebaseio.com/products/$id.json?auth=$authToken',

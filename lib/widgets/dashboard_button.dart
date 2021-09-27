@@ -10,9 +10,15 @@ class DashboardButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onTap,
-      child: Text(text),
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 10,
+      ),
+      child: ElevatedButton(
+        onPressed: onTap,
+        child: Text(text),
+      ),
     );
   }
 }

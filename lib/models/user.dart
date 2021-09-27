@@ -1,3 +1,5 @@
+import 'package:steadyroutes/models/courier.dart';
+
 enum Access {
   admin,
   driver,
@@ -5,37 +7,59 @@ enum Access {
 
 class User {
   final String userId;
-  final String username;
+  final String email;
   final String password;
-  final String access;
+  final String role;
+  Courier? courier;
+  String token;
 
-  const User({
-    required this.userId,
-    required this.username,
-    required this.password,
-    required this.access,
-  });
+  User(
+      {required this.userId,
+      required this.email,
+      required this.password,
+      required this.role,
+      required this.courier,
+      required this.token});
 // User.fromJson(Map<String, String> json)
   factory User.fromJson(Map<String, dynamic>? json) {
     if (json == null) {
-      return const User(userId: '', username: '', password: '', access: '');
+      return User(
+          userId: '',
+          email: '',
+          password: '',
+          role: '',
+          courier: null,
+          token: '');
     }
 
     return User(
-      userId: json['userId'].toString(),
-      username: json['username'].toString(),
+      userId: json['_id'].toString(),
+      email: json['email'].toString(),
       password: json['password'].toString(),
-      access: json['access'].toString(),
+      role: json['role'].toString(),
+      courier: json['courier'] == null
+          ? null
+          : Courier.fromJsonLogin(json['courier'] as Map<String, dynamic>),
+      token: json['token'].toString(),
     );
   }
+
+  User.fromJsonLogin(String json)
+      : userId = json.toString(),
+        email = '',
+        password = '',
+        role = '',
+        token = '';
 
   // Access.values.firstWhere(
   //     (s) => s.toString() == 'Access.${json['access']}',
   //     orElse: () => null);
   Map<String, dynamic> toJson() => {
-        'username': username,
+        'email': email,
         'password': password,
-        'access': access,
-        'userId': userId,
+        'role': role,
+        '_id': userId,
+        'courier': courier?.toJson(),
+        'token': token,
       };
 }

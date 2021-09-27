@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
+import 'package:steadyroutes/pages/add_new_user.dart';
 
-import 'package:steadyroutes/screens/adminDashBoardScreen/admin_dashboard_screen.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/driverScreen/add_driver_screen.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/driverScreen/driver_list_screen.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/driverScreen/driver_receipts_screen.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/receiptScreen/expiry_list_screen.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/receiptScreen/expiry_report_screen.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/receiptScreen/receipt_report_screen.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/receiptScreen/receipt_review_screen.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/receiptScreen/report_list_screen.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/vehicleScreen/add_vehicle_screen.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/vehicleScreen/vehicle_list_screen.dart';
-import 'package:steadyroutes/screens/driverDashBoardScreen/check_in_screen.dart';
-import 'package:steadyroutes/screens/driverDashBoardScreen/check_out_screen.dart';
-import 'package:steadyroutes/screens/driverDashBoardScreen/driver_dashboard_screen.dart';
-import 'package:steadyroutes/screens/driverDashBoardScreen/upload_receipt_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/admin_dashboard_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/driverScreen/add_driver_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/driverScreen/driver_list_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/driverScreen/driver_receipts_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/expiry_list_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/expiry_report_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/receipt_report_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/receipt_review_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/report_list_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/vehicleScreen/add_vehicle_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/vehicleScreen/vehicle_list_screen.dart';
+import 'package:steadyroutes/pages/driverDashBoardScreen/check_in_screen.dart';
+import 'package:steadyroutes/pages/driverDashBoardScreen/check_out_screen.dart';
+import 'package:steadyroutes/pages/driverDashBoardScreen/driver_dashboard_screen.dart';
+import 'package:steadyroutes/pages/driverDashBoardScreen/upload_receipt_screen.dart';
 import 'package:steadyroutes/root.dart';
 import 'package:steadyroutes/services/auth_service.dart';
 import 'package:steadyroutes/services/navigator_sevice.dart';
@@ -30,9 +32,11 @@ void main() {
   Logger.root.onRecord.listen(
     (record) {
       print(
-          '[${record.level.name}]: ${record.loggerName} --- ${record.time} --- ${record.message}');
+        '${record.sequenceNumber}-[${record.level.name}]: ${record.time.toLocal()}, ${record.loggerName}, ${record.message}',
+        //  Error: ${record.error ?? ''}, StackTrace: ${record.stackTrace ?? ''}',
+      );
     },
-    onError: (e) => print(e),
+    onError: (e) => print('error $e'),
   );
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -45,6 +49,9 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    const primaryColor = Color(0xfff23340);
+    const accentColor = Color(0xff448F83);
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthService>(
@@ -57,31 +64,44 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Steady Routes',
         debugShowCheckedModeBanner: false,
-        // home: AuthScreen(),
+        // home: s(),
         theme: ThemeData(
-          primaryColor: Colors.red,
-          accentColor: Colors.teal,
+          fontFamily: GoogleFonts.lato().fontFamily,
+          dividerColor: primaryColor,
+          fixTextFieldOutlineLabel: true,
+          textTheme:
+              GoogleFonts.latoTextTheme(Theme.of(context).textTheme).copyWith(),
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              primary: accentColor,
+            ),
+          ),
+          primaryColor: primaryColor,
+          accentColor: accentColor,
           appBarTheme: const AppBarTheme(
             actionsIconTheme: IconThemeData(
-              color: Colors.red,
+              color: primaryColor,
             ),
             iconTheme: IconThemeData(
-              color: Colors.red,
+              color: primaryColor,
             ),
-            backgroundColor: Colors.white,
+            backgroundColor: Color(0xffffffff),
             elevation: 0,
           ),
 
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              textStyle: const TextStyle(fontSize: 18),
-              padding: const EdgeInsets.symmetric(vertical: 20),
+              textStyle: GoogleFonts.bungee(
+                fontSize: 24,
+                letterSpacing: 1.5,
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 15),
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
                   Radius.circular(10),
                 ),
               ),
-              primary: Colors.red,
+              primary: primaryColor,
             ),
           ),
 
@@ -116,6 +136,8 @@ class MyApp extends StatelessWidget {
           //  ***  //
           VehicleList.routeName: (ctx) => VehicleList(),
           AddVehicle.routeName: (ctx) => AddVehicle(),
+          // *** //
+          AddUser.routeName: (ctx) => AddUser(),
         },
       ),
     );

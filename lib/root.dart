@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:steadyroutes/screens/adminDashBoardScreen/admin_dashboard_screen.dart';
-import 'package:steadyroutes/screens/auth_screen.dart';
-import 'package:steadyroutes/screens/driverDashBoardScreen/driver_dashboard_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/admin_dashboard_screen.dart';
+import 'package:steadyroutes/pages/auth_screen.dart';
+import 'package:steadyroutes/pages/driverDashBoardScreen/driver_dashboard_screen.dart';
 import 'package:steadyroutes/services/auth_service.dart';
 
-import 'screens/driverDashBoardScreen/driver_dashboard_screen.dart';
+import 'pages/driverDashBoardScreen/driver_dashboard_screen.dart';
 
 class Root extends StatefulWidget {
   static const routeName = '/';
@@ -32,16 +32,16 @@ class _RootState extends State<Root> {
       switch (auth.status) {
         case AuthStatus.notDetermined:
           return buildWaitingScreen();
-          break;
+
         case AuthStatus.notLoggedIn:
           return AuthScreen();
-          break;
+
         case AuthStatus.adminLoggedIn:
           return AdminDashboard(); //!
-          break;
+
         case AuthStatus.driverLoggedIn:
           return DriverDashboardScreen();
-          break;
+
         default:
           return buildWaitingScreen();
       }

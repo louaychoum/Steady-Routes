@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:steadyroutes/helpers/constants.dart';
 
-import 'package:steadyroutes/screens/adminDashBoardScreen/driverScreen/driver_list_screen.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/receiptScreen/expiry_report_screen.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/receiptScreen/receipt_report_screen.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/vehicleScreen/vehicle_list_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/driverScreen/driver_list_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/expiry_report_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/receipt_report_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/vehicleScreen/vehicle_list_screen.dart';
 import 'package:steadyroutes/services/auth_service.dart';
 import 'package:steadyroutes/widgets/dashboard_button.dart';
 
@@ -14,6 +15,14 @@ class AdminDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: FittedBox(
+          child: Text(
+            'Hello ${Provider.of<AuthService>(context, listen: false).user.email}\n${Provider.of<AuthService>(context, listen: false).courier?.name}',
+            style: kTextTitleStyle,
+          ),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 8,
@@ -23,8 +32,8 @@ class AdminDashboard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Spacer(
-              flex: 3,
-            ),
+                //3
+                ),
             DashboardButton(
               'Drivers',
               () => Navigator.of(context).pushNamed(

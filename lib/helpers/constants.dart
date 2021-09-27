@@ -1,16 +1,15 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 //* Could be config file
 
-const String apiBase = 'assets/json/';
+const kCompressedImageQuality = 20;
 
 const kTextFieldDecoration = InputDecoration(
-  labelText: 'Username',
-  hintText: 'Enter your username',
-  labelStyle: TextStyle(
-    color: Colors.black,
-  ),
-  hintStyle: TextStyle(color: Colors.blueGrey),
+  labelText: '',
+  hintText: '',
+  alignLabelWithHint: true,
   border: OutlineInputBorder(
     borderRadius: BorderRadius.all(Radius.circular(10.0)),
   ),
@@ -25,52 +24,53 @@ const kTextFieldDecoration = InputDecoration(
     borderSide: BorderSide(color: Colors.red),
     borderRadius: BorderRadius.all(Radius.circular(10.0)),
   ),
+  hintStyle: TextStyle(
+    color: Color(0xFF607D8B),
+  ),
+  labelStyle: TextStyle(
+    color: Color(0xFF000000),
+  ),
 );
 
 const kTextTitleStyle = TextStyle(
-  color: Colors.black,
+  color: Color(0xff000000),
   fontWeight: FontWeight.bold,
   fontSize: 28,
+  letterSpacing: 1,
+);
+
+DateFormat dateFormat = DateFormat("yyyy-MM-dd");
+
+final BaseOptions options = BaseOptions(
+  baseUrl: 'https://dropshoptest.herokuapp.com',
+  sendTimeout: 30000,
+  connectTimeout: 30000,
+  receiveTimeout: 30000,
 );
 
 const kErrorScaffoldColor = Color(0xFFB71C1C);
 const kDefaultScaffoldColor = Color(0xFF009688);
 
 const kExReportDropDownItems = [
-  'Driver Passport',
-  'Driver Visa',
-  'Driver License',
-  'Vehicle Registration',
-  'Vehicle RTA License'
+  'drivinglicense',
+  'visa',
+  'passport',
+  'registration',
+  'license',
 ];
-
 const kMonthCountDropDownItems = [
   1,
   2,
   3,
 ];
-
-// [
-//   DropdownMenuItem(
-//     value: 'Driver Passport',
-//     child: Text('Driver Passport'),
-//   ),
-//   DropdownMenuItem(
-//     value: 'Driver Visa',
-//     child: Text('Driver Visa'),
-//   ),
-//   DropdownMenuItem(
-//     value: 'Driver License',
-//     child: Text('Driver License'),
-//   ),
-//   DropdownMenuItem(
-//     value: 'Vehicle Registration',
-//     child: Text('Vehicle Registration'),
-//   ),
-//   DropdownMenuItem(
-//     value: 'Vehicle RTA License',
-//     child: Text('Vehicle RTA License'),
-//   ),
-// ];
-
-const kCompressedImageQuality = 20;
+const kVehicleCategoryDropDownItems = [
+  'Truck',
+  'Bike',
+  'Sedan',
+];
+const kVehicleStatusDropDownItems = [
+  'In Operation',
+  'In Repair',
+  'In Service',
+  'End Of Life',
+];

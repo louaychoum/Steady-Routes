@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:steadyroutes/models/driver.dart';
 
 import 'package:steadyroutes/models/receipt.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/receiptScreen/receipt_review_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/receipt_review_screen.dart';
 
 import 'package:steadyroutes/services/steady_api_service.dart';
 
@@ -66,10 +66,7 @@ class _ReceiptListViewState extends State<ReceiptListView> {
           onRefresh: () {
             // jwt = Provider.of<AuthService>(context, listen: false).user.jwt;
             jwt = '';
-            return api.receiptsService.fetchReceipts(
-              jwt,
-              driver.id,
-            );
+            return api.receiptsService.fetchReceipts(jwt, driver.id ?? '');
           },
           child: ListView.builder(
             itemCount: api.receiptsService.receipts == null

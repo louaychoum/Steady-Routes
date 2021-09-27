@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/expiry_drivers.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/receiptScreen/expiry_vehicles.dart';
 
 class ExpiryList extends StatelessWidget {
   static const routeName = '/expiry-list';
 
-  final myProducts =
-      List<String>.generate(20, (i) => '2021-12-${i + 1}      Driver Name');
-
   @override
   Widget build(BuildContext context) {
-    final reportType =
-        ModalRoute.of(context)! .settings.arguments as String;
-
+    final reportType = ModalRoute.of(context)?.settings.arguments.toString();
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -21,21 +18,14 @@ class ExpiryList extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              reportType,
+              reportType ?? '',
               style: kTextTitleStyle,
             ),
-            const Divider(
-              color: Colors.red,
-            ),
+            const Divider(),
             Expanded(
-              child: ListView.builder(
-                itemCount: myProducts.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(myProducts[index]),
-                  );
-                },
-              ),
+              child: reportType == 'registration' || reportType == 'license'
+                  ? ExpiryVehicle(reportType)
+                  : ExpiryDrivers(reportType),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,

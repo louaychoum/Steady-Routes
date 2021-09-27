@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:steadyroutes/screens/driverDashboardScreen/check_in_screen.dart';
-import 'package:steadyroutes/screens/driverDashBoardScreen/check_out_screen.dart';
-import 'package:steadyroutes/screens/driverDashBoardScreen/upload_receipt_screen.dart';
+import 'package:steadyroutes/pages/driverDashboardScreen/check_in_screen.dart';
+import 'package:steadyroutes/pages/driverDashBoardScreen/check_out_screen.dart';
+import 'package:steadyroutes/pages/driverDashBoardScreen/upload_receipt_screen.dart';
 import 'package:steadyroutes/services/auth_service.dart';
 import 'package:steadyroutes/widgets/dashboard_button.dart';
 

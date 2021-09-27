@@ -1,12 +1,16 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 
 import 'package:steadyroutes/helpers/geolocator.dart';
-import 'package:steadyroutes/screens/driverDashBoardScreen/driver_dashboard_screen.dart';
+import 'package:steadyroutes/models/location.dart';
+import 'package:steadyroutes/services/auth_service.dart';
 import 'package:steadyroutes/services/navigator_sevice.dart';
+import 'package:steadyroutes/services/steady_api_service.dart';
+import 'package:steadyroutes/widgets/dashboard_button.dart';
+import 'package:steadyroutes/widgets/error_dialog.dart';
 import 'package:steadyroutes/widgets/mall_dropdown.dart';
+import 'package:steadyroutes/widgets/operation_dialog.dart';
 
 class CheckInForm extends StatefulWidget {
   @override
@@ -15,113 +19,108 @@ class CheckInForm extends StatefulWidget {
 
 class _CheckInFormState extends State<CheckInForm> {
   late DateTime now;
-  late String selectedValue;
+  late Position position;
+  Location? selectedLocation;
+  late String jwt;
   bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
 
-  Future<void> _showMyDialog(Position pos, String value, String time) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('\u{2705} Operation Successful'),
-          content: Text(
-            'Checked In At ${pos.latitude} , ${pos.longitude} \nMall: $value \nAt time: $time',
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                NavigationService.popUntilRoot();
-              },
-              child: const Text('Approve'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  List<String> mallData = ['Mall1', 'Mall2'];
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Spacer(
-            flex: 4,
-          ),
-          MallDropdown(
-            (newVal) {
-              selectedValue = newVal!;
-            },
-          ),
-          const Spacer(),
-          if (isLoading)
-            const Center(child: CircularProgressIndicator())
-          else
-            ElevatedButton(
-              onPressed: () async {
-                if (_formKey.currentState != null) {
-                  if (_formKey.currentState!.validate()) {
-                    setState(() {
-                      isLoading = true;
-                    });
-                    now = DateTime.now();
-                    final String convertedDateTime =
-                        "${now.year.toString()}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString()}-${now.minute.toString()}";
-                    try {
-                      final Position position = await determinePosition();
-                      //Todo handle errors
-                      _showMyDialog(position, selectedValue, convertedDateTime);
-                      setState(() {
-                        isLoading = false;
-                      });
-                    } on TimeoutException catch (e) {
-                      setState(() {
-                        isLoading = false;
-                      });
-
-                      debugPrint('timeout $e');
-                    } catch (e) {
-                      setState(() {
-                        isLoading = false;
-                      });
-                      if (e == 'LOCATION_NOT_ENABLED') {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content:
-                                const Text('Please enable location services'),
-                            action: SnackBarAction(
-                              label: 'Enable Location',
-                              onPressed: () {
-                                Geolocator.openLocationSettings();
-                              },
-                            ),
-                          ),
+    return Consumer<SteadyApiService>(
+      builder: (context, api, child) {
+        final auth = Provider.of<AuthService>(context, listen: false);
+        jwt = auth.user.token;
+        return Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Spacer(
+                flex: 4,
+              ),
+              MallDropDown(
+                jwt: jwt,
+                api: api,
+                savedValue: (Location? value) {
+                  selectedLocation = value;
+                },
+              ),
+              if (isLoading)
+                const Center(
+                  child: CircularProgressIndicator(),
+                )
+              else
+                DashboardButton(
+                  'Check In',
+                  () async {
+                    if (_formKey.currentState != null) {
+                      if (_formKey.currentState != null) {
+                        final isValid = _formKey.currentState?.validate();
+                        if (isValid != null && !isValid) return;
+                        _formKey.currentState?.save();
+                        now = DateTime.now();
+                        final String convertedDateTime =
+                            "${now.year.toString()}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString()}-${now.minute.toString()}";
+                        setState(
+                          () => isLoading = true,
                         );
+                        try {
+                          position = await determinePosition();
+                          final addedCheck =
+                              await api.attendanceService.addAttendance(
+                            action: 'checkin',
+                            date: now.toIso8601String(),
+                            driver: auth.driver,
+                            locationId: selectedLocation?.id,
+                            lat: position.latitude,
+                            long: position.longitude,
+                            token: jwt,
+                          );
+                          setState(() {
+                            isLoading = false;
+                          });
+                          if (addedCheck != null && addedCheck.isNotEmpty) {
+                            throw addedCheck;
+                          }
+                          showMyDialog(
+                            context: context,
+                            message:
+                                'Checked In At ${position.latitude} , ${position.longitude}\nMall: ${selectedLocation?.address}\nAt time: $convertedDateTime',
+                          );
+//Todo handle errors
+                        } catch (error) {
+                          setState(() {
+                            isLoading = false;
+                          });
+                          if (error == 'LOCATION_NOT_ENABLED') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text(
+                                    'Please enable location services'),
+                                action: SnackBarAction(
+                                  label: 'Enable Location',
+                                  onPressed: () {
+                                    Geolocator.openLocationSettings();
+                                  },
+                                ),
+                              ),
+                            );
+                          } else {
+                            await buildErrorDialog(error);
+                          }
+                        }
                       }
-                      debugPrint('error is $e');
                     }
-                  }
-                }
-              },
-              child: const Text('Check In'),
-            ),
-          const Spacer(
-            flex: 4,
-          )
-        ],
-      ),
+                  },
+                ),
+              const Spacer(
+                flex: 4,
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 }

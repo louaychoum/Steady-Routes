@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/vehicleScreen/add_vehicle_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/vehicleScreen/add_vehicle_screen.dart';
 import 'package:steadyroutes/widgets/vehicles_listview.dart';
 
 class VehicleList extends StatelessWidget {
@@ -17,8 +17,9 @@ class VehicleList extends StatelessWidget {
             icon: const Icon(
               Icons.add,
             ),
-            onPressed: () =>
-                Navigator.of(context).pushNamed(AddVehicle.routeName),
+            onPressed: () => Navigator.of(context).pushReplacementNamed(
+              AddVehicle.routeName,
+            ),
           ),
         ],
       ),
@@ -31,9 +32,7 @@ class VehicleList extends StatelessWidget {
               'Vehicles List',
               style: kTextTitleStyle,
             ),
-            const Divider(
-              color: Colors.red,
-            ),
+            const Divider(),
             Expanded(
               child: VehiclesListView(),
             ),

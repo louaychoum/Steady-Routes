@@ -11,7 +11,7 @@
   },
   "body" : {
     "receipts" : [
-      { "id" : 1, "date" : "14/07/2024", "url": "https://image.freepik.com/free-vector/paper-cash-sell-receipt_97886-2342.jpg", "cashAmount": 3400.10, "status": "", "driverId": 1},
+      { "id" : 1, "date" : "14/07/2024", "url": "https://image.freepik.com/free-vector/paper-cash-sell-receipt_97886-2342.jpg", "cashAmount": 3400.10, "status": "", "driverId": "60871d8c49edc2abddcd152e"},
       { "id" : 2, "date" : "30/01/2026", "url": "https://image.freepik.com/free-vector/paper-cash-sell-receipt_97886-2342.jpg", "cashAmount": 130001.99, "status": "approved", "driverId": 2},
       { "id" : 3, "date" : "25/11/2030", "url": "https://image.freepik.com/free-vector/paper-cash-sell-receipt_97886-2342.jpg", "cashAmount": 555000.97, "status": "rejected", "driverId":3}
     ]

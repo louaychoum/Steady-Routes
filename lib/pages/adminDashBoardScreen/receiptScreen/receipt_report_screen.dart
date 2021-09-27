@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
-import 'package:steadyroutes/widgets/expiry_info.dart';
+import 'package:steadyroutes/widgets/report_info.dart';
 
-class ExpiryReport extends StatefulWidget {
-  static const routeName = '/expiry-report';
+class ReceiptReport extends StatefulWidget {
+  static const routeName = '/add-report';
 
   @override
-  _ExpiryReportState createState() => _ExpiryReportState();
+  _ReceiptReportState createState() => _ReceiptReportState();
 }
 
-class _ExpiryReportState extends State<ExpiryReport> {
+class _ReceiptReportState extends State<ReceiptReport> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,18 +18,15 @@ class _ExpiryReportState extends State<ExpiryReport> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text(
-              'Near Expiry Report',
+              'Generate Report',
               style: kTextTitleStyle,
             ),
-            const Divider(
-              color: Colors.red,
-            ),
+            const Divider(),
             Expanded(
-              flex: 8,
-              child: ExpiryInfo(),
+              child: ReportInfo(),
             ),
           ],
         ),

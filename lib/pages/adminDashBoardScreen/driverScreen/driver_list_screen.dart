@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:steadyroutes/helpers/constants.dart';
-import 'package:steadyroutes/screens/adminDashBoardScreen/driverScreen/add_driver_screen.dart';
+import 'package:steadyroutes/pages/adminDashBoardScreen/driverScreen/add_driver_screen.dart';
 import 'package:steadyroutes/widgets/drivers_listview.dart';
 
 class DriverList extends StatelessWidget {
@@ -19,8 +19,9 @@ class DriverList extends StatelessWidget {
             icon: const Icon(
               Icons.add,
             ),
-            onPressed: () =>
-                Navigator.of(context).pushNamed(AddDriver.routeName),
+            onPressed: () => Navigator.of(context).pushReplacementNamed(
+              AddDriver.routeName,
+            ),
           ),
         ],
       ),
@@ -33,9 +34,7 @@ class DriverList extends StatelessWidget {
               'Drivers List',
               style: kTextTitleStyle,
             ),
-            const Divider(
-              color: Colors.red,
-            ),
+            const Divider(),
             Expanded(
               child: DriversListView(),
             ),

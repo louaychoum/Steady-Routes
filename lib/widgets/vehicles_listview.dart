@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:steadyroutes/screens/adminDashboardScreen/vehicleScreen/add_vehicle_screen.dart';
+import 'package:steadyroutes/pages/adminDashboardScreen/vehicleScreen/add_vehicle_screen.dart';
+import 'package:steadyroutes/services/auth_service.dart';
+import 'package:steadyroutes/services/navigator_sevice.dart';
 import 'package:steadyroutes/services/steady_api_service.dart';
 
 class VehiclesListView extends StatefulWidget {
@@ -12,6 +14,8 @@ class VehiclesListView extends StatefulWidget {
 class _VehiclesListViewState extends State<VehiclesListView> {
   final _refreshKey = GlobalKey<RefreshIndicatorState>();
   late String jwt;
+  late String courierId;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -19,65 +23,161 @@ class _VehiclesListViewState extends State<VehiclesListView> {
     WidgetsBinding.instance!
         .addPostFrameCallback((_) => _refreshKey.currentState!.show());
   }
-  // var _isInit = true;
-  // var _isLoading = false;
 
-  // @override
-  // void didChangeDependencies() {
-  //   if (_isInit) {
-  //     setState(() {
-  //       _isLoading = true;
-  //     });
-  //     Provider.of<Vehicles>(context).fetchVehicles().then((_) {
-  //       setState(() {
-  //         _isLoading = false;
-  //       });
-  //     });
-  //   }
-  //   _isInit = false;
-  //   super.didChangeDependencies();
-  // }
+  Future<void> fetchVehicles(SteadyApiService api) {
+    setState(() {
+      isLoading = true;
+    });
+    return api.vehiclesService
+        .fetchVehicles(
+      jwt,
+      courierId,
+    )
+        .then(
+      (value) {
+        if (!value) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Failed to get vehicles'),
+              action: SnackBarAction(
+                label: 'Try Again',
+                onPressed: () => {
+                  setState(() {
+                    isLoading = true;
+                  }),
+                  fetchVehicles(api).whenComplete(
+                    () => {
+                      setState(() {
+                        isLoading = false;
+                      }),
+                    },
+                  ),
+                },
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    // final vehicleData = Provider.of<Vehicles>(context);
-    // final vehicles = vehicleData.vehicles;
-
-    return
-        // _isLoading
-        //     ? const Center(
-        //         child: CircularProgressIndicator(),
-        //       )
-        //     : vehicles.isEmpty
-        //         ? const Center(
-        //             child: Text('No vehicles added yetpackage:steadyroutes.'),
-        //           )
-        //         :
-        Consumer<SteadyApiService>(
+    return Consumer<SteadyApiService>(
       builder: (context, api, child) {
+        final auth = Provider.of<AuthService>(context, listen: false);
+        final vehiclesList = api.vehiclesService.vehicles;
         return RefreshIndicator(
           key: _refreshKey,
           onRefresh: () {
-            // jwt = Provider.of<AuthService>(context, listen: false).user.jwt;
-            jwt = '';
-            return api.vehiclesService.fetchVehicles(jwt);
+            jwt = auth.user.token;
+            courierId = auth.courier?.id ?? '';
+            return fetchVehicles(api).whenComplete(() => {
+                  if (mounted)
+                    {
+                      setState(() {
+                        isLoading = false;
+                      }),
+                    },
+                });
           },
-          child: ListView.builder(
-            itemCount: api.vehiclesService.vehicles == null
-                ? 0
-                : api.vehiclesService.vehicles.length,
-            itemBuilder: (context, index) {
-              final vehicles = api.vehiclesService.vehicles[index];
-              return ListTile(
-                title: Text(vehicles.name),
-                trailing: Text(vehicles.plateNumber),
-                onTap: () => Navigator.of(context).pushNamed(
-                  AddVehicle.routeName,
-                  arguments: api.vehiclesService.findById(vehicles.id),
+          child: vehiclesList.isNotEmpty
+              ? ListView.builder(
+                  itemCount: vehiclesList.length,
+                  itemBuilder: (context, index) {
+                    final vehicle = vehiclesList[index];
+                    return Dismissible(
+                      background: Container(
+                        color: Colors.red,
+                        child: const Icon(Icons.delete),
+                      ),
+                      direction: DismissDirection.endToStart,
+                      onDismissed: (direction) {
+                        setState(() {
+                          // final deletedVehicle = vehiclesList.removeAt(index);
+                          final deletedVehicle = vehicle;
+                          api.vehiclesService.deleteVehicle(
+                            jwt,
+                            vehicle.id ?? '',
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("${vehicle.name} was deleted"),
+                              // action: SnackBarAction(
+                              //   label: 'Undo',
+                              //   onPressed: () => setState(
+                              //     () =>
+                              //         driversList.insert(index, deletedDriver),
+                              //   ),
+                              // ),
+                            ),
+                          );
+                        });
+                        WidgetsBinding.instance?.addPostFrameCallback(
+                          (_) => _refreshKey.currentState?.show(),
+                        );
+                      },
+                      confirmDismiss: (direction) {
+                        return showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text("Confirm"),
+                              content: const Text(
+                                  "Are you sure you wish to delete this driver?"),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(true),
+                                  child: const Text("DELETE"),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
+                                  child: const Text("CANCEL"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      key: UniqueKey(),
+                      child: ListTile(
+                        title: Text(vehicle.name),
+                        trailing: Text(vehicle.plateNumber),
+                        onTap: () => NavigationService.navigateToWithArguments(
+                          AddVehicle.routeName,
+                          api.vehiclesService.findById(vehicle.id ?? ''),
+                        )?.then(
+                          (value) =>
+                              WidgetsBinding.instance?.addPostFrameCallback(
+                            (_) => _refreshKey.currentState?.show(),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      'No vehicles added yet...',
+                      textAlign: TextAlign.center,
+                    ),
+                    TextButton(
+                      onPressed: () => fetchVehicles(api).whenComplete(() {
+                        setState(() {
+                          isLoading = false;
+                        });
+                      }),
+                      child: isLoading
+                          ? const CircularProgressIndicator()
+                          : const Text('Refresh'),
+                    )
+                  ],
                 ),
-              );
-            },
-          ),
         );
       },
     );

@@ -1,82 +1,155 @@
-import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
+import 'package:steadyroutes/helpers/constants.dart';
+import 'package:steadyroutes/models/user.dart';
 
 class Driver {
-  final int id;
+  final String? id;
   final String name;
-  final String username;
-  final String plateNumber;
-  final int drivingLicense;
-  final String drivingLicenseExDate; //*may require change
-  final String company;
+  final int? phone;
+  final String licenseNo;
+  final String vehicleId;
+  final String? zoneId; //todo add in new driver page
+  final String? courierId; //todo add in new driver page
+  final DateTime licenseExpiryDate;
   final String passportNumber;
-  final String passportExDate; //*may require change
-  final int visaNumber; //*may require change
-  final String visaExDate; //*may require change
+  final DateTime passportExDate;
+  final String? visaNumber;
+  final DateTime visaExDate;
+  final String? email;
+  final String? password;
+  final User? user;
 
   Driver({
-    required this.id,
+    this.id,
     required this.name,
-    required this.username,
-    required this.plateNumber,
-    required this.drivingLicense,
-    required this.drivingLicenseExDate,
-    required this.company,
+    required this.user,
+    required this.email,
+    required this.password,
+    required this.courierId,
+    required this.phone,
+    required this.vehicleId,
+    required this.licenseNo,
+    required this.licenseExpiryDate,
     required this.passportNumber,
     required this.passportExDate,
     required this.visaNumber,
     required this.visaExDate,
+    required this.zoneId,
   });
+
 // Driver.fromJson(Map<String, dynamic> json)
-  Driver.fromJson(dynamic json)
-      : id = int.parse(json['id'].toString()),
+  Driver.fromJson(Map<String, dynamic> json)
+      : id = json['_id'].toString(),
         name = json['name'].toString(),
-        username = json['username'].toString(),
-        plateNumber = json['plateNumber'].toString(),
-        drivingLicense = int.parse(json['drivingLicense'].toString()),
-        drivingLicenseExDate = json['drivingLicenseExDate'].toString(),
-        company = json['company'].toString(),
+        email = json['email'].toString(),
+        password = json['password'].toString(),
+        user = json['user'] == null
+            ? null
+            : User.fromJson(json['user'] as Map<String, dynamic>),
+        courierId = json['courierId'].toString(),
+        phone = int.tryParse(json['phone'].toString()) ?? 0,
+        licenseNo = json['licenseNo'].toString(),
+        vehicleId = json['vehicleId'].toString(),
+        zoneId = json['zoneId'].toString(),
+        licenseExpiryDate = dateFormat
+            .parse(
+              json['licenseExpiryDate'].toString(),
+            )
+            .toLocal(),
         passportNumber = json['passportNumber'].toString(),
-        passportExDate = json['passportExDate'].toString(),
-        visaNumber = int.parse(json['visaNumber'].toString()),
-        visaExDate = json['visaExDate'].toString();
+        passportExDate = dateFormat
+            .parse(
+              json['passportExpiryDate'].toString(),
+            )
+            .toLocal(),
+        visaNumber = json['visaNumber'].toString(),
+        visaExDate = dateFormat
+            .parse(
+              json['visaExpiryDate'].toString(),
+            )
+            .toLocal();
+
+  Driver.fromJsonLogin(Map<String, dynamic> json)
+      : id = json['_id'].toString(),
+        name = json['name'].toString(),
+        email = json['email'].toString(),
+        password = json['password'].toString(),
+        user = json['user'] == null
+            ? null
+            : User.fromJsonLogin(
+                json['user'].toString(),
+              ),
+        courierId = json['courierId'].toString(),
+        phone = int.tryParse(json['phone'].toString()) ?? 0,
+        licenseNo = json['licenseNo'].toString(),
+        vehicleId = json['vehicleId'].toString(),
+        zoneId = json['zoneId'].toString(),
+        licenseExpiryDate = dateFormat
+            .parse(
+              json['licenseExpiryDate'].toString(),
+            )
+            .toLocal(),
+        passportNumber = json['passportNumber'].toString(),
+        passportExDate = dateFormat
+            .parse(
+              json['passportExpiryDate'].toString(),
+            )
+            .toLocal(),
+        visaNumber = json['visaNumber'].toString(),
+        visaExDate = dateFormat
+            .parse(
+              json['visaExpiryDate'].toString(),
+            )
+            .toLocal();
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
+    final data = <String, dynamic>{};
     data['name'] = name;
-    data['username'] = username;
-    data['plateNumber'] = plateNumber;
-    data['drivingLicense'] = drivingLicense;
-    data['drivingLicenseExDate'] = drivingLicenseExDate;
-    data['company'] = company;
+    data['user'] = user?.toJson();
+    data['email'] = email;
+    data['password'] = password;
+    data['courierId'] = courierId;
+    data['phone'] = phone;
+    data['vehicleId'] = vehicleId;
+    data['zoneId'] = zoneId;
+    data['licenseNo'] = licenseNo;
+    data['licenseExpiryDate'] = licenseExpiryDate;
     data['passportNumber'] = passportNumber;
-    data['passportExDate'] = passportExDate;
+    data['passportExpiryDate'] = passportExDate;
     data['visaNumber'] = visaNumber;
-    data['visaExDate'] = visaExDate;
+    data['visaExpiryDate'] = visaExDate;
     return data;
   }
 
   Driver copyWith({
-    int? id,
+    String? id,
     String? name,
-    String? username,
-    String? plateNumber,
-    int? drivingLicense,
-    String? drivingLicenseExDate, //*may require change
-    String? company,
+    String? email,
+    String? password,
+    int? phone,
+    User? user,
+    String? courierId,
+    String? zoneId,
+    String? vehicleId,
+    String? licenseNo,
+    DateTime? licenseExpiryDate, //*may require change
     String? passportNumber,
-    String? passportExDate, //*may require change
-    int? visaNumber, //*may require change
-    String? visaExDate, //*may require change
+    DateTime? passportExDate, //*may require change
+    String? visaNumber, //*may require change
+    DateTime? visaExDate, //*may require change
   }) {
     return Driver(
       id: id ?? this.id,
       name: name ?? this.name,
-      username: username ?? this.username,
-      plateNumber: plateNumber ?? this.plateNumber,
-      drivingLicense: drivingLicense ?? this.drivingLicense,
-      drivingLicenseExDate: drivingLicenseExDate ?? this.drivingLicenseExDate,
-      company: company ?? this.company,
+      email: email ?? this.email,
+      password: password ?? this.password,
+      courierId: courierId ?? this.courierId,
+      phone: phone ?? this.phone,
+      user: user ?? this.user,
+      vehicleId: vehicleId ?? this.vehicleId,
+      zoneId: zoneId ?? this.zoneId,
+      licenseNo: licenseNo ?? this.licenseNo,
+      licenseExpiryDate: licenseExpiryDate ?? this.licenseExpiryDate,
       passportNumber: passportNumber ?? this.passportNumber,
       passportExDate: passportExDate ?? this.passportExDate,
       visaNumber: visaNumber ?? this.visaNumber,
